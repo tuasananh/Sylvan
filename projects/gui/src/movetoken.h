@@ -25,22 +25,21 @@
 /*!
  * \brief A chessmove (usually SAN) token in a PGN game.
  */
-class MoveToken : public PgnToken
-{
+class MoveToken : public PgnToken {
 public:
-    /*! Creates a new MoveToken with text \a text at \ply. */
-    MoveToken(int ply, const QString& text);
+  /*! Creates a new MoveToken with text \a text at \ply. */
+  MoveToken(int ply, const QString &text);
 
-    // Inherited from PgnToken
-    virtual QString toString() const;
+  // Inherited from PgnToken
+  virtual QString toString() const;
 
 protected:
-    // Inherited from PgnToken
-    virtual void vInsert(QTextCursor& cursor);
+  // Inherited from PgnToken
+  virtual void vInsert(QTextCursor &cursor);
 
 private:
-    int m_ply;
-    QString m_text;
+  int m_ply;
+  QString m_text;
 };
 
 #endif // MOVETOKEN_H

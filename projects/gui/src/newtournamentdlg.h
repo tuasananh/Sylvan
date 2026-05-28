@@ -36,37 +36,36 @@ namespace Ui {
 class NewTournamentDialog;
 }
 
-class NewTournamentDialog : public QDialog
-{
-    Q_OBJECT
+class NewTournamentDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    explicit NewTournamentDialog(EngineManager* engineManager,
-                                 QWidget* parent = nullptr);
-    virtual ~NewTournamentDialog();
+  explicit NewTournamentDialog(EngineManager *engineManager,
+                               QWidget *parent = nullptr);
+  virtual ~NewTournamentDialog();
 
-    Tournament* createTournament(GameManager* gameManager) const;
+  Tournament *createTournament(GameManager *gameManager) const;
 
 private slots:
-    void addEngineOnDblClick(const QModelIndex& index);
-    void addEngine();
-    void removeEngine();
-    void configureEngine(const QModelIndex& index);
-    void onVariantChanged(const QString& variant);
-    void onPlayerSelectionChanged(const QItemSelection& selected,
-                                  const QItemSelection& deselected);
+  void addEngineOnDblClick(const QModelIndex &index);
+  void addEngine();
+  void removeEngine();
+  void configureEngine(const QModelIndex &index);
+  void onVariantChanged(const QString &variant);
+  void onPlayerSelectionChanged(const QItemSelection &selected,
+                                const QItemSelection &deselected);
 
 private:
-    void moveEngine(int offset);
-    bool canStart() const;
-    void readSettings();
+  void moveEngine(int offset);
+  bool canStart() const;
+  void readSettings();
 
-    EngineManager* m_srcEngineManager;
-    EngineManager* m_addedEnginesManager;
-    EngineConfigurationModel* m_srcEnginesModel;
-    EngineConfigurationModel* m_addedEnginesModel;
-    EngineConfigurationProxyModel* m_proxyModel;
-    Ui::NewTournamentDialog* ui;
+  EngineManager *m_srcEngineManager;
+  EngineManager *m_addedEnginesManager;
+  EngineConfigurationModel *m_srcEnginesModel;
+  EngineConfigurationModel *m_addedEnginesModel;
+  EngineConfigurationProxyModel *m_proxyModel;
+  Ui::NewTournamentDialog *ui;
 };
 
 #endif // NEWTOURNAMENTDIALOG_H

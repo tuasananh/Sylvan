@@ -18,23 +18,21 @@
 */
 
 #include "tournamentfactory.h"
-#include "roundrobintournament.h"
 #include "gauntlettournament.h"
 #include "knockouttournament.h"
 #include "pyramidtournament.h"
+#include "roundrobintournament.h"
 
-Tournament* TournamentFactory::create(const QString& type,
-                                      GameManager* manager,
-                                      QObject* parent)
-{
-    if (type == "round-robin")
-        return new RoundRobinTournament(manager, parent);
-    if (type == "gauntlet")
-        return new GauntletTournament(manager, parent);
-    if (type == "knockout")
-        return new KnockoutTournament(manager, parent);
-    if (type == "pyramid")
-        return new PyramidTournament(manager, parent);
+Tournament *TournamentFactory::create(const QString &type, GameManager *manager,
+                                      QObject *parent) {
+  if (type == "round-robin")
+    return new RoundRobinTournament(manager, parent);
+  if (type == "gauntlet")
+    return new GauntletTournament(manager, parent);
+  if (type == "knockout")
+    return new KnockoutTournament(manager, parent);
+  if (type == "pyramid")
+    return new PyramidTournament(manager, parent);
 
-    return nullptr;
+  return nullptr;
 }

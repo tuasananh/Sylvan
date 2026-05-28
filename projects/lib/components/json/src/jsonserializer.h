@@ -26,12 +26,11 @@
 #ifndef JSONSERIALIZER_H
 #define JSONSERIALIZER_H
 
+#include <QCoreApplication>
 #include <QString>
 #include <QVariant>
-#include <QCoreApplication>
 
 class QTextStream;
-
 
 /*!
  * \brief A JSON (JavaScript Object Notation) serializer.
@@ -50,36 +49,34 @@ class QTextStream;
  * JSON specification: http://json.org/
  * \sa JsonParser
  */
-class LIB_EXPORT JsonSerializer
-{
-	Q_DECLARE_TR_FUNCTIONS(JsonSerializer)
+class LIB_EXPORT JsonSerializer {
+  Q_DECLARE_TR_FUNCTIONS(JsonSerializer)
 
-	public:
-		/*! Creates a new serializer that operates on \a data. */
-		JsonSerializer(const QVariant& data);
-		/*!
-		 * Converts the data into JSON format and writes it to
-		 * \a stream.
-		 *
-		 * Returns false if an invalid or unsupported variant type
-		 * is encountered. Otherwise returns true.
-		 */
-		bool serialize(QTextStream& stream);
+public:
+  /*! Creates a new serializer that operates on \a data. */
+  JsonSerializer(const QVariant &data);
+  /*!
+   * Converts the data into JSON format and writes it to
+   * \a stream.
+   *
+   * Returns false if an invalid or unsupported variant type
+   * is encountered. Otherwise returns true.
+   */
+  bool serialize(QTextStream &stream);
 
-		/*! Returns true if an error occured. */
-		bool hasError() const;
-		/*! Returns a detailed description of the error. */
-		QString errorString() const;
+  /*! Returns true if an error occured. */
+  bool hasError() const;
+  /*! Returns a detailed description of the error. */
+  QString errorString() const;
 
-	private:
-		bool serializeNode(QTextStream& stream,
-				   const QVariant& node,
-				   int indentLevel);
-		void setError(const QString& message);
+private:
+  bool serializeNode(QTextStream &stream, const QVariant &node,
+                     int indentLevel);
+  void setError(const QString &message);
 
-		bool m_error;
-		const QVariant m_data;
-		QString m_errorString;
+  bool m_error;
+  const QVariant m_data;
+  QString m_errorString;
 };
 
 #endif // JSONSERIALIZER_H

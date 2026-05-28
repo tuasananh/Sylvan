@@ -30,41 +30,34 @@ class TimeControlDialog;
 /*!
  * \brief A dialog for setting a chess game's time controls
  */
-class TimeControlDialog : public QDialog
-{
-    Q_OBJECT
+class TimeControlDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /*!
-         * Creates a new time control dialog.
-         *
-         * The dialog is initialized according to \a tc.
-         */
-    explicit TimeControlDialog(const TimeControl& tc,
-                               QWidget *parent = nullptr);
-    /*! Destroys the dialog. */
-    virtual ~TimeControlDialog();
+  /*!
+   * Creates a new time control dialog.
+   *
+   * The dialog is initialized according to \a tc.
+   */
+  explicit TimeControlDialog(const TimeControl &tc, QWidget *parent = nullptr);
+  /*! Destroys the dialog. */
+  virtual ~TimeControlDialog();
 
-    /*! Returns the time control that was set in the dialog. */
-    TimeControl timeControl() const;
+  /*! Returns the time control that was set in the dialog. */
+  TimeControl timeControl() const;
 
 private slots:
-    void onTournamentSelected();
-    void onTimePerMoveSelected();
-    void onInfiniteSelected();
+  void onTournamentSelected();
+  void onTimePerMoveSelected();
+  void onInfiniteSelected();
 
 private:
-    enum TimeUnit
-    {
-        Seconds,
-        Minutes,
-        Hours
-    };
+  enum TimeUnit { Seconds, Minutes, Hours };
 
-    int timeToMs() const;
-    void setTime(int ms);
+  int timeToMs() const;
+  void setTime(int ms);
 
-    Ui::TimeControlDialog *ui;
+  Ui::TimeControlDialog *ui;
 };
 
 #endif // TIMECONTROLDIALOG_H

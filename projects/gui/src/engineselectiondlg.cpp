@@ -17,37 +17,32 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "engineconfigproxymodel.h"
 #include "engineselectiondlg.h"
+#include "engineconfigproxymodel.h"
 #include "ui_engineselectiondlg.h"
 
-EngineSelectionDialog::EngineSelectionDialog(EngineConfigurationProxyModel* model,
-                                             QWidget* parent)
-    : QDialog(parent),
-      m_model(model),
-      ui(new Ui::EngineSelectionDialog)
-{
-    Q_ASSERT(model != nullptr);
-    ui->setupUi(this);
+EngineSelectionDialog::EngineSelectionDialog(
+    EngineConfigurationProxyModel *model, QWidget *parent)
+    : QDialog(parent), m_model(model), ui(new Ui::EngineSelectionDialog) {
+  Q_ASSERT(model != nullptr);
+  ui->setupUi(this);
 
-    ui->m_enginesList->setModel(m_model);
+  ui->m_enginesList->setModel(m_model);
 
-    connect(ui->m_engineFilterEdit, SIGNAL(textChanged(QString)),
-            m_model, SLOT(setFilterWildcard(QString)));
+  connect(ui->m_engineFilterEdit, SIGNAL(textChanged(QString)), m_model,
+          SLOT(setFilterWildcard(QString)));
 }
 
-EngineSelectionDialog::~EngineSelectionDialog()
-{
-    m_model->setFilterWildcard(QString());
-    delete ui;
+EngineSelectionDialog::~EngineSelectionDialog() {
+  m_model->setFilterWildcard(QString());
+  delete ui;
 }
 
-QItemSelection EngineSelectionDialog::selection() const
-{
-    return m_model->mapSelectionToSource(ui->m_enginesList->selectionModel()->selection());
+QItemSelection EngineSelectionDialog::selection() const {
+  return m_model->mapSelectionToSource(
+      ui->m_enginesList->selectionModel()->selection());
 }
 
-QListView* EngineSelectionDialog::enginesList() const
-{
-    return ui->m_enginesList;
+QListView *EngineSelectionDialog::enginesList() const {
+  return ui->m_enginesList;
 }

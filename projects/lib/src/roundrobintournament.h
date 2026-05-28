@@ -28,27 +28,26 @@
  * In a Round-robin tournament each player meets all
  * other contestants in turn.
  */
-class LIB_EXPORT RoundRobinTournament : public Tournament
-{
-    Q_OBJECT
+class LIB_EXPORT RoundRobinTournament : public Tournament {
+  Q_OBJECT
 
 public:
-    /*! Creates a new Round-robin tournament. */
-    explicit RoundRobinTournament(GameManager* gameManager,
-                                  QObject *parent = nullptr);
-    // Inherited from Tournament
-    virtual QString type() const;
+  /*! Creates a new Round-robin tournament. */
+  explicit RoundRobinTournament(GameManager *gameManager,
+                                QObject *parent = nullptr);
+  // Inherited from Tournament
+  virtual QString type() const;
 
 protected:
-    // Inherited from Tournament
-    virtual void initializePairing();
-    virtual int gamesPerCycle() const;
-    virtual TournamentPair* nextPair(int gameNumber);
+  // Inherited from Tournament
+  virtual void initializePairing();
+  virtual int gamesPerCycle() const;
+  virtual TournamentPair *nextPair(int gameNumber);
 
 private:
-    int m_pairNumber;
-    QList<int> m_topHalf;
-    QList<int> m_bottomHalf;
+  int m_pairNumber;
+  QList<int> m_topHalf;
+  QList<int> m_bottomHalf;
 };
 
 #endif // ROUNDROBINTOURNAMENT_H

@@ -30,42 +30,31 @@
 
 class QTextDocument;
 
-class PgnHighlighter : public QSyntaxHighlighter
-{
-	Q_OBJECT
+class PgnHighlighter : public QSyntaxHighlighter {
+  Q_OBJECT
 
-	public:
-		enum Construct
-		{
-			Tag,
-			String,
-			MoveNumber,
-			Result,
-			Comment,
-			LastConstrcut = Comment
-		};
+public:
+  enum Construct {
+    Tag,
+    String,
+    MoveNumber,
+    Result,
+    Comment,
+    LastConstrcut = Comment
+  };
 
-		PgnHighlighter(QTextDocument* document);
+  PgnHighlighter(QTextDocument *document);
 
-		void setFormatFor(Construct construct, const QTextCharFormat& format);
-		QTextCharFormat formatFor(Construct construct) const;
+  void setFormatFor(Construct construct, const QTextCharFormat &format);
+  QTextCharFormat formatFor(Construct construct) const;
 
-	protected:
-		enum State
-		{
-			NormalState = -1,
-			InTag,
-			InString,
-			InMoveNumber,
-			InComment
-		};
+protected:
+  enum State { NormalState = -1, InTag, InString, InMoveNumber, InComment };
 
-		void highlightBlock(const QString& text);
+  void highlightBlock(const QString &text);
 
-	private:
-		QTextCharFormat m_formats[LastConstrcut + 1];
-
+private:
+  QTextCharFormat m_formats[LastConstrcut + 1];
 };
 
 #endif // PGN_HIGHLIGHTER_H
-

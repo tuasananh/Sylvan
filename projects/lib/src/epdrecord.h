@@ -20,8 +20,8 @@
 #ifndef EPDRECORD_H
 #define EPDRECORD_H
 
-#include <QStringList>
 #include <QMap>
+#include <QStringList>
 
 class QTextStream;
 
@@ -43,34 +43,33 @@ class QTextStream;
  *
  * \sa OpeningSuite
  */
-class LIB_EXPORT EpdRecord
-{
+class LIB_EXPORT EpdRecord {
 public:
-    /*! Creates a new empty EPD record. */
-    EpdRecord();
+  /*! Creates a new empty EPD record. */
+  EpdRecord();
 
-    /*!
-         * Reads and parses a record from \a stream.
-         * Returns true if successful; otherwise returns false.
-         */
-    bool parse(QTextStream& stream);
-    /*!
-         * Returns true if the record contains an opcode that
-         * matches \a opcode; otherwise returns false.
-         */
-    bool hasOpcode(const QString& opcode) const;
-    /*! Returns the record's FEN string. */
-    QString fen() const;
-    /*!
-         * Returns the list of operands for \a opcode.
-         * An empty list is returned if the operation doesn't
-         * have any operands.
-         */
-    QStringList operands(const QString& opcode) const;
+  /*!
+   * Reads and parses a record from \a stream.
+   * Returns true if successful; otherwise returns false.
+   */
+  bool parse(QTextStream &stream);
+  /*!
+   * Returns true if the record contains an opcode that
+   * matches \a opcode; otherwise returns false.
+   */
+  bool hasOpcode(const QString &opcode) const;
+  /*! Returns the record's FEN string. */
+  QString fen() const;
+  /*!
+   * Returns the list of operands for \a opcode.
+   * An empty list is returned if the operation doesn't
+   * have any operands.
+   */
+  QStringList operands(const QString &opcode) const;
 
 private:
-    QString m_fen;
-    QMap<QString, QStringList> m_operations;
+  QString m_fen;
+  QMap<QString, QStringList> m_operations;
 };
 
 #endif // EPDRECORD_H

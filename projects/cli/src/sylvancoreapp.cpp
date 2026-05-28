@@ -16,100 +16,89 @@
 */
 
 #include "sylvancoreapp.h"
+#include <QDir>
+#include <QFileInfo>
 #include <QSettings>
 #include <QTime>
-#include <QFileInfo>
-#include <QDir>
-#include <mersenne.h>
+#include <cstdio>
+#include <cstdlib>
 #include <enginemanager.h>
 #include <gamemanager.h>
-#include <cstdlib>
-#include <cstdio>
+#include <mersenne.h>
 
+SylvanCoreApplication::SylvanCoreApplication(int &argc, char *argv[])
+    : QCoreApplication(argc, argv), m_engineManager(nullptr),
+      m_gameManager(nullptr) {
+  Mersenne::initialize(QTime(0, 0, 0).msecsTo(QTime::currentTime()));
 
-SylvanCoreApplication::SylvanCoreApplication(int& argc, char* argv[])
-	: QCoreApplication(argc, argv),
-	  m_engineManager(nullptr),
-	  m_gameManager(nullptr)
-{
-	Mersenne::initialize(QTime(0,0,0).msecsTo(QTime::currentTime()));
+  QCoreApplication::setOrganizationName(QLatin1String("EterCyber"));
+  QCoreApplication::setApplicationName(QLatin1String("Sylvan"));
 
-    QCoreApplication::setOrganizationName(QLatin1String("EterCyber"));
-    QCoreApplication::setApplicationName(QLatin1String("Sylvan"));
+  // Use Ini format on all platforms
+  QSettings::setDefaultFormat(QSettings::IniFormat);
 
-	// Use Ini format on all platforms
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+  qInstallMessageHandler(SylvanCoreApplication::messageHandler);
 
-    qInstallMessageHandler(SylvanCoreApplication::messageHandler);
-
-	// Load the engines
-	QString configFile("engines.json");
-	if (!QFile::exists(configFile))
-		configFile = configPath() + "/" + configFile;
-	engineManager()->loadEngines(configFile);
+  // Load the engines
+  QString configFile("engines.json");
+  if (!QFile::exists(configFile))
+    configFile = configPath() + "/" + configFile;
+  engineManager()->loadEngines(configFile);
 }
 
-SylvanCoreApplication::~SylvanCoreApplication()
-{
-}
+SylvanCoreApplication::~SylvanCoreApplication() {}
 
 void SylvanCoreApplication::messageHandler(QtMsgType type,
-					      const QMessageLogContext &context,
-					      const QString &message)
-{
-	QByteArray msg = message.toLocal8Bit();
-	switch (type)
-	{
-	case QtInfoMsg:
-		fprintf(stdout, "%s\n", msg.constData());
-		break;
-	case QtDebugMsg:
-		fprintf(stdout, "Debug: %s\n", msg.constData());
-		break;
-	case QtWarningMsg:
-		fprintf(stderr, "Warning: %s\n", msg.constData());
-		break;
-	case QtCriticalMsg:
-		fprintf(stderr, "Critical: %s (%s:%u, %s)\n", msg.constData(),
-			context.file, context.line, context.function);
-		break;
-	case QtFatalMsg:
-		fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", msg.constData(),
-			context.file, context.line, context.function);
-		abort();
-	}
+                                           const QMessageLogContext &context,
+                                           const QString &message) {
+  QByteArray msg = message.toLocal8Bit();
+  switch (type) {
+  case QtInfoMsg:
+    fprintf(stdout, "%s\n", msg.constData());
+    break;
+  case QtDebugMsg:
+    fprintf(stdout, "Debug: %s\n", msg.constData());
+    break;
+  case QtWarningMsg:
+    fprintf(stderr, "Warning: %s\n", msg.constData());
+    break;
+  case QtCriticalMsg:
+    fprintf(stderr, "Critical: %s (%s:%u, %s)\n", msg.constData(), context.file,
+            context.line, context.function);
+    break;
+  case QtFatalMsg:
+    fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", msg.constData(), context.file,
+            context.line, context.function);
+    abort();
+  }
 }
 
-QString SylvanCoreApplication::configPath()
-{
-	// QDesktopServices requires QtGui
-	QSettings settings;
-	QFileInfo fi(settings.fileName());
-	QDir dir(fi.absolutePath());
+QString SylvanCoreApplication::configPath() {
+  // QDesktopServices requires QtGui
+  QSettings settings;
+  QFileInfo fi(settings.fileName());
+  QDir dir(fi.absolutePath());
 
-	if (!dir.exists())
-		dir.mkpath(fi.absolutePath());
+  if (!dir.exists())
+    dir.mkpath(fi.absolutePath());
 
-	return fi.absolutePath();
+  return fi.absolutePath();
 }
 
-EngineManager* SylvanCoreApplication::engineManager()
-{
-	if (m_engineManager == nullptr)
-		m_engineManager = new EngineManager(this);
+EngineManager *SylvanCoreApplication::engineManager() {
+  if (m_engineManager == nullptr)
+    m_engineManager = new EngineManager(this);
 
-	return m_engineManager;
+  return m_engineManager;
 }
 
-GameManager* SylvanCoreApplication::gameManager()
-{
-	if (m_gameManager == nullptr)
-		m_gameManager = new GameManager(this);
+GameManager *SylvanCoreApplication::gameManager() {
+  if (m_gameManager == nullptr)
+    m_gameManager = new GameManager(this);
 
-	return m_gameManager;
+  return m_gameManager;
 }
 
-SylvanCoreApplication* SylvanCoreApplication::instance()
-{
-    return static_cast<SylvanCoreApplication*>(QCoreApplication::instance());
+SylvanCoreApplication *SylvanCoreApplication::instance() {
+  return static_cast<SylvanCoreApplication *>(QCoreApplication::instance());
 }

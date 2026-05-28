@@ -21,34 +21,31 @@
 
 namespace Chess {
 
-Side::Side(const QString& symbol)
-{
-    if (symbol == "w")
-        m_type = Red;
-    else if (symbol == "b")
-        m_type = Black;
-    else
-        m_type = NoSide;
+Side::Side(const QString &symbol) {
+  if (symbol == "w")
+    m_type = Red;
+  else if (symbol == "b")
+    m_type = Black;
+  else
+    m_type = NoSide;
 }
 
-QString Side::symbol() const
-{
-    if (m_type == Red)
-        return "w";
-    else if (m_type == Black)
-        return "b";
+QString Side::symbol() const {
+  if (m_type == Red)
+    return "w";
+  else if (m_type == Black)
+    return "b";
 
-    return QString();
+  return QString();
 }
 
-QString Side::toString() const
-{
-    if (m_type == Red)
-        return tr("Red");
-    else if (m_type == Black)
-        return tr("Black");
+QString Side::toString() const {
+  if (m_type == Red)
+    return tr("Red");
+  else if (m_type == Black)
+    return tr("Black");
 
-    return QString();
+  return QString();
 }
 
 } // namespace Chess

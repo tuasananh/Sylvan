@@ -40,72 +40,68 @@ class QProgressDialog;
  * ThreadedTask destroys itself and the progress dialog automatically
  * after the task is finished or cancelled.
  */
-class ThreadedTask : public QThread
-{
-    Q_OBJECT
+class ThreadedTask : public QThread {
+  Q_OBJECT
 
 public:
-    /*!
-         * Creates a new ThreadedTask object and initializes the
-         * progress dialog.
-         *
-         * The progress dialog is initialized with the window title
-         * \a title, label text \a labelText, and a range from
-         * \a minimum to \a maximum. The dialog is window modal and
-         * its parent is set to \a parent.
-         */
-    explicit ThreadedTask(const QString& title,
-                          const QString& labelText,
-                          int minimum,
-                          int maximum,
-                          QWidget* parent);
-    /*! Destroys the task and its progress dialog. */
-    virtual ~ThreadedTask();
+  /*!
+   * Creates a new ThreadedTask object and initializes the
+   * progress dialog.
+   *
+   * The progress dialog is initialized with the window title
+   * \a title, label text \a labelText, and a range from
+   * \a minimum to \a maximum. The dialog is window modal and
+   * its parent is set to \a parent.
+   */
+  explicit ThreadedTask(const QString &title, const QString &labelText,
+                        int minimum, int maximum, QWidget *parent);
+  /*! Destroys the task and its progress dialog. */
+  virtual ~ThreadedTask();
 
 signals:
-    /*!
-         * The reimplementation of QThread::run() should emit this
-         * signal periodically to keep the progress dialog informed
-         * of progress.
-         */
-    void progressValueChanged(int value);
-    /*!
-         * Subclasses should emit this signal when the status
-         * message (ie. the label text) is changed.
-         */
-    void statusMessageChanged(const QString& message);
+  /*!
+   * The reimplementation of QThread::run() should emit this
+   * signal periodically to keep the progress dialog informed
+   * of progress.
+   */
+  void progressValueChanged(int value);
+  /*!
+   * Subclasses should emit this signal when the status
+   * message (ie. the label text) is changed.
+   */
+  void statusMessageChanged(const QString &message);
 
 protected:
-    /*!
-         * Returns true if the user had pressed the "cancel" button
-         * on the progress dialog; otherwise returns false.
-         *
-         * The reimplementation of QThread::run() should check this
-         * value periodically and return if cancel was requested.
-         */
-    bool cancelRequested() const;
+  /*!
+   * Returns true if the user had pressed the "cancel" button
+   * on the progress dialog; otherwise returns false.
+   *
+   * The reimplementation of QThread::run() should check this
+   * value periodically and return if cancel was requested.
+   */
+  bool cancelRequested() const;
 
-    /*!
-         * Returns human-readable version of the given time \a
-         * sec.
-         */
-    QString humaniseTime(int sec) const;
+  /*!
+   * Returns human-readable version of the given time \a
+   * sec.
+   */
+  QString humaniseTime(int sec) const;
 
 private slots:
-    // Yes, QThread subclasses shouldn't normally have slots
-    // because they're executed in the wrong thread. But in this
-    // case it doesn't matter because we're just setting a flag.
-    void cancel();
+  // Yes, QThread subclasses shouldn't normally have slots
+  // because they're executed in the wrong thread. But in this
+  // case it doesn't matter because we're just setting a flag.
+  void cancel();
 
-    void updateProgress(int value);
-    void setStatusMessage(const QString& msg);
+  void updateProgress(int value);
+  void setStatusMessage(const QString &msg);
 
 private:
-    bool m_cancel;
-    QString m_statusMessage;
-    QTime m_taskStart;
-    int m_lastUpdate;
-    QProgressDialog* m_dlg;
+  bool m_cancel;
+  QString m_statusMessage;
+  QTime m_taskStart;
+  int m_lastUpdate;
+  QProgressDialog *m_dlg;
 };
 
 #endif // THREADEDTASK_H

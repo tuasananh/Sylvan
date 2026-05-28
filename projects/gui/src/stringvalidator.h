@@ -20,8 +20,8 @@
 #ifndef STRINGVALIDATOR_H
 #define STRINGVALIDATOR_H
 
-#include <QValidator>
 #include <QModelIndex>
+#include <QValidator>
 
 class QAbstractItemModel;
 
@@ -34,29 +34,28 @@ class QAbstractItemModel;
  * \internal Later this class could be extended to use a QStringList
  * as the lookup source.
  */
-class StringValidator : public QValidator
-{
-    Q_OBJECT
+class StringValidator : public QValidator {
+  Q_OBJECT
 
 public:
-    /*! Creates a new StringValidator object. */
-    explicit StringValidator(QObject* parent = nullptr);
+  /*! Creates a new StringValidator object. */
+  explicit StringValidator(QObject *parent = nullptr);
 
-    /*! Uses \a model as the validation model. */
-    void setModel(const QAbstractItemModel* model);
-    /*!
-         * Sets the index where the lookup starts to \a index.
-         *
-         * By default \a model->index(0, 0) is used.
-         */
-    void setStartIndex(const QModelIndex& index);
+  /*! Uses \a model as the validation model. */
+  void setModel(const QAbstractItemModel *model);
+  /*!
+   * Sets the index where the lookup starts to \a index.
+   *
+   * By default \a model->index(0, 0) is used.
+   */
+  void setStartIndex(const QModelIndex &index);
 
-    // Inherited from QValidator
-    virtual State validate(QString& input, int& pos) const;
+  // Inherited from QValidator
+  virtual State validate(QString &input, int &pos) const;
 
 private:
-    const QAbstractItemModel* m_model;
-    QModelIndex m_startIndex;
+  const QAbstractItemModel *m_model;
+  QModelIndex m_startIndex;
 };
 
 #endif // STRINGVALIDATOR_H

@@ -26,25 +26,24 @@
 class EngineManager;
 class GameManager;
 
-class SylvanCoreApplication : public QCoreApplication
-{
-	Q_OBJECT
+class SylvanCoreApplication : public QCoreApplication {
+  Q_OBJECT
 
-	public:
-        SylvanCoreApplication(int& argc, char* argv[]);
-        virtual ~SylvanCoreApplication();
+public:
+  SylvanCoreApplication(int &argc, char *argv[]);
+  virtual ~SylvanCoreApplication();
 
-		QString configPath();
-		EngineManager* engineManager();
-		GameManager* gameManager();
-        static SylvanCoreApplication* instance();
+  QString configPath();
+  EngineManager *engineManager();
+  GameManager *gameManager();
+  static SylvanCoreApplication *instance();
 
-		static void messageHandler(QtMsgType type,
-					   const QMessageLogContext &context,
-					   const QString &message);
-	private:
-		EngineManager* m_engineManager;
-		GameManager* m_gameManager;
+  static void messageHandler(QtMsgType type, const QMessageLogContext &context,
+                             const QString &message);
+
+private:
+  EngineManager *m_engineManager;
+  GameManager *m_gameManager;
 };
 
-#endif  // SYLVAN_CORE_APPLICATION_H
+#endif // SYLVAN_CORE_APPLICATION_H

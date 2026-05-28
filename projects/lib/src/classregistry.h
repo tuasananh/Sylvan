@@ -20,8 +20,8 @@
 #ifndef CLASSREGISTRY_H
 #define CLASSREGISTRY_H
 
-#include <QString>
 #include <QMap>
+#include <QString>
 
 /*!
  * Registers a new class.
@@ -34,8 +34,9 @@
  * \note The call to this macro should be in class \a TYPE's
  * implementation file (.cpp).
  */
-#define REGISTER_CLASS(BASE, TYPE, KEY, REGISTRY) \
-    static ClassRegistration<BASE> _class_registration_ ## TYPE(REGISTRY, &ClassRegistry<BASE>::factory<TYPE>, KEY);
+#define REGISTER_CLASS(BASE, TYPE, KEY, REGISTRY)                              \
+  static ClassRegistration<BASE> _class_registration_##TYPE(                   \
+      REGISTRY, &ClassRegistry<BASE>::factory<TYPE>, KEY);
 
 /*!
  * \brief A class for creating objects based on the class'
@@ -43,70 +44,54 @@
  *
  * The created objects of a registry must have the same base class.
  */
-template<class T>
-class ClassRegistry
-{
+template <class T> class ClassRegistry {
 public:
-    /*! Typedef to the factory function. */
-    typedef T* (*Factory)(void);
+  /*! Typedef to the factory function. */
+  typedef T *(*Factory)(void);
 
-    /*!
-         * Factory function for creating an object of type \a Subclass,
-         * which must be a subclass of \a T.
-         */
-    template<class Subclass>
-    static T* factory()
-    {
-        return new Subclass;
-    }
+  /*!
+   * Factory function for creating an object of type \a Subclass,
+   * which must be a subclass of \a T.
+   */
+  template <class Subclass> static T *factory() { return new Subclass; }
 
-    /*! Returns a list of factory functions. */
-    const QMap<QString, Factory>& items() const
-    {
-        return m_items;
-    }
-    /*! Adds a new factory associated with \a key. */
-    void add(Factory f, const QString& key)
-    {
-        m_items[key] = f;
-    }
-    /*!
-         * Creates and returns an object whose type is associated with \a key.
-         *
-         * Returns 0 if there is no type that matches \a key.
-         */
-    T* create(const QString& key)
-    {
-        if (!m_items.contains(key))
-            return nullptr;
+  /*! Returns a list of factory functions. */
+  const QMap<QString, Factory> &items() const { return m_items; }
+  /*! Adds a new factory associated with \a key. */
+  void add(Factory f, const QString &key) { m_items[key] = f; }
+  /*!
+   * Creates and returns an object whose type is associated with \a key.
+   *
+   * Returns 0 if there is no type that matches \a key.
+   */
+  T *create(const QString &key) {
+    if (!m_items.contains(key))
+      return nullptr;
 
-        return m_items[key]();
-    }
+    return m_items[key]();
+  }
 
 private:
-    QMap<QString, Factory> m_items;
+  QMap<QString, Factory> m_items;
 };
 
 /*! \brief A class for registering a new subclass of the templated class. */
-template<class T>
-class ClassRegistration
-{
+template <class T> class ClassRegistration {
 public:
-    /*!
-         * Creates a new registration object and adds (registers)
-         * a new class to a class registry.
-         *
-         * \param registry A registry where the class is added.
-         * \param factory A factory function for creating instances
-         * of the class.
-         * \param key A key (class name) associated with the class.
-         */
-    ClassRegistration(ClassRegistry<T>* registry,
-                      typename ClassRegistry<T>::Factory factory,
-                      const QString& key)
-    {
-        registry->add(factory, key);
-    }
+  /*!
+   * Creates a new registration object and adds (registers)
+   * a new class to a class registry.
+   *
+   * \param registry A registry where the class is added.
+   * \param factory A factory function for creating instances
+   * of the class.
+   * \param key A key (class name) associated with the class.
+   */
+  ClassRegistration(ClassRegistry<T> *registry,
+                    typename ClassRegistry<T>::Factory factory,
+                    const QString &key) {
+    registry->add(factory, key);
+  }
 };
 
 #endif // CLASSREGISTRY_H

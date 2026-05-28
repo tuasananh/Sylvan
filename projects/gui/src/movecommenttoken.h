@@ -25,28 +25,27 @@
 /*!
  * \brief A comment token for a move in a PGN game
  */
-class MoveCommentToken : public PgnToken
-{
+class MoveCommentToken : public PgnToken {
 public:
-    /*! Creates a new MoveCommentToken with text \a text at \a ply. */
-    MoveCommentToken(int ply, const QString& text);
+  /*! Creates a new MoveCommentToken with text \a text at \a ply. */
+  MoveCommentToken(int ply, const QString &text);
 
-    // Inherited from PgnToken
-    virtual QString toString() const;
+  // Inherited from PgnToken
+  virtual QString toString() const;
 
-    /*!
-         * Sets the comment's text to \a text.
-         * Changes to the text document have to be made separately.
-         */
-    void setValue(const QString& text);
+  /*!
+   * Sets the comment's text to \a text.
+   * Changes to the text document have to be made separately.
+   */
+  void setValue(const QString &text);
 
 protected:
-    // Inherited from PgnToken
-    virtual void vInsert(QTextCursor& cursor);
+  // Inherited from PgnToken
+  virtual void vInsert(QTextCursor &cursor);
 
 private:
-    int m_ply;
-    QString m_text;
+  int m_ply;
+  QString m_text;
 };
 
 #endif // MOVECOMMENTTOKEN_H

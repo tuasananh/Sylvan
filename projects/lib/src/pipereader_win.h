@@ -20,10 +20,10 @@
 #ifndef PIPEREADER_WIN_H
 #define PIPEREADER_WIN_H
 
-#include <windows.h>
-#include <QThread>
 #include <QMutex>
 #include <QSemaphore>
+#include <QThread>
+#include <windows.h>
 
 /*!
  * \brief A thread class for reading input from a child process
@@ -38,45 +38,44 @@
  * \note This class is for Windows only
  * \sa EngineProcess
  */
-class LIB_EXPORT PipeReader : public QThread
-{
-    Q_OBJECT
+class LIB_EXPORT PipeReader : public QThread {
+  Q_OBJECT
 
 public:
-    /*! Creates a new PipeReader and starts the read loop. */
-    PipeReader(HANDLE pipe, QObject* parent = nullptr);
+  /*! Creates a new PipeReader and starts the read loop. */
+  PipeReader(HANDLE pipe, QObject *parent = nullptr);
 
-    /*!
-         * Read up to \a maxSize bytes into \a data.
-         * \return number of bytes read or -1 if an error occurred.
-         */
-    qint64 readData(char* data, qint64 maxSize);
+  /*!
+   * Read up to \a maxSize bytes into \a data.
+   * \return number of bytes read or -1 if an error occurred.
+   */
+  qint64 readData(char *data, qint64 maxSize);
 
-    /*! Returns the number of bytes available for reading. */
-    qint64 bytesAvailable() const;
+  /*! Returns the number of bytes available for reading. */
+  qint64 bytesAvailable() const;
 
-    /*! Returns true if a complete line of data can be read. */
-    bool canReadLine() const;
+  /*! Returns true if a complete line of data can be read. */
+  bool canReadLine() const;
 
 signals:
-    /*! There's a new line of data available. */
-    void readyRead();
+  /*! There's a new line of data available. */
+  void readyRead();
 
 protected:
-    virtual void run();
+  virtual void run();
 
 private:
-    static const int BufSize = 0x8000;
+  static const int BufSize = 0x8000;
 
-    HANDLE m_pipe;
-    char m_buf[BufSize];
-    const char* const m_bufEnd;
-    char* m_start;
-    char* m_end;
-    mutable QMutex m_mutex;
-    QSemaphore m_freeBytes;
-    QSemaphore m_usedBytes;
-    int m_lastNewLine;
+  HANDLE m_pipe;
+  char m_buf[BufSize];
+  const char *const m_bufEnd;
+  char *m_start;
+  char *m_end;
+  mutable QMutex m_mutex;
+  QSemaphore m_freeBytes;
+  QSemaphore m_usedBytes;
+  int m_lastNewLine;
 };
 
 #endif // PIPEREADER_WIN_H

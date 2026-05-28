@@ -31,37 +31,36 @@
  * there are more than 2 players in a tournament. This is because the ratings
  * are calculated as if each player's results were against a single opponent.
  */
-class LIB_EXPORT Elo
-{
+class LIB_EXPORT Elo {
 public:
-    /*! Creates a new Elo object. */
-    Elo(int wins, int losses, int draws);
+  /*! Creates a new Elo object. */
+  Elo(int wins, int losses, int draws);
 
-    /*! Returns the Elo difference. */
-    qreal diff() const;
-    /*! Returns the error margin in Elo points. */
-    qreal errorMargin() const;
-    /*! Returns the ratio of points won. */
-    qreal pointRatio() const;
-    /*! Returns the ratio of drawn games. */
-    qreal drawRatio() const;
-    /*! Returns the likelihood of superiority. */
-    qreal LOS() const;
+  /*! Returns the Elo difference. */
+  qreal diff() const;
+  /*! Returns the error margin in Elo points. */
+  qreal errorMargin() const;
+  /*! Returns the ratio of points won. */
+  qreal pointRatio() const;
+  /*! Returns the ratio of drawn games. */
+  qreal drawRatio() const;
+  /*! Returns the likelihood of superiority. */
+  qreal LOS() const;
 
 private:
-    int m_wins;
-    int m_losses;
-    int m_draws;
-    qreal m_mu;
-    qreal m_stdev;
+  int m_wins;
+  int m_losses;
+  int m_draws;
+  qreal m_mu;
+  qreal m_stdev;
 
-    // Elo difference
-    static qreal diff(qreal p);
-    // Inverted error function
-    static qreal erfInv(qreal x);
-    // Quantile function for the standard Gaussian law:
-    // probability -> quantile
-    static qreal phiInv(qreal p);
+  // Elo difference
+  static qreal diff(qreal p);
+  // Inverted error function
+  static qreal erfInv(qreal x);
+  // Quantile function for the standard Gaussian law:
+  // probability -> quantile
+  static qreal phiInv(qreal p);
 };
 
 #endif // ELO_H

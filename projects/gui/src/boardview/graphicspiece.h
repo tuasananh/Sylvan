@@ -37,65 +37,61 @@ class QSvgRenderer;
  * For convenience reasons the boundingRect() of a piece should
  * be equal to that of a square on the chessboard.
  */
-class GraphicsPiece : public QGraphicsObject
-{
-    Q_OBJECT
+class GraphicsPiece : public QGraphicsObject {
+  Q_OBJECT
 
 public:
-    /*! The type value returned by type(). */
-    enum { Type = UserType + 4 };
+  /*! The type value returned by type(). */
+  enum { Type = UserType + 4 };
 
-    /*!
-         * Creates a new GraphicsPiece object of type \a piece.
-         *
-         * The painted image is scaled to fit inside a square that is
-         * \a squareSize wide and high.
-         * \a elementId is the XML ID of the piece picture which is
-         * rendered by \a renderer.
-         */
-    GraphicsPiece(const Chess::Piece& piece,
-                  qreal squareSize,
-                  const QString& elementId,
-                  QSvgRenderer* renderer,
-                  QGraphicsItem* parent = nullptr);
+  /*!
+   * Creates a new GraphicsPiece object of type \a piece.
+   *
+   * The painted image is scaled to fit inside a square that is
+   * \a squareSize wide and high.
+   * \a elementId is the XML ID of the piece picture which is
+   * rendered by \a renderer.
+   */
+  GraphicsPiece(const Chess::Piece &piece, qreal squareSize,
+                const QString &elementId, QSvgRenderer *renderer,
+                QGraphicsItem *parent = nullptr);
 
-    // Inherited from QGraphicsObject
-    virtual int type() const;
-    virtual QRectF boundingRect() const;
-    virtual void paint(QPainter* painter,
-                       const QStyleOptionGraphicsItem* option,
-                       QWidget* widget = nullptr);
+  // Inherited from QGraphicsObject
+  virtual int type() const;
+  virtual QRectF boundingRect() const;
+  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                     QWidget *widget = nullptr);
 
-    /*! Returns the type of the chess piece. */
-    Chess::Piece pieceType() const;
-    /*!
-         * Returns the container of the piece.
-         *
-         * Usually the container is the chessboard or the piece reserve.
-         * A piece can have a container even if it doesn't have a parent
-         * item.
-         */
-    QGraphicsItem* container() const;
-    /*! Sets the container to \a item. */
-    void setContainer(QGraphicsItem* item);
+  /*! Returns the type of the chess piece. */
+  Chess::Piece pieceType() const;
+  /*!
+   * Returns the container of the piece.
+   *
+   * Usually the container is the chessboard or the piece reserve.
+   * A piece can have a container even if it doesn't have a parent
+   * item.
+   */
+  QGraphicsItem *container() const;
+  /*! Sets the container to \a item. */
+  void setContainer(QGraphicsItem *item);
 
 public slots:
-    /*!
-         * Restores the parent item (container).
-         *
-         * If the piece doesn't have a parent item but does have a container,
-         * this function sets the parent item to the container. Usually this
-         * function is called after an animation or drag operation that had
-         * cleared the parent item to make the piece a top-level item.
-         */
-    void restoreParent();
+  /*!
+   * Restores the parent item (container).
+   *
+   * If the piece doesn't have a parent item but does have a container,
+   * this function sets the parent item to the container. Usually this
+   * function is called after an animation or drag operation that had
+   * cleared the parent item to make the piece a top-level item.
+   */
+  void restoreParent();
 
 private:
-    Chess::Piece m_piece;
-    QRectF m_rect;
-    QString m_elementId;
-    QSvgRenderer* m_renderer;
-    QGraphicsItem* m_container;
+  Chess::Piece m_piece;
+  QRectF m_rect;
+  QString m_elementId;
+  QSvgRenderer *m_renderer;
+  QGraphicsItem *m_container;
 };
 
 #endif // GRAPHICSPIECE_H

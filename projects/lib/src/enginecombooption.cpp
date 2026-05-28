@@ -19,48 +19,38 @@
 
 #include "enginecombooption.h"
 
-EngineComboOption::EngineComboOption(const QString& name,
-                                     const QVariant& value,
-                                     const QVariant& defaultValue,
-                                     const QStringList& choices,
-                                     const QString& alias)
+EngineComboOption::EngineComboOption(const QString &name, const QVariant &value,
+                                     const QVariant &defaultValue,
+                                     const QStringList &choices,
+                                     const QString &alias)
     : EngineOption(name, QVariant::String, value, defaultValue, alias),
-      m_choices(choices)
-{
+      m_choices(choices) {}
+
+EngineOption *EngineComboOption::copy() const {
+  return new EngineComboOption(*this);
 }
 
-EngineOption* EngineComboOption::copy() const
-{
-    return new EngineComboOption(*this);
+bool EngineComboOption::isValid(const QVariant &value) const {
+  return m_choices.contains(value.toString());
 }
 
-bool EngineComboOption::isValid(const QVariant& value) const
-{
-    return m_choices.contains(value.toString());
+QStringList EngineComboOption::choices() const { return m_choices; }
+
+void EngineComboOption::setChoices(const QStringList &choices) {
+  m_choices = choices;
 }
 
-QStringList EngineComboOption::choices() const
-{
-    return m_choices;
-}
+QVariant EngineComboOption::toVariant() const {
+  QVariantMap map;
 
-void EngineComboOption::setChoices(const QStringList& choices)
-{
-    m_choices = choices;
-}
+  map.insert("type", "combo");
 
-QVariant EngineComboOption::toVariant() const
-{
-    QVariantMap map;
+  map.insert("name", name());
+  map.insert("value", value());
+  map.insert("default", defaultValue());
+  map.insert("alias", alias());
 
-    map.insert("type", "combo");
+  map.insert("choices", choices());
 
-    map.insert("name", name());
-    map.insert("value", value());
-    map.insert("default", defaultValue());
-    map.insert("alias", alias());
-
-    map.insert("choices", choices());
-
-    return map;
+  return map;
 }

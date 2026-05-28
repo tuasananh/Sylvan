@@ -25,20 +25,17 @@
 /*!
  * \brief Provides a game tab bar for game windows.
  */
-class GameTabBar : public QTabBar
-{
-    Q_OBJECT
+class GameTabBar : public QTabBar {
+  Q_OBJECT
 
 public:
-    GameTabBar(QWidget* parent = nullptr);
+  GameTabBar(QWidget *parent = nullptr);
 
 public slots:
-    /*! Show the next tab in the tab bar. */
-    void showNextTab();
-    /*! Show the previous tab in the tab bar. */
-    void showPreviousTab();
-
+  /*! Show the next tab in the tab bar. */
+  void showNextTab();
+  /*! Show the previous tab in the tab bar. */
+  void showPreviousTab();
 };
 
 #endif // GAME_TAB_BAR_H
-

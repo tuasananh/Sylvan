@@ -33,24 +33,23 @@ class GameDatabaseSearchDialog;
  *
  * \sa GameDatabaseDialog
  */
-class GameDatabaseSearchDialog : public QDialog
-{
-    Q_OBJECT
+class GameDatabaseSearchDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /*! Constructs a new GameDatabaseSearchDialog. */
-    GameDatabaseSearchDialog(QWidget* parent = nullptr);
-    /*! Destroys the dialog. */
-    virtual ~GameDatabaseSearchDialog();
+  /*! Constructs a new GameDatabaseSearchDialog. */
+  GameDatabaseSearchDialog(QWidget *parent = nullptr);
+  /*! Destroys the dialog. */
+  virtual ~GameDatabaseSearchDialog();
 
-    /*! Returns the PGN filter. */
-    PgnGameFilter filter() const;
+  /*! Returns the PGN filter. */
+  PgnGameFilter filter() const;
 
 private slots:
-    void onResultChanged(int index);
+  void onResultChanged(int index);
 
 private:
-    Ui::GameDatabaseSearchDialog* ui;
+  Ui::GameDatabaseSearchDialog *ui;
 };
 
 #endif // GAMEDATABASESEARCHDIALOG_H

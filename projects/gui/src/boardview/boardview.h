@@ -32,31 +32,30 @@ class QTimer;
  * Unlike a pure QGraphicsView, BoardView doesn't use scrollbars and
  * always keeps the view fitted to the entire scene.
  */
-class BoardView : public QGraphicsView
-{
-    Q_OBJECT
+class BoardView : public QGraphicsView {
+  Q_OBJECT
 
 public:
-    /*! Creates a new BoardView object that displays \a scene. */
-    explicit BoardView(QGraphicsScene* scene, QWidget* parent = nullptr);
+  /*! Creates a new BoardView object that displays \a scene. */
+  explicit BoardView(QGraphicsScene *scene, QWidget *parent = nullptr);
 
-    // Inherited from QGraphicsView
-    virtual QSize sizeHint() const;
-    virtual int heightForWidth(int width) const;
+  // Inherited from QGraphicsView
+  virtual QSize sizeHint() const;
+  virtual int heightForWidth(int width) const;
 
 protected:
-    // Inherited from QGraphicsView
-    virtual void resizeEvent(QResizeEvent* event);
-    virtual void paintEvent(QPaintEvent* event);
+  // Inherited from QGraphicsView
+  virtual void resizeEvent(QResizeEvent *event);
+  virtual void paintEvent(QPaintEvent *event);
 
 private slots:
-    void fitToRect();
-    void onSceneRectChanged();
+  void fitToRect();
+  void onSceneRectChanged();
 
 private:
-    bool m_initialized;
-    QTimer* m_resizeTimer;
-    QPixmap m_resizePixmap;
+  bool m_initialized;
+  QTimer *m_resizeTimer;
+  QPixmap m_resizePixmap;
 };
 
 #endif // BOARDVIEW_H

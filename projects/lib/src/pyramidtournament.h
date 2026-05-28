@@ -28,26 +28,25 @@
  * In a Pyramid tournament each player meets all
  * of their predecessors in sequence.
  */
-class LIB_EXPORT PyramidTournament : public Tournament
-{
-    Q_OBJECT
+class LIB_EXPORT PyramidTournament : public Tournament {
+  Q_OBJECT
 
 public:
-    /*! Creates a new Pyramid tournament. */
-    explicit PyramidTournament(GameManager* gameManager,
-                               QObject *parent = nullptr);
-    // Inherited from Tournament
-    virtual QString type() const;
+  /*! Creates a new Pyramid tournament. */
+  explicit PyramidTournament(GameManager *gameManager,
+                             QObject *parent = nullptr);
+  // Inherited from Tournament
+  virtual QString type() const;
 
 protected:
-    // Inherited from Tournament
-    virtual void initializePairing();
-    virtual int gamesPerCycle() const;
-    virtual TournamentPair* nextPair(int gameNumber);
+  // Inherited from Tournament
+  virtual void initializePairing();
+  virtual int gamesPerCycle() const;
+  virtual TournamentPair *nextPair(int gameNumber);
 
 private:
-    int m_pairNumber;
-    int m_currentPlayer;
+  int m_pairNumber;
+  int m_currentPlayer;
 };
 
 #endif // PYRAMIDTOURNAMENT_H

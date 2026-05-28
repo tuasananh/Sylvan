@@ -38,48 +38,48 @@ class EngineManager;
  * %EngineConfigurationModel is a \e list based model; its items don't have
  * parent-child relationGuardp.
  *
- * Almost all of the method calls are inherited from \e QAbstractItemModel. Refer
- * to QAbstractItemModel's documentation for better overview of each method.
-*/
-class EngineConfigurationModel : public QAbstractListModel
-{
-    Q_OBJECT
+ * Almost all of the method calls are inherited from \e QAbstractItemModel.
+ * Refer to QAbstractItemModel's documentation for better overview of each
+ * method.
+ */
+class EngineConfigurationModel : public QAbstractListModel {
+  Q_OBJECT
 
 public:
-    /*!
-         * Creates an empty model.
-        */
-    EngineConfigurationModel(EngineManager* engineManager, QObject* parent = nullptr);
-    /*! Destroys the model. */
-    virtual ~EngineConfigurationModel();
+  /*!
+   * Creates an empty model.
+   */
+  EngineConfigurationModel(EngineManager *engineManager,
+                           QObject *parent = nullptr);
+  /*! Destroys the model. */
+  virtual ~EngineConfigurationModel();
 
-    /*!
-         * Returns the chosen chess variant.
-         *
-         * By default an empty string is returned, meaning that engines
-         * are not filtered by their supported variants.
-         */
-    QString chessVariant() const;
-    /*! Sets the chosen chess variant to \a variant. */
-    void setChessVariant(const QString& variant);
+  /*!
+   * Returns the chosen chess variant.
+   *
+   * By default an empty string is returned, meaning that engines
+   * are not filtered by their supported variants.
+   */
+  QString chessVariant() const;
+  /*! Sets the chosen chess variant to \a variant. */
+  void setChessVariant(const QString &variant);
 
-    // Inherited from QAbstractListModel
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex& index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation,
-                                int role = Qt::DisplayRole) const;
+  // Inherited from QAbstractListModel
+  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex &index, int role) const;
+  virtual QVariant headerData(int section, Qt::Orientation orientation,
+                              int role = Qt::DisplayRole) const;
 
 private slots:
-    void onEngineAdded(int index);
-    void onEngineAboutToBeRemoved(int index);
-    void onEngineUpdated(int index);
-    void onEnginesReset();
+  void onEngineAdded(int index);
+  void onEngineAboutToBeRemoved(int index);
+  void onEngineUpdated(int index);
+  void onEnginesReset();
 
 private:
-    EngineManager* m_engineManager;
-    QString m_chessVariant;
+  EngineManager *m_engineManager;
+  QString m_chessVariant;
 };
 
 #endif // ENGINE_CONFIGURATION_MODEL_H
-

@@ -16,152 +16,131 @@
 */
 
 #include "enginematch.h"
+#include "board/board.h"
+#include "qglobal.h"
 #include <QMultiMap>
-#include <chessplayer.h>
-#include <playerbuilder.h>
 #include <chessgame.h>
-#include <polyglotbook.h>
-#include <tournament.h>
+#include <chessplayer.h>
 #include <gamemanager.h>
+#include <playerbuilder.h>
+#include <polyglotbook.h>
 #include <sprt.h>
+#include <tournament.h>
 
-
-EngineMatch::EngineMatch(Tournament* tournament, QObject* parent)
-	: QObject(parent),
-	  m_tournament(tournament),
-	  m_debug(false),
-      m_ratingInterval(0)/*,
-      m_bookMode(OpeningBook::BookRandom)*/
+EngineMatch::EngineMatch(Tournament *tournament, QObject *parent)
+    : QObject(parent), m_tournament(tournament), m_debug(false),
+      m_ratingInterval(0) /*,
+       m_bookMode(OpeningBook::BookRandom)*/
 {
-	Q_ASSERT(tournament != nullptr);
+  Q_ASSERT(tournament != nullptr);
 
-	m_startTime.start();
+  m_startTime.start();
 }
 
-EngineMatch::~EngineMatch()
-{
-	qDeleteAll(m_books);
+EngineMatch::~EngineMatch() { qDeleteAll(m_books); }
+
+OpeningBook *EngineMatch::addOpeningBook(const QString &fileName) {
+  if (fileName.isEmpty())
+    return nullptr;
+
+  if (m_books.contains(fileName))
+    return m_books[fileName];
+
+  PolyglotBook *book = nullptr; // new PolyglotBook(m_bookMode);
+  /*if (!book->read(fileName))
+      {
+              delete book;
+              qWarning("Can't read opening book file %s",
+  qUtf8Printable(fileName)); return nullptr;
+  }*/
+
+  m_books[fileName] = book;
+  return book;
 }
 
-OpeningBook* EngineMatch::addOpeningBook(const QString& fileName)
-{
-    if (fileName.isEmpty())
-		return nullptr;
+void EngineMatch::start() {
+  connect(m_tournament, SIGNAL(finished()), this, SLOT(onTournamentFinished()));
+  connect(m_tournament, SIGNAL(gameStarted(ChessGame *, int, int, int)), this,
+          SLOT(onGameStarted(ChessGame *, int)));
+  connect(m_tournament, SIGNAL(gameFinished(ChessGame *, int, int, int)), this,
+          SLOT(onGameFinished(ChessGame *, int)));
 
-    if (m_books.contains(fileName))
-		return m_books[fileName];
+  if (m_debug)
+    connect(m_tournament->gameManager(), SIGNAL(debugMessage(QString)), this,
+            SLOT(print(QString)));
 
-    PolyglotBook* book = nullptr;//new PolyglotBook(m_bookMode);
-    /*if (!book->read(fileName))
-	{
-		delete book;
-		qWarning("Can't read opening book file %s", qUtf8Printable(fileName));
-		return nullptr;
-    }*/
-
-	m_books[fileName] = book;
-    return book;
+  QMetaObject::invokeMethod(m_tournament, "start", Qt::QueuedConnection);
 }
 
-void EngineMatch::start()
-{
-	connect(m_tournament, SIGNAL(finished()),
-		this, SLOT(onTournamentFinished()));
-	connect(m_tournament, SIGNAL(gameStarted(ChessGame*, int, int, int)),
-		this, SLOT(onGameStarted(ChessGame*, int)));
-	connect(m_tournament, SIGNAL(gameFinished(ChessGame*, int, int, int)),
-		this, SLOT(onGameFinished(ChessGame*, int)));
-
-	if (m_debug)
-		connect(m_tournament->gameManager(), SIGNAL(debugMessage(QString)),
-            this, SLOT(print(QString)));
-
-	QMetaObject::invokeMethod(m_tournament, "start", Qt::QueuedConnection);
+void EngineMatch::stop() {
+  QMetaObject::invokeMethod(m_tournament, "stop", Qt::QueuedConnection);
 }
 
-void EngineMatch::stop()
-{
-	QMetaObject::invokeMethod(m_tournament, "stop", Qt::QueuedConnection);
+void EngineMatch::setDebugMode(bool debug) { m_debug = debug; }
+
+void EngineMatch::setRatingInterval(int interval) {
+  Q_ASSERT(interval >= 0);
+  m_ratingInterval = interval;
 }
 
-void EngineMatch::setDebugMode(bool debug)
-{
-	m_debug = debug;
+void EngineMatch::setBookMode(OpeningBook::BookMoveMode mode) {
+  m_bookMode = mode;
 }
 
-void EngineMatch::setRatingInterval(int interval)
-{
-	Q_ASSERT(interval >= 0);
-	m_ratingInterval = interval;
+void EngineMatch::onGameStarted(ChessGame *game, int number) {
+  Q_ASSERT(game != nullptr);
+
+  auto fen = game->board()->fenString();
+  qInfo("Started game %d of %d (%s vs %s) with fen: %s", number,
+        m_tournament->finalGameCount(),
+        qUtf8Printable(game->player(Chess::Side::Red)->name()),
+        qUtf8Printable(game->player(Chess::Side::Black)->name()),
+        qUtf8Printable(fen));
 }
 
-void EngineMatch::setBookMode(OpeningBook::BookMoveMode mode)
-{
-	m_bookMode = mode;
+void EngineMatch::onGameFinished(ChessGame *game, int number) {
+  Q_ASSERT(game != nullptr);
+
+  Chess::Result result(game->result());
+  qInfo("Finished game %d (%s vs %s): %s", number,
+        qUtf8Printable(game->player(Chess::Side::Red)->name()),
+        qUtf8Printable(game->player(Chess::Side::Black)->name()),
+        qUtf8Printable(result.toVerboseString()));
+
+  if (m_tournament->playerCount() == 2) {
+    TournamentPlayer fcp = m_tournament->playerAt(0);
+    TournamentPlayer scp = m_tournament->playerAt(1);
+    int totalResults = fcp.gamesFinished();
+    qInfo("Score of %s vs %s: %d - %d - %d  [%.3f] %d",
+          qUtf8Printable(fcp.name()), qUtf8Printable(scp.name()), fcp.wins(),
+          scp.wins(), fcp.draws(), double(fcp.score()) / (totalResults * 2),
+          totalResults);
+  }
+
+  if (m_ratingInterval != 0 &&
+      (m_tournament->finishedGameCount() % m_ratingInterval) == 0)
+    printRanking();
 }
 
-void EngineMatch::onGameStarted(ChessGame* game, int number)
-{
-	Q_ASSERT(game != nullptr);
+void EngineMatch::onTournamentFinished() {
+  if (m_ratingInterval == 0 ||
+      m_tournament->finishedGameCount() % m_ratingInterval != 0)
+    printRanking();
 
-	qInfo("Started game %d of %d (%s vs %s)",
-	      number,
-	      m_tournament->finalGameCount(),
-          qUtf8Printable(game->player(Chess::Side::Red)->name()),
-	      qUtf8Printable(game->player(Chess::Side::Black)->name()));
+  QString error = m_tournament->errorString();
+  if (!error.isEmpty())
+    qWarning("%s", qUtf8Printable(error));
+
+  qInfo("Finished match");
+  connect(m_tournament->gameManager(), SIGNAL(finished()), this,
+          SIGNAL(finished()));
+  m_tournament->gameManager()->finish();
 }
 
-void EngineMatch::onGameFinished(ChessGame* game, int number)
-{
-	Q_ASSERT(game != nullptr);
-
-	Chess::Result result(game->result());
-	qInfo("Finished game %d (%s vs %s): %s",
-	      number,
-          qUtf8Printable(game->player(Chess::Side::Red)->name()),
-	      qUtf8Printable(game->player(Chess::Side::Black)->name()),
-	      qUtf8Printable(result.toVerboseString()));
-
-	if (m_tournament->playerCount() == 2)
-	{
-		TournamentPlayer fcp = m_tournament->playerAt(0);
-		TournamentPlayer scp = m_tournament->playerAt(1);
-		int totalResults = fcp.gamesFinished();
-		qInfo("Score of %s vs %s: %d - %d - %d  [%.3f] %d",
-		      qUtf8Printable(fcp.name()),
-		      qUtf8Printable(scp.name()),
-		      fcp.wins(), scp.wins(), fcp.draws(),
-		      double(fcp.score()) / (totalResults * 2),
-		      totalResults);
-	}
-
-	if (m_ratingInterval != 0
-	&&  (m_tournament->finishedGameCount() % m_ratingInterval) == 0)
-		printRanking();
+void EngineMatch::print(const QString &msg) {
+  qInfo("%lld %s", m_startTime.elapsed(), qUtf8Printable(msg));
 }
 
-void EngineMatch::onTournamentFinished()
-{
-	if (m_ratingInterval == 0
-	||  m_tournament->finishedGameCount() % m_ratingInterval != 0)
-		printRanking();
-
-	QString error = m_tournament->errorString();
-	if (!error.isEmpty())
-		qWarning("%s", qUtf8Printable(error));
-
-	qInfo("Finished match");
-	connect(m_tournament->gameManager(), SIGNAL(finished()),
-		this, SIGNAL(finished()));
-	m_tournament->gameManager()->finish();
-}
-
-void EngineMatch::print(const QString& msg)
-{
-	qInfo("%lld %s", m_startTime.elapsed(), qUtf8Printable(msg));
-}
-
-void EngineMatch::printRanking()
-{
-	qInfo("%s", qUtf8Printable(m_tournament->results()));
+void EngineMatch::printRanking() {
+  qInfo("%s", qUtf8Printable(m_tournament->results()));
 }

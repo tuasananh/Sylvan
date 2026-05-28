@@ -25,41 +25,40 @@
 namespace Chess {
 
 /*!
-* \brief A generic chess square type consisting of a file and a rank.
-*
-* Square is mainly used as a middle-layer between the Board
-* class (which uses integers for squares) and more generic, high-level
-* classes like GenericMove.
-*/
-class LIB_EXPORT Square
-{
+ * \brief A generic chess square type consisting of a file and a rank.
+ *
+ * Square is mainly used as a middle-layer between the Board
+ * class (which uses integers for squares) and more generic, high-level
+ * classes like GenericMove.
+ */
+class LIB_EXPORT Square {
 public:
-    /*! Creates a new square with invalid defaults. */
-    Square();
-    /*! Creates a new square from \a file and \a rank. */
-    Square(int file, int rank);
+  /*! Creates a new square with invalid defaults. */
+  Square();
+  /*! Creates a new square from \a file and \a rank. */
+  Square(int file, int rank);
 
-    /*! Returns true if \a other is the same as this square. */
-    bool operator==(const Square& other) const;
-    /*! Returns true if \a other is different from this square. */
-    bool operator!=(const Square& other) const;
+  /*! Returns true if \a other is the same as this square. */
+  bool operator==(const Square &other) const;
+  /*! Returns true if \a other is different from this square. */
+  bool operator!=(const Square &other) const;
 
-    /*! Returns true if both file and rank have non-negative values. */
-    bool isValid() const;
+  /*! Returns true if both file and rank have non-negative values. */
+  bool isValid() const;
 
-    /*! Zero-based file of the square. 0 is the 'a' file. */
-    int file() const;
-    /*! Zero-based rank of the square. 0 is red's first rank. */
-    int rank() const;
+  /*! Zero-based file of the square. 0 is the 'a' file. */
+  int file() const;
+  /*! Zero-based rank of the square. 0 is red's first rank. */
+  int rank() const;
 
-    /*! Sets the file to \a file. */
-    void setFile(int file);
-    /*! Sets the rank to \a rank. */
-    void setRank(int rank);
+  /*! Sets the file to \a file. */
+  void setFile(int file);
+  /*! Sets the rank to \a rank. */
+  void setRank(int rank);
 
 private:
-    int m_file;
-    int m_rank;
+  int m_file;
+  int m_rank;
 };
 
 } // namespace Chess

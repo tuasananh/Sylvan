@@ -20,39 +20,38 @@
 #ifndef CHESSCLOCK_H
 #define CHESSCLOCK_H
 
-#include <QWidget>
 #include <QTime>
+#include <QWidget>
 
 class QTimerEvent;
 class QLabel;
 
-class ChessClock: public QWidget
-{
-    Q_OBJECT
+class ChessClock : public QWidget {
+  Q_OBJECT
 
 public:
-    ChessClock(QWidget* parent = nullptr);
+  ChessClock(QWidget *parent = nullptr);
 
 public slots:
-    void setPlayerName(const QString& name);
-    void setInfiniteTime(bool infinite);
-    void setTime(int totalTime);
-    void start(int totalTime);
-    void stop();
+  void setPlayerName(const QString &name);
+  void setInfiniteTime(bool infinite);
+  void setTime(int totalTime);
+  void start(int totalTime);
+  void stop();
 
 protected:
-    virtual void timerEvent(QTimerEvent* event);
+  virtual void timerEvent(QTimerEvent *event);
 
 private:
-    void stopTimer();
+  void stopTimer();
 
-    int m_totalTime;
-    int m_timerId;
-    bool m_infiniteTime;
-    QTime m_time;
-    QLabel* m_nameLabel;
-    QLabel* m_timeLabel;
-    QPalette m_defaultPalette;
+  int m_totalTime;
+  int m_timerId;
+  bool m_infiniteTime;
+  QTime m_time;
+  QLabel *m_nameLabel;
+  QLabel *m_timeLabel;
+  QPalette m_defaultPalette;
 };
 
 #endif // CHESSCLOCK

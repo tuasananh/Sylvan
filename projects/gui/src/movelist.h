@@ -20,100 +20,95 @@
 #ifndef MOVE_LIST_H
 #define MOVE_LIST_H
 
-#include <QWidget>
-#include <QPointer>
-#include <QUrl>
-#include <QPair>
 #include <QList>
+#include <QPair>
+#include <QPointer>
 #include <QTextBlockFormat>
 #include <QTextCharFormat>
 #include <QTextCursor>
+#include <QUrl>
+#include <QWidget>
 
+#include "movecommenttoken.h"
 #include "movenumbertoken.h"
 #include "movetoken.h"
-#include "movecommenttoken.h"
 
 class QTimer;
 class QTextBrowser;
 class PgnGame;
 class ChessGame;
 
-namespace Chess { class GenericMove; }
+namespace Chess {
+class GenericMove;
+}
 
-class MoveList : public QWidget
-{
-    Q_OBJECT
+class MoveList : public QWidget {
+  Q_OBJECT
 
 public:
-    /*! Constructs a move list with the given \a parent. */
-    MoveList(QWidget* parent = nullptr);
+  /*! Constructs a move list with the given \a parent. */
+  MoveList(QWidget *parent = nullptr);
 
-    /*!
-         * Associates \a game and \a pgn with this document.
-         *
-         * Either \a game or \a pgn must not be NULL.
-         * If \a pgn is NULL, then the PGN data is retrieved from \a game.
-         */
-    void setGame(ChessGame* game, PgnGame* pgn = nullptr);
+  /*!
+   * Associates \a game and \a pgn with this document.
+   *
+   * Either \a game or \a pgn must not be NULL.
+   * If \a pgn is NULL, then the PGN data is retrieved from \a game.
+   */
+  void setGame(ChessGame *game, PgnGame *pgn = nullptr);
 
 public slots:
-    /*!
-         * Highlights move \a moveNum.
-         *
-         * Returns true if \a moveNum is a valid move index;
-         * otherwise returns false.
-         */
-    bool selectMove(int moveNum);
-    /*! Updates the move at \a ply */
-    void setMove(int ply,
-                 const Chess::GenericMove& move,
-                 const QString& sanString,
-                 const QString& comment);
+  /*!
+   * Highlights move \a moveNum.
+   *
+   * Returns true if \a moveNum is a valid move index;
+   * otherwise returns false.
+   */
+  bool selectMove(int moveNum);
+  /*! Updates the move at \a ply */
+  void setMove(int ply, const Chess::GenericMove &move,
+               const QString &sanString, const QString &comment);
 
 signals:
-    /*!
-         * Emitted when the user selects move \a num.
-         *
-         * If \a keyLeft is true, the current move's reverse animation
-         * is shown; otherwise the previous move's animation is shown.
-         */
-    void moveClicked(int num, bool keyLeft);
-    /*! Emitted when the user clicks comment \a num. */
-    void commentClicked(int num, const QString& comment);
+  /*!
+   * Emitted when the user selects move \a num.
+   *
+   * If \a keyLeft is true, the current move's reverse animation
+   * is shown; otherwise the previous move's animation is shown.
+   */
+  void moveClicked(int num, bool keyLeft);
+  /*! Emitted when the user clicks comment \a num. */
+  void commentClicked(int num, const QString &comment);
 
 protected:
-    // Reimplemented from QWidget
-    virtual bool eventFilter(QObject* obj, QEvent* event);
+  // Reimplemented from QWidget
+  virtual bool eventFilter(QObject *obj, QEvent *event);
 
 private slots:
-    void onMoveMade(const Chess::GenericMove& move,
-                    const QString& sanString,
-                    const QString& comment);
-    void onLinkClicked(const QUrl& url);
-    void selectChosenMove();
+  void onMoveMade(const Chess::GenericMove &move, const QString &sanString,
+                  const QString &comment);
+  void onLinkClicked(const QUrl &url);
+  void selectChosenMove();
 
 private:
-    struct Move
-    {
-        MoveNumberToken number;
-        MoveToken move;
-        MoveCommentToken comment;
-    };
+  struct Move {
+    MoveNumberToken number;
+    MoveToken move;
+    MoveCommentToken comment;
+  };
 
-    void insertMove(int ply,
-                    const QString& san,
-                    const QString& comment,
-                    QTextCursor cursor = QTextCursor());
+  void insertMove(int ply, const QString &san, const QString &comment,
+                  QTextCursor cursor = QTextCursor());
 
-    QTextBrowser* m_moveList;
-    QPointer<ChessGame> m_game;
-    QList<Move> m_moves;
-    int m_moveCount;
-    int m_startingSide;
-    int m_selectedMove;
-    int m_moveToBeSelected;
-    QTextCharFormat m_defaultTextFormat;
-    QTimer* m_selectionTimer;
+  QTextBrowser *m_moveList;
+  QPointer<ChessGame> m_game;
+  QList<Move> m_moves;
+  int m_moveCount;
+  int m_startingSide;
+  int m_selectedMove;
+  int m_moveToBeSelected;
+  QTextCharFormat m_defaultTextFormat;
+  QTimer *m_selectionTimer;
 };
 
 #endif // MOVE_LIST_H

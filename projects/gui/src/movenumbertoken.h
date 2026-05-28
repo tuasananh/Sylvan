@@ -25,25 +25,24 @@
 /*!
  * \brief A fullmove number token in a PGN game.
  */
-class MoveNumberToken : public PgnToken
-{
+class MoveNumberToken : public PgnToken {
 public:
-    /*!
-         * Creates a new MoveNumberToken at \a ply for a game started
-         * by \a startingSide.
-         */
-    MoveNumberToken(int ply, int startingSide);
+  /*!
+   * Creates a new MoveNumberToken at \a ply for a game started
+   * by \a startingSide.
+   */
+  MoveNumberToken(int ply, int startingSide);
 
-    // Inherited from PgnToken
-    virtual QString toString() const;
+  // Inherited from PgnToken
+  virtual QString toString() const;
 
 protected:
-    // Inherited from PgnToken
-    virtual void vInsert(QTextCursor& cursor);
+  // Inherited from PgnToken
+  virtual void vInsert(QTextCursor &cursor);
 
 private:
-    int m_ply;
-    int m_startingSide;
+  int m_ply;
+  int m_startingSide;
 };
 
 #endif // MOVENUMBERTOKEN_H

@@ -18,10 +18,10 @@
 */
 
 #include "zobrist.h"
-#include <QVarLengthArray>
+#include "piece.h"
 #include <QMutex>
 #include <QMutexLocker>
-#include "piece.h"
+#include <QVarLengthArray>
 
 namespace {
 
@@ -34,58 +34,44 @@ namespace Chess {
 
 int Zobrist::s_randomSeed = 1;
 
-Zobrist::Zobrist(const quint64* keys)
-    : m_initialized(false),
-      m_squareCount(0),
-      m_pieceTypeCount(0),
-      m_keys(keys)
-{
+Zobrist::Zobrist(const quint64 *keys)
+    : m_initialized(false), m_squareCount(0), m_pieceTypeCount(0),
+      m_keys(keys) {}
+
+bool Zobrist::isInitialized() const { return m_initialized; }
+
+void Zobrist::initialize(int squareCount, int pieceTypeCount) {
+  Q_ASSERT(squareCount > 0);
+  Q_ASSERT(pieceTypeCount > 1);
+
+  QMutexLocker locker(&s_mutex);
+
+  if (m_initialized)
+    return;
+
+  m_squareCount = squareCount;
+  m_pieceTypeCount = pieceTypeCount;
+  m_initialized = true;
 }
 
-bool Zobrist::isInitialized() const
-{
-    return m_initialized;
+quint64 Zobrist::side() const { return m_keys[0]; }
+
+quint64 Zobrist::piece(const Piece &piece, int square) const {
+  Q_ASSERT(piece.isValid());
+  Q_ASSERT(piece.type() >= 0 && piece.type() < m_pieceTypeCount);
+  Q_ASSERT(square >= 0 && square < m_squareCount);
+
+  int i = 1 + m_squareCount * m_pieceTypeCount * piece.side() +
+          piece.type() * m_squareCount + square;
+  return m_keys[i];
 }
 
-void Zobrist::initialize(int squareCount,
-                         int pieceTypeCount)
-{
-    Q_ASSERT(squareCount > 0);
-    Q_ASSERT(pieceTypeCount > 1);
+quint64 Zobrist::reservePiece(const Piece &piece, int slot) const {
+  Q_ASSERT(slot >= 0);
 
-    QMutexLocker locker(&s_mutex);
-
-    if (m_initialized)
-        return;
-
-    m_squareCount = squareCount;
-    m_pieceTypeCount = pieceTypeCount;
-    m_initialized = true;
-}
-
-quint64 Zobrist::side() const
-{
-    return m_keys[0];
-}
-
-quint64 Zobrist::piece(const Piece& piece, int square) const
-{
-    Q_ASSERT(piece.isValid());
-    Q_ASSERT(piece.type() >= 0 && piece.type() < m_pieceTypeCount);
-    Q_ASSERT(square >= 0 && square < m_squareCount);
-
-    int i = 1 + m_squareCount * m_pieceTypeCount * piece.side() +
-            piece.type() * m_squareCount + square;
-    return m_keys[i];
-}
-
-quint64 Zobrist::reservePiece(const Piece& piece, int slot) const
-{
-    Q_ASSERT(slot >= 0);
-
-    // HACK: Use the "wall" squares (0...n) as slots
-    // for hand pieces.
-    return this->piece(piece, slot);
+  // HACK: Use the "wall" squares (0...n) as slots
+  // for hand pieces.
+  return this->piece(piece, slot);
 }
 
 } // namespace Chess

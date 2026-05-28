@@ -18,24 +18,19 @@
 */
 
 #include "enginefactory.h"
-#include "uciengine.h"
 #include "ucciengine.h"
+#include "uciengine.h"
 
 REGISTER_ENGINE_CLASS(UciEngine, "uci")
 REGISTER_ENGINE_CLASS(UcciEngine, "ucci")
 
-ClassRegistry<ChessEngine>* EngineFactory::registry()
-{
-    static ClassRegistry<ChessEngine>* registry = new ClassRegistry<ChessEngine>;
-    return registry;
+ClassRegistry<ChessEngine> *EngineFactory::registry() {
+  static ClassRegistry<ChessEngine> *registry = new ClassRegistry<ChessEngine>;
+  return registry;
 }
 
-ChessEngine* EngineFactory::create(const QString& protocol)
-{
-    return registry()->create(protocol);
+ChessEngine *EngineFactory::create(const QString &protocol) {
+  return registry()->create(protocol);
 }
 
-QStringList EngineFactory::protocols()
-{
-    return registry()->items().keys();
-}
+QStringList EngineFactory::protocols() { return registry()->items().keys(); }

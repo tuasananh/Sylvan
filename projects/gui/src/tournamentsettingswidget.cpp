@@ -23,157 +23,132 @@
 #include "ui_tournamentsettingswidget.h"
 
 TournamentSettingsWidget::TournamentSettingsWidget(QWidget *parent)
-    : QWidget(parent),
-      ui(new Ui::TournamentSettingsWidget)
-{
-    ui->setupUi(this);
+    : QWidget(parent), ui(new Ui::TournamentSettingsWidget) {
+  ui->setupUi(this);
 
-    connect(ui->m_knockoutRadio, &QRadioButton::toggled, [=](bool checked)
-    {
-        ui->m_roundsSpin->setEnabled(!checked);
-        ui->m_seedsSpin->setEnabled(checked);
-    });
+  connect(ui->m_knockoutRadio, &QRadioButton::toggled, [=](bool checked) {
+    ui->m_roundsSpin->setEnabled(!checked);
+    ui->m_seedsSpin->setEnabled(checked);
+  });
 
-    readSettings();
+  readSettings();
 }
 
-TournamentSettingsWidget::~TournamentSettingsWidget()
-{
-    delete ui;
+TournamentSettingsWidget::~TournamentSettingsWidget() { delete ui; }
+
+QString TournamentSettingsWidget::tournamentType() const {
+  if (ui->m_roundRobinRadio->isChecked())
+    return "round-robin";
+  else if (ui->m_gauntletRadio->isChecked())
+    return "gauntlet";
+  else if (ui->m_knockoutRadio->isChecked())
+    return "knockout";
+  else if (ui->m_pyramidRadio->isChecked())
+    return "pyramid";
+
+  Q_UNREACHABLE();
+  return QString();
 }
 
-QString TournamentSettingsWidget::tournamentType() const
-{
-    if (ui->m_roundRobinRadio->isChecked())
-        return "round-robin";
-    else if (ui->m_gauntletRadio->isChecked())
-        return "gauntlet";
-    else if (ui->m_knockoutRadio->isChecked())
-        return "knockout";
-    else if (ui->m_pyramidRadio->isChecked())
-        return "pyramid";
-
-    Q_UNREACHABLE();
-    return QString();
+int TournamentSettingsWidget::gamesPerEncounter() const {
+  return ui->m_gamesPerEncounterSpin->value();
 }
 
-int TournamentSettingsWidget::gamesPerEncounter() const
-{
-    return ui->m_gamesPerEncounterSpin->value();
+int TournamentSettingsWidget::rounds() const {
+  return ui->m_roundsSpin->value();
 }
 
-int TournamentSettingsWidget::rounds() const
-{
-    return ui->m_roundsSpin->value();
+int TournamentSettingsWidget::seedCount() const {
+  return ui->m_seedsSpin->value();
 }
 
-int TournamentSettingsWidget::seedCount() const
-{
-    return ui->m_seedsSpin->value();
+int TournamentSettingsWidget::delayBetweenGames() const {
+  return int(ui->m_waitSpin->value() * 1000.0);
 }
 
-int TournamentSettingsWidget::delayBetweenGames() const
-{
-    return int(ui->m_waitSpin->value() * 1000.0);
+bool TournamentSettingsWidget::openingRepetition() const {
+  return ui->m_repeatCheck->isChecked();
 }
 
-bool TournamentSettingsWidget::openingRepetition() const
-{
-    return ui->m_repeatCheck->isChecked();
+bool TournamentSettingsWidget::engineRecovery() const {
+  return ui->m_recoverCheck->isChecked();
 }
 
-bool TournamentSettingsWidget::engineRecovery() const
-{
-    return ui->m_recoverCheck->isChecked();
+bool TournamentSettingsWidget::savingOfUnfinishedGames() const {
+  return ui->m_saveUnfinishedGamesCheck->isChecked();
 }
 
-bool TournamentSettingsWidget::savingOfUnfinishedGames() const
-{
-    return ui->m_saveUnfinishedGamesCheck->isChecked();
+void TournamentSettingsWidget::readSettings() {
+  QSettings s;
+  s.beginGroup("tournament");
+
+  QString type = s.value("type").toString();
+  if (type == "round-robin")
+    ui->m_roundRobinRadio->setChecked(true);
+  else if (type == "gauntlet")
+    ui->m_gauntletRadio->setChecked(true);
+  else if (type == "knockout")
+    ui->m_knockoutRadio->setChecked(true);
+  else if (type == "pyramid")
+    ui->m_pyramidRadio->setChecked(true);
+
+  ui->m_seedsSpin->setValue(s.value("seeds", 0).toInt());
+  ui->m_gamesPerEncounterSpin->setValue(
+      s.value("games_per_encounter", 1).toInt());
+  ui->m_roundsSpin->setValue(s.value("rounds", 1).toInt());
+  ui->m_waitSpin->setValue(s.value("wait", 0.0).toDouble());
+
+  ui->m_repeatCheck->setChecked(s.value("repeat").toBool());
+  ui->m_recoverCheck->setChecked(s.value("recover").toBool());
+  ui->m_saveUnfinishedGamesCheck->setChecked(
+      s.value("save_unfinished_games", true).toBool());
+
+  s.endGroup();
 }
 
-void TournamentSettingsWidget::readSettings()
-{
-    QSettings s;
-    s.beginGroup("tournament");
+void TournamentSettingsWidget::enableSettingsUpdates() {
+  connect(ui->m_roundRobinRadio, &QRadioButton::toggled, [=](bool checked) {
+    if (checked)
+      QSettings().setValue("tournament/type", "round-robin");
+  });
+  connect(ui->m_gauntletRadio, &QRadioButton::toggled, [=](bool checked) {
+    if (checked)
+      QSettings().setValue("tournament/type", "gauntlet");
+  });
+  connect(ui->m_knockoutRadio, &QRadioButton::toggled, [=](bool checked) {
+    if (checked)
+      QSettings().setValue("tournament/type", "knockout");
+  });
+  connect(ui->m_pyramidRadio, &QRadioButton::toggled, [=](bool checked) {
+    if (checked)
+      QSettings().setValue("tournament/type", "pyramid");
+  });
 
-    QString type = s.value("type").toString();
-    if (type == "round-robin")
-        ui->m_roundRobinRadio->setChecked(true);
-    else if (type == "gauntlet")
-        ui->m_gauntletRadio->setChecked(true);
-    else if (type == "knockout")
-        ui->m_knockoutRadio->setChecked(true);
-    else if (type == "pyramid")
-        ui->m_pyramidRadio->setChecked(true);
+  connect(ui->m_seedsSpin,
+          static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+          [=](int value) { QSettings().setValue("tournament/seeds", value); });
+  connect(ui->m_gamesPerEncounterSpin,
+          static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+          [=](int value) {
+            QSettings().setValue("tournament/games_per_encounter", value);
+          });
+  connect(ui->m_roundsSpin,
+          static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+          [=](int value) { QSettings().setValue("tournament/rounds", value); });
+  connect(
+      ui->m_waitSpin,
+      static_cast<void (QDoubleSpinBox::*)(double)>(
+          &QDoubleSpinBox::valueChanged),
+      [=](double value) { QSettings().setValue("tournament/wait", value); });
 
-    ui->m_seedsSpin->setValue(s.value("seeds", 0).toInt());
-    ui->m_gamesPerEncounterSpin->setValue(s.value("games_per_encounter", 1).toInt());
-    ui->m_roundsSpin->setValue(s.value("rounds", 1).toInt());
-    ui->m_waitSpin->setValue(s.value("wait", 0.0).toDouble());
-
-    ui->m_repeatCheck->setChecked(s.value("repeat").toBool());
-    ui->m_recoverCheck->setChecked(s.value("recover").toBool());
-    ui->m_saveUnfinishedGamesCheck->setChecked(
-                s.value("save_unfinished_games", true).toBool());
-
-    s.endGroup();
-}
-
-void TournamentSettingsWidget::enableSettingsUpdates()
-{
-    connect(ui->m_roundRobinRadio, &QRadioButton::toggled, [=](bool checked)
-    {
-        if (checked)
-            QSettings().setValue("tournament/type", "round-robin");
-    });
-    connect(ui->m_gauntletRadio, &QRadioButton::toggled, [=](bool checked)
-    {
-        if (checked)
-            QSettings().setValue("tournament/type", "gauntlet");
-    });
-    connect(ui->m_knockoutRadio, &QRadioButton::toggled, [=](bool checked)
-    {
-        if (checked)
-            QSettings().setValue("tournament/type", "knockout");
-    });
-    connect(ui->m_pyramidRadio, &QRadioButton::toggled, [=](bool checked)
-    {
-        if (checked)
-            QSettings().setValue("tournament/type", "pyramid");
-    });
-
-    connect(ui->m_seedsSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [=](int value)
-    {
-        QSettings().setValue("tournament/seeds", value);
-    });
-    connect(ui->m_gamesPerEncounterSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [=](int value)
-    {
-        QSettings().setValue("tournament/games_per_encounter", value);
-    });
-    connect(ui->m_roundsSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [=](int value)
-    {
-        QSettings().setValue("tournament/rounds", value);
-    });
-    connect(ui->m_waitSpin, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            [=](double value)
-    {
-        QSettings().setValue("tournament/wait", value);
-    });
-
-    connect(ui->m_repeatCheck, &QCheckBox::toggled, [=](bool checked)
-    {
-        QSettings().setValue("tournament/repeat", checked);
-    });
-    connect(ui->m_recoverCheck, &QCheckBox::toggled, [=](bool checked)
-    {
-        QSettings().setValue("tournament/recover", checked);
-    });
-    connect(ui->m_saveUnfinishedGamesCheck, &QCheckBox::toggled, [=](bool checked)
-    {
-        QSettings().setValue("tournament/save_unfinished_games", checked);
-    });
+  connect(ui->m_repeatCheck, &QCheckBox::toggled, [=](bool checked) {
+    QSettings().setValue("tournament/repeat", checked);
+  });
+  connect(ui->m_recoverCheck, &QCheckBox::toggled, [=](bool checked) {
+    QSettings().setValue("tournament/recover", checked);
+  });
+  connect(ui->m_saveUnfinishedGamesCheck, &QCheckBox::toggled,
+          [=](bool checked) {
+            QSettings().setValue("tournament/save_unfinished_games", checked);
+          });
 }

@@ -19,25 +19,18 @@
 
 #include "movetoken.h"
 
-MoveToken::MoveToken(int ply, const QString& text)
-    : PgnToken(),
-      m_ply(ply),
-      m_text(text)
-{
-}
+MoveToken::MoveToken(int ply, const QString &text)
+    : PgnToken(), m_ply(ply), m_text(text) {}
 
-QString MoveToken::toString() const
-{
-    return m_text;
-}
+QString MoveToken::toString() const { return m_text; }
 
-void MoveToken::vInsert(QTextCursor& cursor)
-{
-    QString html = QString("<a class=\"move\" href=\"move://%1@\">%2</a> ")
-            .arg(m_ply).arg(m_text);
+void MoveToken::vInsert(QTextCursor &cursor) {
+  QString html = QString("<a class=\"move\" href=\"move://%1@\">%2</a> ")
+                     .arg(m_ply)
+                     .arg(m_text);
 
 #ifndef Q_OS_WIN32
-    html.replace('-', "&#8288;-&#8288;");
+  html.replace('-', "&#8288;-&#8288;");
 #endif
-    cursor.insertHtml(html);
+  cursor.insertHtml(html);
 }

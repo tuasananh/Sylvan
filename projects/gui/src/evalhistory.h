@@ -20,8 +20,8 @@
 #ifndef EVALHISTORY_H
 #define EVALHISTORY_H
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
 class QCustomPlot;
 class ChessGame;
@@ -33,31 +33,30 @@ class PgnGame;
  * The fullmove number is on the X axis and score (from red's
  * perspective) is on the Y axis.
  */
-class EvalHistory : public QWidget
-{
-    Q_OBJECT
+class EvalHistory : public QWidget {
+  Q_OBJECT
 
 public:
-    /*! Creates a new EvalHistory widget. */
-    explicit EvalHistory(QWidget* parent = nullptr);
-    /*!
-         * Connects the widget to \a game and disconnects
-         * from the previous game (if any).
-         */
-    void setGame(ChessGame* game);
-    /*! Sets evaluation history from PGN game (pointer) \a pgn */
-    void setPgnGame(PgnGame *pgn);
+  /*! Creates a new EvalHistory widget. */
+  explicit EvalHistory(QWidget *parent = nullptr);
+  /*!
+   * Connects the widget to \a game and disconnects
+   * from the previous game (if any).
+   */
+  void setGame(ChessGame *game);
+  /*! Sets evaluation history from PGN game (pointer) \a pgn */
+  void setPgnGame(PgnGame *pgn);
 
 private slots:
-    void onScore(int ply, int score);
+  void onScore(int ply, int score);
 
 private:
-    void addData(int ply, int score);
-    void replot(int maxPly);
-    void setScores(const QMap<int, int> &scores);
+  void addData(int ply, int score);
+  void replot(int maxPly);
+  void setScores(const QMap<int, int> &scores);
 
-    QCustomPlot* m_plot;
-    QPointer<ChessGame> m_game;
+  QCustomPlot *m_plot;
+  QPointer<ChessGame> m_game;
 };
 
 #endif // EVALHISTORY_H

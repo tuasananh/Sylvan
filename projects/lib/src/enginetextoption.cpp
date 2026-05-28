@@ -19,47 +19,39 @@
 
 #include "enginetextoption.h"
 
-EngineTextOption::EngineTextOption(const QString& name,
-                                   const QVariant& value,
-                                   const QVariant& defaultValue,
-                                   const QString& alias,
-                                   EditorType editorType)
+EngineTextOption::EngineTextOption(const QString &name, const QVariant &value,
+                                   const QVariant &defaultValue,
+                                   const QString &alias, EditorType editorType)
     : EngineOption(name, QVariant::String, value, defaultValue, alias),
-      m_editorType(editorType)
-{
+      m_editorType(editorType) {}
+
+EngineOption *EngineTextOption::copy() const {
+  return new EngineTextOption(*this);
 }
 
-EngineOption* EngineTextOption::copy() const
-{
-    return new EngineTextOption(*this);
+bool EngineTextOption::isValid(const QVariant &value) const {
+  return value.canConvert(QVariant::String);
 }
 
-bool EngineTextOption::isValid(const QVariant& value) const
-{
-    return value.canConvert(QVariant::String);
-}
+QVariant EngineTextOption::toVariant() const {
+  QVariantMap map;
 
-QVariant EngineTextOption::toVariant() const
-{
-    QVariantMap map;
+  switch (m_editorType) {
+  case LineEdit:
+    map.insert("type", "text");
+    break;
+  case FileDialog:
+    map.insert("type", "file");
+    break;
+  case FolderDialog:
+    map.insert("type", "folder");
+    break;
+  }
 
-    switch (m_editorType)
-    {
-    case LineEdit:
-        map.insert("type", "text");
-        break;
-    case FileDialog:
-        map.insert("type", "file");
-        break;
-    case FolderDialog:
-        map.insert("type", "folder");
-        break;
-    }
+  map.insert("name", name());
+  map.insert("value", value());
+  map.insert("default", defaultValue());
+  map.insert("alias", alias());
 
-    map.insert("name", name());
-    map.insert("value", value());
-    map.insert("default", defaultValue());
-    map.insert("alias", alias());
-
-    return map;
+  return map;
 }

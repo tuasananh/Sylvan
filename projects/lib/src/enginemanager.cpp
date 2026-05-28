@@ -23,124 +23,105 @@
 #include <jsonparser.h>
 #include <jsonserializer.h>
 
-EngineManager::EngineManager(QObject* parent)
-    : QObject(parent)
-{
+EngineManager::EngineManager(QObject *parent) : QObject(parent) {}
+
+EngineManager::~EngineManager() {}
+
+int EngineManager::engineCount() const { return m_engines.count(); }
+
+EngineConfiguration EngineManager::engineAt(int index) const {
+  return m_engines.at(index);
 }
 
-EngineManager::~EngineManager()
-{
+void EngineManager::addEngine(const EngineConfiguration &engine) {
+  m_engines << engine;
+
+  emit engineAdded(m_engines.size() - 1);
 }
 
-int EngineManager::engineCount() const
-{
-    return m_engines.count();
+void EngineManager::updateEngineAt(int index,
+                                   const EngineConfiguration &engine) {
+  m_engines[index] = engine;
+
+  emit engineUpdated(index);
 }
 
-EngineConfiguration EngineManager::engineAt(int index) const
-{
-    return m_engines.at(index);
+void EngineManager::removeEngineAt(int index) {
+  emit engineAboutToBeRemoved(index);
+
+  m_engines.removeAt(index);
 }
 
-void EngineManager::addEngine(const EngineConfiguration& engine)
-{
-    m_engines << engine;
+QList<EngineConfiguration> EngineManager::engines() const { return m_engines; }
 
-    emit engineAdded(m_engines.size() - 1);
+void EngineManager::setEngines(const QList<EngineConfiguration> &engines) {
+  m_engines = engines;
+
+  emit enginesReset();
 }
 
-void EngineManager::updateEngineAt(int index, const EngineConfiguration& engine)
-{
-    m_engines[index] = engine;
+bool EngineManager::supportsVariant(const QString &variant) const {
+  if (m_engines.isEmpty())
+    return false;
 
-    emit engineUpdated(index);
+  for (const auto &config : qAsConst(m_engines)) {
+    if (!config.supportsVariant(variant))
+      return false;
+  }
+
+  return true;
 }
 
-void EngineManager::removeEngineAt(int index)
-{
-    emit engineAboutToBeRemoved(index);
+void EngineManager::loadEngines(const QString &fileName) {
+  if (!QFile::exists(fileName))
+    return;
 
-    m_engines.removeAt(index);
+  QFile input(fileName);
+  if (!input.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    qWarning("cannot open engine configuration file: %s",
+             qUtf8Printable(fileName));
+    return;
+  }
+
+  QTextStream stream(&input);
+  JsonParser parser(stream);
+  const QVariantList engines(parser.parse().toList());
+
+  if (parser.hasError()) {
+    qWarning("%s",
+             qUtf8Printable(
+                 QString("bad engine configuration file line %1 in %2: %3")
+                     .arg(parser.errorLineNumber())
+                     .arg(fileName)
+                     .arg(parser.errorString()))); // clazy:exclude=qstring-arg
+    return;
+  }
+
+  for (const QVariant &engine : engines)
+    addEngine(EngineConfiguration(engine));
 }
 
-QList<EngineConfiguration> EngineManager::engines() const
-{
-    return m_engines;
+void EngineManager::saveEngines(const QString &fileName) {
+  QVariantList engines;
+  for (const EngineConfiguration &config : qAsConst(m_engines))
+    engines << config.toVariant();
+
+  QFile output(fileName);
+  if (!output.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    qWarning("cannot open engine configuration file: %s",
+             qUtf8Printable(fileName));
+    return;
+  }
+
+  QTextStream out(&output);
+  JsonSerializer serializer(engines);
+  serializer.serialize(out);
 }
 
-void EngineManager::setEngines(const QList<EngineConfiguration>& engines)
-{
-    m_engines = engines;
+QSet<QString> EngineManager::engineNames() const {
+  QSet<QString> names;
+  for (const EngineConfiguration &engine : qAsConst(m_engines))
+    names.insert(engine.name());
 
-    emit enginesReset();
-}
-
-bool EngineManager::supportsVariant(const QString& variant) const
-{
-    if (m_engines.isEmpty())
-        return false;
-
-    for (const auto& config : qAsConst(m_engines))
-    {
-        if (!config.supportsVariant(variant))
-            return false;
-    }
-
-    return true;
-}
-
-void EngineManager::loadEngines(const QString& fileName)
-{
-    if (!QFile::exists(fileName))
-        return;
-
-    QFile input(fileName);
-    if (!input.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        qWarning("cannot open engine configuration file: %s",
-                 qUtf8Printable(fileName));
-        return;
-    }
-
-    QTextStream stream(&input);
-    JsonParser parser(stream);
-    const QVariantList engines(parser.parse().toList());
-
-    if (parser.hasError())
-    {
-        qWarning("%s", qUtf8Printable(QString("bad engine configuration file line %1 in %2: %3")
-                                      .arg(parser.errorLineNumber()).arg(fileName).arg(parser.errorString()))); // clazy:exclude=qstring-arg
-        return;
-    }
-
-    for (const QVariant& engine : engines)
-        addEngine(EngineConfiguration(engine));
-}
-
-void EngineManager::saveEngines(const QString& fileName)
-{
-    QVariantList engines;
-    for (const EngineConfiguration& config : qAsConst(m_engines))
-        engines << config.toVariant();
-
-    QFile output(fileName);
-    if (!output.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qWarning("cannot open engine configuration file: %s",
-                 qUtf8Printable(fileName));
-        return;
-    }
-
-    QTextStream out(&output);
-    JsonSerializer serializer(engines);
-    serializer.serialize(out);
-}
-
-QSet<QString> EngineManager::engineNames() const
-{
-    QSet<QString> names;
-    for (const EngineConfiguration& engine : qAsConst(m_engines))
-        names.insert(engine.name());
-
-    return names;
+  return names;
 }

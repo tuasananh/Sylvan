@@ -17,43 +17,26 @@
 
 #include "worker.h"
 
-Worker::Worker(const QString& title)
-    : QObject(nullptr), QRunnable(), m_cancel(false), m_title(title)
-{
-}
+Worker::Worker(const QString &title)
+    : QObject(nullptr), QRunnable(), m_cancel(false), m_title(title) {}
 
-Worker::~Worker()
-{
-}
+Worker::~Worker() {}
 
-void Worker::cancel()
-{
-    m_cancel = true;
-}
+void Worker::cancel() { m_cancel = true; }
 
-bool Worker::cancelRequested() const
-{
-    return m_cancel;
-}
+bool Worker::cancelRequested() const { return m_cancel; }
 
-QTime Worker::startTime() const
-{
-    return m_startTime;
-}
+QTime Worker::startTime() const { return m_startTime; }
 
-QString Worker::title() const
-{
-    return m_title;
-}
+QString Worker::title() const { return m_title; }
 
-void Worker::run()
-{
-    m_startTime = QTime::currentTime();
-    emit started();
+void Worker::run() {
+  m_startTime = QTime::currentTime();
+  emit started();
 
-    work();
-    if (m_cancel)
-        emit cancelled();
+  work();
+  if (m_cancel)
+    emit cancelled();
 
-    emit finished();
+  emit finished();
 }

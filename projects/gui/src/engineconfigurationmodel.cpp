@@ -23,146 +23,130 @@
 
 #include "engineconfigurationmodel.h"
 
-EngineConfigurationModel::EngineConfigurationModel(EngineManager* engineManager, QObject* parent)
-    : QAbstractListModel(parent), m_engineManager(engineManager)
-{
-    Q_ASSERT(m_engineManager != nullptr);
+EngineConfigurationModel::EngineConfigurationModel(EngineManager *engineManager,
+                                                   QObject *parent)
+    : QAbstractListModel(parent), m_engineManager(engineManager) {
+  Q_ASSERT(m_engineManager != nullptr);
 
-    connect(m_engineManager, SIGNAL(engineAdded(int)), this,
-            SLOT(onEngineAdded(int)));
-    connect(m_engineManager, SIGNAL(engineAboutToBeRemoved(int)), this,
-            SLOT(onEngineAboutToBeRemoved(int)));
-    connect(m_engineManager, SIGNAL(engineUpdated(int)), this,
-            SLOT(onEngineUpdated(int)));
-    connect(m_engineManager, SIGNAL(enginesReset()), this,
-            SLOT(onEnginesReset()));
+  connect(m_engineManager, SIGNAL(engineAdded(int)), this,
+          SLOT(onEngineAdded(int)));
+  connect(m_engineManager, SIGNAL(engineAboutToBeRemoved(int)), this,
+          SLOT(onEngineAboutToBeRemoved(int)));
+  connect(m_engineManager, SIGNAL(engineUpdated(int)), this,
+          SLOT(onEngineUpdated(int)));
+  connect(m_engineManager, SIGNAL(enginesReset()), this,
+          SLOT(onEnginesReset()));
 }
 
-EngineConfigurationModel::~EngineConfigurationModel()
-{
+EngineConfigurationModel::~EngineConfigurationModel() {}
+
+QString EngineConfigurationModel::chessVariant() const {
+  return m_chessVariant;
 }
 
-QString EngineConfigurationModel::chessVariant() const
-{
-    return m_chessVariant;
+void EngineConfigurationModel::setChessVariant(const QString &variant) {
+  if (variant == m_chessVariant)
+    return;
+
+  beginResetModel();
+  m_chessVariant = variant;
+  endResetModel();
 }
 
-void EngineConfigurationModel::setChessVariant(const QString& variant)
-{
-    if (variant == m_chessVariant)
-        return;
+int EngineConfigurationModel::rowCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
 
-    beginResetModel();
-    m_chessVariant = variant;
-    endResetModel();
+  return m_engineManager->engineCount();
 }
 
-int EngineConfigurationModel::rowCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
+int EngineConfigurationModel::columnCount(const QModelIndex &parent) const {
+  Q_UNUSED(parent)
 
-    return m_engineManager->engineCount();
+  return 5;
 }
 
-int EngineConfigurationModel::columnCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
+QVariant EngineConfigurationModel::data(const QModelIndex &index,
+                                        int role) const {
+  if (!index.isValid())
+    return QVariant();
 
-    return 5;
-}
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    const EngineConfiguration engine(m_engineManager->engineAt(index.row()));
 
-QVariant EngineConfigurationModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        const EngineConfiguration engine(m_engineManager->engineAt(index.row()));
-
-        switch (index.column())
-        {
-        case 0:
-            return engine.name();
-        case 1:
-            return engine.command();
-        case 2:
-            return engine.workingDirectory();
-        case 3:
-            return engine.protocol();
-        case 4:
-            return engine.supportedVariants();
-        default:
-            return QVariant();
-        }
+    switch (index.column()) {
+    case 0:
+      return engine.name();
+    case 1:
+      return engine.command();
+    case 2:
+      return engine.workingDirectory();
+    case 3:
+      return engine.protocol();
+    case 4:
+      return engine.supportedVariants();
+    default:
+      return QVariant();
     }
-    else if (role == Qt::ForegroundRole)
-    {
-        if (m_chessVariant.isEmpty())
-            return QVariant();
+  } else if (role == Qt::ForegroundRole) {
+    if (m_chessVariant.isEmpty())
+      return QVariant();
 
-        const auto engine = m_engineManager->engineAt(index.row());
-        if (!engine.supportsVariant(m_chessVariant))
-            return QBrush(Qt::red);
+    const auto engine = m_engineManager->engineAt(index.row());
+    if (!engine.supportsVariant(m_chessVariant))
+      return QBrush(Qt::red);
 
-        int count = 0;
-        const auto& engines = m_engineManager->engines();
-        for (const EngineConfiguration& engine2: engines)
-            if (engine.name() == engine2.name())
-                if (++count > 1)
-                    return QBrush(Qt::gray);
-
-        return QVariant();
-    }
+    int count = 0;
+    const auto &engines = m_engineManager->engines();
+    for (const EngineConfiguration &engine2 : engines)
+      if (engine.name() == engine2.name())
+        if (++count > 1)
+          return QBrush(Qt::gray);
 
     return QVariant();
+  }
+
+  return QVariant();
 }
 
-QVariant EngineConfigurationModel::headerData(int section, Qt::Orientation orientation,
-                                              int role) const
-{
-    if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
-    {
-        switch (section)
-        {
-        case 0:
-            return tr("Name");
-        case 1:
-            return tr("Command");
-        case 2:
-            return tr("Working Directory");
-        case 3:
-            return tr("Protocol");
-        case 4:
-            return tr("Variants");
-        default:
-            return QVariant();
-        }
+QVariant EngineConfigurationModel::headerData(int section,
+                                              Qt::Orientation orientation,
+                                              int role) const {
+  if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
+    switch (section) {
+    case 0:
+      return tr("Name");
+    case 1:
+      return tr("Command");
+    case 2:
+      return tr("Working Directory");
+    case 3:
+      return tr("Protocol");
+    case 4:
+      return tr("Variants");
+    default:
+      return QVariant();
     }
+  }
 
-    return QVariant();
+  return QVariant();
 }
 
-void EngineConfigurationModel::onEngineAdded(int index)
-{
-    beginInsertRows(QModelIndex(), index, index);
-    endInsertRows();
+void EngineConfigurationModel::onEngineAdded(int index) {
+  beginInsertRows(QModelIndex(), index, index);
+  endInsertRows();
 }
 
-void EngineConfigurationModel::onEngineAboutToBeRemoved(int index)
-{
-    beginRemoveRows(QModelIndex(), index, index);
-    endRemoveRows();
+void EngineConfigurationModel::onEngineAboutToBeRemoved(int index) {
+  beginRemoveRows(QModelIndex(), index, index);
+  endRemoveRows();
 }
 
-void EngineConfigurationModel::onEngineUpdated(int index)
-{
-    QModelIndex indexToUpdate = this->index(index);
-    emit dataChanged(indexToUpdate, indexToUpdate);
+void EngineConfigurationModel::onEngineUpdated(int index) {
+  QModelIndex indexToUpdate = this->index(index);
+  emit dataChanged(indexToUpdate, indexToUpdate);
 }
 
-void EngineConfigurationModel::onEnginesReset()
-{
-    beginResetModel();
-    endResetModel();
+void EngineConfigurationModel::onEnginesReset() {
+  beginResetModel();
+  endResetModel();
 }

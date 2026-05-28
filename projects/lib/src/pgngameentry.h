@@ -20,8 +20,8 @@
 #ifndef PGNGAMEENTRY_H
 #define PGNGAMEENTRY_H
 
-#include <QDate>
 #include "board/result.h"
+#include <QDate>
 
 class PgnStream;
 class PgnGameFilter;
@@ -38,75 +38,73 @@ class QDataStream;
  *
  * \sa PgnGame, PgnStream
  */
-class LIB_EXPORT PgnGameEntry
-{
+class LIB_EXPORT PgnGameEntry {
 public:
-    /*! A PGN tag's type. */
-    enum TagType
-    {
-        EventTag,	//!< The name of the tournament or match event
-        SiteTag,	//!< The location of the event
-        DateTag,	//!< The starting date of the game
-        RoundTag,	//!< The playing round ordinal of the game
-        RedTag,	//!< The player of the red pieces
-        BlackTag,	//!< The player of the black pieces
-        ResultTag,	//!< The result of the game
-        VariantTag	//!< The chess variant of the game
-    };
+  /*! A PGN tag's type. */
+  enum TagType {
+    EventTag,  //!< The name of the tournament or match event
+    SiteTag,   //!< The location of the event
+    DateTag,   //!< The starting date of the game
+    RoundTag,  //!< The playing round ordinal of the game
+    RedTag,    //!< The player of the red pieces
+    BlackTag,  //!< The player of the black pieces
+    ResultTag, //!< The result of the game
+    VariantTag //!< The chess variant of the game
+  };
 
-    /*! Creates a new empty PgnGameEntry object. */
-    PgnGameEntry();
+  /*! Creates a new empty PgnGameEntry object. */
+  PgnGameEntry();
 
-    /*! Resets the entry to an empty default. */
-    void clear();
-    /*!
-         * Reads an entry from a PGN stream.
-         * Returns true if successful; otherwise returns false.
-         */
-    bool read(PgnStream& in);
+  /*! Resets the entry to an empty default. */
+  void clear();
+  /*!
+   * Reads an entry from a PGN stream.
+   * Returns true if successful; otherwise returns false.
+   */
+  bool read(PgnStream &in);
 
-    /*!
-         * Reads an entry from data stream.
-         * Returns true if successful; otherwise returns false.
-         */
-    bool read(QDataStream& in);
+  /*!
+   * Reads an entry from data stream.
+   * Returns true if successful; otherwise returns false.
+   */
+  bool read(QDataStream &in);
 
-    /*!
-         * Writes an entry to data stream.
-         */
-    void write(QDataStream& out) const;
+  /*!
+   * Writes an entry to data stream.
+   */
+  void write(QDataStream &out) const;
 
-    /*!
-         * Returns true if the PGN tags match \a filter.
-         * The matching is case insensitive.
-         */
-    bool match(const PgnGameFilter& filter) const;
+  /*!
+   * Returns true if the PGN tags match \a filter.
+   * The matching is case insensitive.
+   */
+  bool match(const PgnGameFilter &filter) const;
 
-    /*! Returns the stream position where the game begins. */
-    qint64 pos() const;
-    /*! Returns the line number where the game begins. */
-    qint64 lineNumber() const;
+  /*! Returns the stream position where the game begins. */
+  qint64 pos() const;
+  /*! Returns the line number where the game begins. */
+  qint64 lineNumber() const;
 
-    /*! Returns the tag value corresponding to \a type. */
-    QString tagValue(TagType type) const;
+  /*! Returns the tag value corresponding to \a type. */
+  QString tagValue(TagType type) const;
 
 private:
-    void addTag(const QByteArray& tagValue);
+  void addTag(const QByteArray &tagValue);
 
-    QByteArray m_data;
+  QByteArray m_data;
 
-    qint64 m_pos;
-    qint64 m_lineNumber;
+  qint64 m_pos;
+  qint64 m_lineNumber;
 };
 
 /*! Reads a PGN game entry from a PGN stream. */
-extern LIB_EXPORT PgnStream& operator>>(PgnStream& in, PgnGameEntry& entry);
+extern LIB_EXPORT PgnStream &operator>>(PgnStream &in, PgnGameEntry &entry);
 
 /*! Reads a PGN game entry from a data stream. */
-extern LIB_EXPORT QDataStream& operator>>(QDataStream& in, PgnGameEntry& entry);
+extern LIB_EXPORT QDataStream &operator>>(QDataStream &in, PgnGameEntry &entry);
 
 /*! Writes a PGN game entry to a data stream. */
-extern LIB_EXPORT QDataStream& operator<<(QDataStream& out,
-                                          const PgnGameEntry& entry);
+extern LIB_EXPORT QDataStream &operator<<(QDataStream &out,
+                                          const PgnGameEntry &entry);
 
 #endif // PGNGAMEENTRY_H

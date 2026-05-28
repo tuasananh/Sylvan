@@ -26,11 +26,10 @@
 #ifndef JSONPARSER_H
 #define JSONPARSER_H
 
-#include <QVariant>
 #include <QCoreApplication>
+#include <QVariant>
 
 class QTextStream;
-
 
 /*!
  * \brief A JSON (JavaScript Object Notation) parser.
@@ -41,65 +40,62 @@ class QTextStream;
  * JSON specification: http://json.org/
  * \sa JsonSerializer
  */
-class LIB_EXPORT JsonParser
-{
-	Q_DECLARE_TR_FUNCTIONS(JsonParser)
+class LIB_EXPORT JsonParser {
+  Q_DECLARE_TR_FUNCTIONS(JsonParser)
 
-	public:
-		/*! Creates a new parser that reads data from \a stream. */
-		JsonParser(QTextStream& stream);
-		/*!
-		 * Parses JSON data from the stream.
-		 *
-		 * Returns a null QVariant object if a parsing error occurs.
-		 * Use hasError() to check for errors.
-		 */
-		QVariant parse();
+public:
+  /*! Creates a new parser that reads data from \a stream. */
+  JsonParser(QTextStream &stream);
+  /*!
+   * Parses JSON data from the stream.
+   *
+   * Returns a null QVariant object if a parsing error occurs.
+   * Use hasError() to check for errors.
+   */
+  QVariant parse();
 
-		/*! Returns true if a parsing error occured. */
-		bool hasError() const;
-		/*! Returns a detailed description of the error. */
-		QString errorString() const;
-		/*! Returns the line number on which the error occured. */
-		qint64 errorLineNumber() const;
+  /*! Returns true if a parsing error occured. */
+  bool hasError() const;
+  /*! Returns a detailed description of the error. */
+  QString errorString() const;
+  /*! Returns the line number on which the error occured. */
+  qint64 errorLineNumber() const;
 
-	private:
-		enum Token
-		{
-			JsonError,
-			JsonGeneric,
-			JsonNone,
-			JsonComma,
-			JsonColon,
-			JsonBeginObject,
-			JsonEndObject,
-			JsonBeginArray,
-			JsonEndArray,
-			JsonTrue,
-			JsonFalse,
-			JsonNull,
-			JsonNumber,
-			JsonString
-		};
+private:
+  enum Token {
+    JsonError,
+    JsonGeneric,
+    JsonNone,
+    JsonComma,
+    JsonColon,
+    JsonBeginObject,
+    JsonEndObject,
+    JsonBeginArray,
+    JsonEndArray,
+    JsonTrue,
+    JsonFalse,
+    JsonNull,
+    JsonNumber,
+    JsonString
+  };
 
-		static QString tokenString(Token type,
-					   const QString& str = QString());
+  static QString tokenString(Token type, const QString &str = QString());
 
-		Token parseToken();
-		QVariant parseValue(Token* tokenType = 0);
-		QVariant parseObject();
-		QVariant parseArray();
-		QString parseString();
-		void setError(const QString& message);
-		void clearError();
+  Token parseToken();
+  QVariant parseValue(Token *tokenType = 0);
+  QVariant parseObject();
+  QVariant parseArray();
+  QString parseString();
+  void setError(const QString &message);
+  void clearError();
 
-		bool m_error;
-		qint64 m_currentLine;
-		qint64 m_errorLine;
-		QString m_errorString;
-		QString m_lastToken;
-		QChar m_buffer;
-		QTextStream& m_stream;
+  bool m_error;
+  qint64 m_currentLine;
+  qint64 m_errorLine;
+  QString m_errorString;
+  QString m_lastToken;
+  QChar m_buffer;
+  QTextStream &m_stream;
 };
 
 #endif // JSONPARSER_H

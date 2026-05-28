@@ -29,30 +29,20 @@ namespace {
 
 namespace Chess {
 
-StandardBoard::StandardBoard()
-    : WesternBoard(new WesternZobrist(nullptr))
-{
+StandardBoard::StandardBoard() : WesternBoard(new WesternZobrist(nullptr)) {}
+
+Board *StandardBoard::copy() const { return new StandardBoard(*this); }
+
+QString StandardBoard::variant() const { return "standard"; }
+
+QString StandardBoard::defaultFenString() const {
+  return "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 "
+         "1";
 }
 
-Board* StandardBoard::copy() const
-{
-    return new StandardBoard(*this);
-}
-
-QString StandardBoard::variant() const
-{
-    return "standard";
-}
-
-QString StandardBoard::defaultFenString() const
-{
-    return "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
-}
-
-Result StandardBoard::tablebaseResult(unsigned int* dtz) const
-{
-    Q_UNUSED(dtz);
-    return Result();
+Result StandardBoard::tablebaseResult(unsigned int *dtz) const {
+  Q_UNUSED(dtz);
+  return Result();
 }
 
 } // namespace Chess

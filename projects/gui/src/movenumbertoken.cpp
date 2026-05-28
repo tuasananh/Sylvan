@@ -24,39 +24,31 @@
 #include "movenumbertoken.h"
 
 MoveNumberToken::MoveNumberToken(int ply, int startingSide)
-    : PgnToken(),
-      m_ply(ply),
-      m_startingSide(startingSide)
-{
+    : PgnToken(), m_ply(ply), m_startingSide(startingSide) {}
+
+QString MoveNumberToken::toString() const {
+  int number = (m_ply + m_startingSide) / 2 + 1;
+  if ((m_ply + m_startingSide) % 2 == 0)
+    return QString("%1.").arg(number);
+  return QString("%1...").arg(number);
 }
 
-QString MoveNumberToken::toString() const
-{
-    int number = (m_ply + m_startingSide) / 2 + 1;
-    if ((m_ply + m_startingSide) % 2 == 0)
-        return QString("%1.").arg(number);
-    return QString("%1...").arg(number);
-}
+void MoveNumberToken::vInsert(QTextCursor &cursor) {
+  QTextBlockFormat format(cursor.blockFormat());
 
-void MoveNumberToken::vInsert(QTextCursor& cursor)
-{
-    QTextBlockFormat format(cursor.blockFormat());
+  // Ignore black's move if it's:
+  // - not the first move of the game OR
+  // - the cursor's not in a comment block
+  if (format.indent() == 0 && m_ply > 0 && (m_ply + m_startingSide) % 2 != 0) {
+    if (cursor.hasSelection())
+      cursor.removeSelectedText();
+    return;
+  }
 
-    // Ignore black's move if it's:
-    // - not the first move of the game OR
-    // - the cursor's not in a comment block
-    if (format.indent() == 0 && m_ply > 0
-            &&  (m_ply + m_startingSide) % 2 != 0)
-    {
-        if (cursor.hasSelection())
-            cursor.removeSelectedText();
-        return;
-    }
+  format.setIndent(0);
 
-    format.setIndent(0);
-
-    QString html = QString("<strong>%1</strong> ").arg(toString());
-    if (m_ply > 0)
-        cursor.insertBlock(format);
-    cursor.insertHtml(html);
+  QString html = QString("<strong>%1</strong> ").arg(toString());
+  if (m_ply > 0)
+    cursor.insertBlock(format);
+  cursor.insertHtml(html);
 }

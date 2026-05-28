@@ -26,29 +26,28 @@ namespace Ui {
 class TournamentSettingsWidget;
 }
 
-class TournamentSettingsWidget : public QWidget
-{
-    Q_OBJECT
+class TournamentSettingsWidget : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit TournamentSettingsWidget(QWidget *parent = nullptr);
-    virtual ~TournamentSettingsWidget();
+  explicit TournamentSettingsWidget(QWidget *parent = nullptr);
+  virtual ~TournamentSettingsWidget();
 
-    QString tournamentType() const;
-    int gamesPerEncounter() const;
-    int rounds() const;
-    int seedCount() const;
-    int delayBetweenGames() const;
-    bool openingRepetition() const;
-    bool engineRecovery() const;
-    bool savingOfUnfinishedGames() const;
+  QString tournamentType() const;
+  int gamesPerEncounter() const;
+  int rounds() const;
+  int seedCount() const;
+  int delayBetweenGames() const;
+  bool openingRepetition() const;
+  bool engineRecovery() const;
+  bool savingOfUnfinishedGames() const;
 
-    void enableSettingsUpdates();
+  void enableSettingsUpdates();
 
 private:
-    void readSettings();
+  void readSettings();
 
-    Ui::TournamentSettingsWidget *ui;
+  Ui::TournamentSettingsWidget *ui;
 };
 
 #endif // TOURNAMENTSETTINGSWIDGET_H

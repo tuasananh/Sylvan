@@ -21,30 +21,28 @@
 #define GAMEWALL_H
 
 #include <QDialog>
-#include <QMap>
 #include <QList>
+#include <QMap>
 
 class ChessGame;
 class GameManager;
 class GameWallWidget;
 
-class GameWall : public QWidget
-{
-    Q_OBJECT
+class GameWall : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit GameWall(GameManager* manager,
-                      QWidget *parent = nullptr);
+  explicit GameWall(GameManager *manager, QWidget *parent = nullptr);
 
 public slots:
-    void addGame(ChessGame* game);
-    void removeGame(ChessGame* game);
+  void addGame(ChessGame *game);
+  void removeGame(ChessGame *game);
 
 private:
-    GameWallWidget* getFreeWidget();
+  GameWallWidget *getFreeWidget();
 
-    QMap<ChessGame*, GameWallWidget*> m_games;
-    QList<GameWallWidget*> m_gamesToRemove;
+  QMap<ChessGame *, GameWallWidget *> m_games;
+  QList<GameWallWidget *> m_gamesToRemove;
 };
 
 #endif // GAMEWALL_H

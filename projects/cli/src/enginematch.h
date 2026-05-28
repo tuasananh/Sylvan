@@ -20,51 +20,49 @@
 #ifndef ENGINEMATCH_H
 #define ENGINEMATCH_H
 
-#include <QObject>
-#include <QMap>
-#include <QString>
 #include <QElapsedTimer>
+#include <QMap>
+#include <QObject>
+#include <QString>
 #include <openingbook.h>
 
 class ChessGame;
 class OpeningBook;
 class Tournament;
 
+class EngineMatch : public QObject {
+  Q_OBJECT
 
-class EngineMatch : public QObject
-{
-	Q_OBJECT
+public:
+  EngineMatch(Tournament *tournament, QObject *parent = nullptr);
+  virtual ~EngineMatch();
 
-	public:
-		EngineMatch(Tournament* tournament, QObject* parent = nullptr);
-		virtual ~EngineMatch();
+  OpeningBook *addOpeningBook(const QString &fileName);
+  void setDebugMode(bool debug);
+  void setRatingInterval(int interval);
+  void setBookMode(OpeningBook::BookMoveMode mode);
 
-		OpeningBook* addOpeningBook(const QString& fileName);
-		void setDebugMode(bool debug);
-		void setRatingInterval(int interval);
-		void setBookMode(OpeningBook::BookMoveMode mode);
+  void start();
+  void stop();
 
-		void start();
-		void stop();
+signals:
+  void finished();
 
-	signals:
-		void finished();
+private slots:
+  void onGameStarted(ChessGame *game, int number);
+  void onGameFinished(ChessGame *game, int number);
+  void onTournamentFinished();
+  void print(const QString &msg);
 
-	private slots:
-		void onGameStarted(ChessGame* game, int number);
-		void onGameFinished(ChessGame* game, int number);
-		void onTournamentFinished();
-		void print(const QString& msg);
+private:
+  void printRanking();
 
-	private:
-		void printRanking();
-
-		Tournament* m_tournament;
-		bool m_debug;
-		int m_ratingInterval;
-		OpeningBook::BookMoveMode m_bookMode;
-		QMap<QString, OpeningBook*> m_books;
-		QElapsedTimer m_startTime;
+  Tournament *m_tournament;
+  bool m_debug;
+  int m_ratingInterval;
+  OpeningBook::BookMoveMode m_bookMode;
+  QMap<QString, OpeningBook *> m_books;
+  QElapsedTimer m_startTime;
 };
 
 #endif // ENGINEMATCH_H

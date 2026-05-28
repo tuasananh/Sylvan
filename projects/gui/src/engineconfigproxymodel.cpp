@@ -22,24 +22,20 @@
 #include "engineconfigproxymodel.h"
 
 EngineConfigurationProxyModel::EngineConfigurationProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
-{
+    : QSortFilterProxyModel(parent) {}
+
+void EngineConfigurationProxyModel::setFilterVariant(const QString &variant) {
+  m_filterVariant = variant;
+  invalidateFilter();
 }
 
-void EngineConfigurationProxyModel::setFilterVariant(const QString& variant)
-{
-    m_filterVariant = variant;
-    invalidateFilter();
-}
+bool EngineConfigurationProxyModel::filterAcceptsRow(
+    int sourceRow, const QModelIndex &sourceParent) const {
+  QModelIndex variantsIndex = sourceModel()->index(sourceRow, 4, sourceParent);
+  QStringList variants(sourceModel()->data(variantsIndex).toStringList());
 
-bool EngineConfigurationProxyModel::filterAcceptsRow(int sourceRow,
-                                                     const QModelIndex& sourceParent) const
-{
-    QModelIndex variantsIndex = sourceModel()->index(sourceRow, 4, sourceParent);
-    QStringList variants(sourceModel()->data(variantsIndex).toStringList());
+  if (!m_filterVariant.isEmpty() && !variants.contains(m_filterVariant))
+    return false;
 
-    if (!m_filterVariant.isEmpty() && !variants.contains(m_filterVariant))
-        return false;
-
-    return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+  return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
 }

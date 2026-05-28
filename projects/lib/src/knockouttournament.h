@@ -28,36 +28,35 @@
  * A single-elimination tournament where the number of rounds is
  * determined by the number of players.
  */
-class LIB_EXPORT KnockoutTournament : public Tournament
-{
-    Q_OBJECT
+class LIB_EXPORT KnockoutTournament : public Tournament {
+  Q_OBJECT
 
 public:
-    /*! Creates a new Knockout tournament. */
-    explicit KnockoutTournament(GameManager* gameManager,
-                                QObject *parent = nullptr);
+  /*! Creates a new Knockout tournament. */
+  explicit KnockoutTournament(GameManager *gameManager,
+                              QObject *parent = nullptr);
 
-    // Inherited from Tournament
-    virtual QString type() const;
-    virtual bool canSetRoundMultiplier() const;
-    virtual QString results() const;
+  // Inherited from Tournament
+  virtual QString type() const;
+  virtual bool canSetRoundMultiplier() const;
+  virtual QString results() const;
 
 protected:
-    // Inherited from Tournament
-    virtual void initializePairing();
-    virtual int gamesPerCycle() const;
-    virtual TournamentPair* nextPair(int gameNumber);
-    virtual void addScore(int player, int score);
-    virtual bool areAllGamesFinished() const;
+  // Inherited from Tournament
+  virtual void initializePairing();
+  virtual int gamesPerCycle() const;
+  virtual TournamentPair *nextPair(int gameNumber);
+  virtual void addScore(int player, int score);
+  virtual bool areAllGamesFinished() const;
 
 private:
-    static int playerSeed(int rank, int bracketSize);
+  static int playerSeed(int rank, int bracketSize);
 
-    QList<int> firstRoundPlayers() const;
-    QList<int> lastRoundWinners() const;
-    bool needMoreGames(const TournamentPair* pair) const;
+  QList<int> firstRoundPlayers() const;
+  QList<int> lastRoundWinners() const;
+  bool needMoreGames(const TournamentPair *pair) const;
 
-    QList< QList<TournamentPair*> > m_rounds;
+  QList<QList<TournamentPair *>> m_rounds;
 };
 
 #endif // KNOCKOUTTOURNAMENT_H

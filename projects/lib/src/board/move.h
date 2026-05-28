@@ -20,8 +20,8 @@
 #ifndef MOVE_H
 #define MOVE_H
 
-#include <QtGlobal>
 #include <QMetaType>
+#include <QtGlobal>
 
 namespace Chess {
 
@@ -40,75 +40,56 @@ namespace Chess {
  * \sa Board
  * \sa GenericMove
  */
-class Move
-{
+class Move {
 public:
-    /*! Creates an empty Move (null move). */
-    Move();
-    /*!
-         * Creates a new Move object with at least a source
-         * square and a target square.
-         */
-    Move(int sourceSquare,
-         int targetSquare);
-    /*!
-         * The source square.
-         *
-         * A value of 0 means that this move is a piece drop,
-         * a special move allowed by some variants.
-         */
-    int sourceSquare() const;
-    /*! The target square. */
-    int targetSquare() const;
-    /*! Returns true if this is a null move. */
-    bool isNull() const;
-    /*! Returns true if \a other is equal to this move. */
-    bool operator==(const Move& other) const;
-    /*! Returns true if \a other is different from this move. */
-    bool operator!=(const Move& other) const;
+  /*! Creates an empty Move (null move). */
+  Move();
+  /*!
+   * Creates a new Move object with at least a source
+   * square and a target square.
+   */
+  Move(int sourceSquare, int targetSquare);
+  /*!
+   * The source square.
+   *
+   * A value of 0 means that this move is a piece drop,
+   * a special move allowed by some variants.
+   */
+  int sourceSquare() const;
+  /*! The target square. */
+  int targetSquare() const;
+  /*! Returns true if this is a null move. */
+  bool isNull() const;
+  /*! Returns true if \a other is equal to this move. */
+  bool operator==(const Move &other) const;
+  /*! Returns true if \a other is different from this move. */
+  bool operator!=(const Move &other) const;
 
 private:
-    quint32 m_data;
+  quint32 m_data;
 };
 
-inline Move::Move()
-    : m_data(0)
-{
+inline Move::Move() : m_data(0) {}
+
+inline Move::Move(int sourceSquare, int targetSquare)
+    : m_data(sourceSquare | (targetSquare << 8)) {
+  Q_ASSERT(sourceSquare >= 0 && sourceSquare <= 0xFF);
+  Q_ASSERT(targetSquare >= 0 && targetSquare <= 0xFF);
 }
 
-inline Move::Move(int sourceSquare,
-                  int targetSquare)
-    : m_data(sourceSquare |
-             (targetSquare << 8))
-{
-    Q_ASSERT(sourceSquare >= 0 && sourceSquare <= 0xFF);
-    Q_ASSERT(targetSquare >= 0 && targetSquare <= 0xFF);
+inline bool Move::isNull() const { return (m_data == 0); }
+
+inline bool Move::operator==(const Move &other) const {
+  return (m_data == other.m_data);
 }
 
-inline bool Move::isNull() const
-{
-    return (m_data == 0);
+inline bool Move::operator!=(const Move &other) const {
+  return (m_data != other.m_data);
 }
 
-inline bool Move::operator==(const Move& other) const
-{
-    return (m_data == other.m_data);
-}
+inline int Move::sourceSquare() const { return m_data & 0xff; }
 
-inline bool Move::operator!=(const Move& other) const
-{
-    return (m_data != other.m_data);
-}
-
-inline int Move::sourceSquare() const
-{
-    return m_data & 0xff;
-}
-
-inline int Move::targetSquare() const
-{
-    return (m_data >> 8) & 0xff;
-}
+inline int Move::targetSquare() const { return (m_data >> 8) & 0xff; }
 
 } // namespace Chess
 

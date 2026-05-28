@@ -24,20 +24,15 @@ namespace Chess {
 
 REGISTER_BOARD(StandardBoard, "standard")
 
-ClassRegistry<Board>* BoardFactory::registry()
-{
-    static ClassRegistry<Board>* registry = new ClassRegistry<Board>;
-    return registry;
+ClassRegistry<Board> *BoardFactory::registry() {
+  static ClassRegistry<Board> *registry = new ClassRegistry<Board>;
+  return registry;
 }
 
-Board* BoardFactory::create(const QString& variant)
-{
-    return registry()->create(variant);
+Board *BoardFactory::create(const QString &variant) {
+  return registry()->create(variant);
 }
 
-QStringList BoardFactory::variants()
-{
-    return registry()->items().keys();
-}
+QStringList BoardFactory::variants() { return registry()->items().keys(); }
 
 } // namespace Chess

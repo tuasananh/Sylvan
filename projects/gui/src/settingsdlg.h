@@ -29,30 +29,29 @@ class SettingsDialog;
 /*!
  * \brief Dialog for configuring global settings
  */
-class SettingsDialog : public QDialog
-{
-    Q_OBJECT
+class SettingsDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /*! Creates a new SettingsDialog. */
-    SettingsDialog(QWidget* parent = nullptr);
-    /*! Destroys the dialog. */
-    virtual ~SettingsDialog();
+  /*! Creates a new SettingsDialog. */
+  SettingsDialog(QWidget *parent = nullptr);
+  /*! Destroys the dialog. */
+  virtual ~SettingsDialog();
 
 protected:
-    // Inherited from QDialog
-    virtual void closeEvent(QCloseEvent* event);
+  // Inherited from QDialog
+  virtual void closeEvent(QCloseEvent *event);
 
 private slots:
-    void browseTbPath();
-    void browseDefaultPgnOutFile();
-    void browseTournamentDefaultPgnOutFile();
-    void browseTournamentDefaultEpdOutFile();
+  void browseTbPath();
+  void browseDefaultPgnOutFile();
+  void browseTournamentDefaultPgnOutFile();
+  void browseTournamentDefaultEpdOutFile();
 
 private:
-    void readSettings();
+  void readSettings();
 
-    Ui::SettingsDialog* ui;
+  Ui::SettingsDialog *ui;
 };
 
 #endif // SETTINGSDIALOG_H

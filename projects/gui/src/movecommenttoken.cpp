@@ -19,33 +19,22 @@
 
 #include "movecommenttoken.h"
 
-MoveCommentToken::MoveCommentToken(int ply, const QString& text)
-    : PgnToken(),
-      m_ply(ply),
-      m_text(text)
-{
+MoveCommentToken::MoveCommentToken(int ply, const QString &text)
+    : PgnToken(), m_ply(ply), m_text(text) {}
+
+QString MoveCommentToken::toString() const { return m_text; }
+
+void MoveCommentToken::vInsert(QTextCursor &cursor) {
+  QString html = QString("<a class=\"comment\" href=\"comment://%1@\">%2</a> ")
+                     .arg(m_ply)
+                     .arg(m_text);
+
+  if (m_text.length() > 18) {
+    QTextBlockFormat format(cursor.blockFormat());
+    format.setIndent(1);
+    cursor.insertBlock(format);
+  }
+  cursor.insertHtml(html);
 }
 
-QString MoveCommentToken::toString() const
-{
-    return m_text;
-}
-
-void MoveCommentToken::vInsert(QTextCursor& cursor)
-{
-    QString html = QString("<a class=\"comment\" href=\"comment://%1@\">%2</a> ")
-            .arg(m_ply).arg(m_text);
-
-    if (m_text.length() > 18)
-    {
-        QTextBlockFormat format(cursor.blockFormat());
-        format.setIndent(1);
-        cursor.insertBlock(format);
-    }
-    cursor.insertHtml(html);
-}
-
-void MoveCommentToken::setValue(const QString& text)
-{
-    m_text = text;
-}
+void MoveCommentToken::setValue(const QString &text) { m_text = text; }

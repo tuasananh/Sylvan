@@ -19,61 +19,46 @@
 
 #include "pgntoken.h"
 
-PgnToken::PgnToken()
-    : m_begin(-1),
-      m_end(-1)
-{
+PgnToken::PgnToken() : m_begin(-1), m_end(-1) {}
+
+PgnToken::~PgnToken() {}
+
+bool PgnToken::isEmpty() const { return toString().isEmpty(); }
+
+int PgnToken::length() const { return m_end - m_begin; }
+
+void PgnToken::insert(QTextCursor &cursor) {
+  if (isEmpty())
+    return;
+
+  if (!cursor.hasSelection())
+    m_begin = cursor.position();
+  else
+    m_begin = cursor.selectionStart();
+
+  vInsert(cursor);
+  m_end = cursor.position();
 }
 
-PgnToken::~PgnToken()
-{
+void PgnToken::select(QTextCursor &cursor) {
+  if (m_begin == -1 || m_end == -1)
+    return;
+
+  cursor.setPosition(m_begin);
+  cursor.setPosition(m_end, QTextCursor::KeepAnchor);
 }
 
-bool PgnToken::isEmpty() const
-{
-    return toString().isEmpty();
+void PgnToken::move(int diff) {
+  if (m_begin == -1 || m_end == -1)
+    return;
+
+  m_begin += diff;
+  m_end += diff;
 }
 
-int PgnToken::length() const
-{
-    return m_end - m_begin;
-}
-
-void PgnToken::insert(QTextCursor& cursor)
-{
-    if (isEmpty())
-        return;
-
-    if (!cursor.hasSelection())
-        m_begin = cursor.position();
-    else
-        m_begin = cursor.selectionStart();
-
-    vInsert(cursor);
-    m_end = cursor.position();
-}
-
-void PgnToken::select(QTextCursor& cursor)
-{
-    if (m_begin == -1 || m_end == -1)
-        return;
-
-    cursor.setPosition(m_begin);
-    cursor.setPosition(m_end, QTextCursor::KeepAnchor);
-}
-
-void PgnToken::move(int diff)
-{
-    if (m_begin == -1 || m_end == -1)
-        return;
-
-    m_begin += diff;
-    m_end += diff;
-}
-
-void PgnToken::mergeCharFormat(QTextCursor& cursor, const QTextCharFormat& format)
-{
-    cursor.setPosition(m_begin);
-    cursor.setPosition(m_end - 1, QTextCursor::KeepAnchor);
-    cursor.mergeCharFormat(format);
+void PgnToken::mergeCharFormat(QTextCursor &cursor,
+                               const QTextCharFormat &format) {
+  cursor.setPosition(m_begin);
+  cursor.setPosition(m_end - 1, QTextCursor::KeepAnchor);
+  cursor.mergeCharFormat(format);
 }

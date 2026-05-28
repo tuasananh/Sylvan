@@ -27,21 +27,19 @@ class GameManager;
 
 /*!
  * \brief A factory for creating Tournament objects. */
-class LIB_EXPORT TournamentFactory
-{
+class LIB_EXPORT TournamentFactory {
 public:
-    /*!
-         * Creates and returns a new tournament of type \a type
-         * that uses \a manager to manage its games.
-         *
-         * Returns 0 if \a type is not supported.
-         */
-    static Tournament* create(const QString& type,
-                              GameManager* manager,
-                              QObject* parent = nullptr);
+  /*!
+   * Creates and returns a new tournament of type \a type
+   * that uses \a manager to manage its games.
+   *
+   * Returns 0 if \a type is not supported.
+   */
+  static Tournament *create(const QString &type, GameManager *manager,
+                            QObject *parent = nullptr);
 
 private:
-    TournamentFactory();
+  TournamentFactory();
 };
 
 #endif // TOURNAMENTFACTORY_H

@@ -17,63 +17,44 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "gauntlettournament.h"
-#include <algorithm>
 #include "chessgame.h"
+#include <algorithm>
 
-GauntletTournament::GauntletTournament(GameManager* gameManager,
+GauntletTournament::GauntletTournament(GameManager *gameManager,
                                        QObject *parent)
-    : Tournament(gameManager, parent),
-      m_opponent(-1)
-{
+    : Tournament(gameManager, parent), m_opponent(-1) {}
+
+QString GauntletTournament::type() const { return "gauntlet"; }
+
+void GauntletTournament::onGameAboutToStart(ChessGame *game,
+                                            const PlayerBuilder *red,
+                                            const PlayerBuilder *black) {
+  Q_UNUSED(black);
+  const int blackIndex = playerIndex(game, Chess::Side::Black);
+  if (!red->isHuman() && blackIndex == 0)
+    game->setBoardShouldBeFlipped(true);
 }
 
-QString GauntletTournament::type() const
-{
-    return "gauntlet";
-}
+void GauntletTournament::initializePairing() { m_opponent = 1; }
 
-void GauntletTournament::onGameAboutToStart(ChessGame* game,
-                                            const PlayerBuilder* red,
-                                            const PlayerBuilder* black)
-{
-    Q_UNUSED(black);
-    const int blackIndex = playerIndex(game, Chess::Side::Black);
-    if (!red->isHuman() && blackIndex == 0)
-        game->setBoardShouldBeFlipped(true);
-}
+int GauntletTournament::gamesPerCycle() const { return playerCount() - 1; }
 
-void GauntletTournament::initializePairing()
-{
+TournamentPair *GauntletTournament::nextPair(int gameNumber) {
+  if (gameNumber >= finalGameCount())
+    return nullptr;
+  if (gameNumber % gamesPerEncounter() != 0)
+    return currentPair();
+
+  if (m_opponent >= playerCount()) {
     m_opponent = 1;
+    setCurrentRound(currentRound() + 1);
+  }
+
+  int red = 0;
+  int black = m_opponent++;
+
+  return pair(red, black);
 }
 
-int GauntletTournament::gamesPerCycle() const
-{
-    return playerCount() - 1;
-}
-
-TournamentPair* GauntletTournament::nextPair(int gameNumber)
-{
-    if (gameNumber >= finalGameCount())
-        return nullptr;
-    if (gameNumber % gamesPerEncounter() != 0)
-        return currentPair();
-
-    if (m_opponent >= playerCount())
-    {
-        m_opponent = 1;
-        setCurrentRound(currentRound() + 1);
-    }
-
-    int red = 0;
-    int black = m_opponent++;
-
-    return pair(red, black);
-}
-
-bool GauntletTournament::hasGauntletRatingsOrder() const
-{
-    return true;
-}
+bool GauntletTournament::hasGauntletRatingsOrder() const { return true; }

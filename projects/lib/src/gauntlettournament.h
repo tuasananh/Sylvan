@@ -28,29 +28,27 @@
  * In a Gauntlet tournament the first participant plays
  * against all the others.
  */
-class LIB_EXPORT GauntletTournament : public Tournament
-{
-    Q_OBJECT
+class LIB_EXPORT GauntletTournament : public Tournament {
+  Q_OBJECT
 
 public:
-    /*! Creates a new Gauntlet tournament. */
-    explicit GauntletTournament(GameManager* gameManager,
-                                QObject *parent = nullptr);
-    // Inherited from Tournament
-    virtual QString type() const;
+  /*! Creates a new Gauntlet tournament. */
+  explicit GauntletTournament(GameManager *gameManager,
+                              QObject *parent = nullptr);
+  // Inherited from Tournament
+  virtual QString type() const;
 
 protected:
-    // Inherited from Tournament
-    virtual void onGameAboutToStart(ChessGame* game,
-                                    const PlayerBuilder* red,
-                                    const PlayerBuilder* black);
-    virtual void initializePairing();
-    virtual int gamesPerCycle() const;
-    virtual TournamentPair* nextPair(int gameNumber);
-    virtual bool hasGauntletRatingsOrder() const;
+  // Inherited from Tournament
+  virtual void onGameAboutToStart(ChessGame *game, const PlayerBuilder *red,
+                                  const PlayerBuilder *black);
+  virtual void initializePairing();
+  virtual int gamesPerCycle() const;
+  virtual TournamentPair *nextPair(int gameNumber);
+  virtual bool hasGauntletRatingsOrder() const;
 
 private:
-    int m_opponent;
+  int m_opponent;
 };
 
 #endif // GAUNTLETTOURNAMENT_H

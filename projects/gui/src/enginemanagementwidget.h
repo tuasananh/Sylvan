@@ -35,42 +35,41 @@ class EngineManagementWidget;
 /*!
  * \brief The EngineManagementWidget class provides a dialog for chess engine
  * management.
-*/
-class EngineManagementWidget : public QWidget
-{
-    Q_OBJECT
+ */
+class EngineManagementWidget : public QWidget {
+  Q_OBJECT
 
 public:
-    /*! Creates a new engine management widget. */
-    EngineManagementWidget(QWidget* parent = nullptr);
-    /*! Destroys the widget. */
-    virtual ~EngineManagementWidget();
+  /*! Creates a new engine management widget. */
+  EngineManagementWidget(QWidget *parent = nullptr);
+  /*! Destroys the widget. */
+  virtual ~EngineManagementWidget();
 
-    /*!
-         * Returns true if configuration has changed;
-         * otherwise returns false.
-         */
-    bool hasConfigChanged() const;
+  /*!
+   * Returns true if configuration has changed;
+   * otherwise returns false.
+   */
+  bool hasConfigChanged() const;
 
-    /*! Saves the engine configuration to engines.json. */
-    void saveConfig();
+  /*! Saves the engine configuration to engines.json. */
+  void saveConfig();
 
 private slots:
-    void updateUi();
-    void updateSearch(const QString& terms);
-    void addEngine();
-    void configureEngine();
-    void configureEngine(const QModelIndex& index);
-    void removeEngine();
-    void browseDefaultLocation();
+  void updateUi();
+  void updateSearch(const QString &terms);
+  void addEngine();
+  void configureEngine();
+  void configureEngine(const QModelIndex &index);
+  void removeEngine();
+  void browseDefaultLocation();
 
 private:
-    void updateEngineCount();
+  void updateEngineCount();
 
-    EngineManager* m_engineManager;
-    bool m_hasChanged;
-    QSortFilterProxyModel* m_filteredModel;
-    Ui::EngineManagementWidget* ui;
+  EngineManager *m_engineManager;
+  bool m_hasChanged;
+  QSortFilterProxyModel *m_filteredModel;
+  Ui::EngineManagementWidget *ui;
 };
 
 #endif // ENGINEMANAGEMENTWIDGET_H

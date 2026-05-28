@@ -25,33 +25,28 @@
 
 class QToolButton;
 
-class PathLineEdit : public QLineEdit
-{
-    Q_OBJECT
+class PathLineEdit : public QLineEdit {
+  Q_OBJECT
 
 public:
-    enum PathType
-    {
-        FilePath,
-        FolderPath
-    };
+  enum PathType { FilePath, FolderPath };
 
-    explicit PathLineEdit(PathType pathType, QWidget* parent = nullptr);
-    virtual ~PathLineEdit();
+  explicit PathLineEdit(PathType pathType, QWidget *parent = nullptr);
+  virtual ~PathLineEdit();
 
-    void setDefaultDirectory(const QString& dir);
+  void setDefaultDirectory(const QString &dir);
 
 protected:
-    virtual void resizeEvent(QResizeEvent* event);
+  virtual void resizeEvent(QResizeEvent *event);
 
 private slots:
-    void browse();
-    void setPath(const QString& path);
+  void browse();
+  void setPath(const QString &path);
 
 private:
-    PathType m_pathType;
-    QToolButton* m_browseBtn;
-    QDir m_defaultDir;
+  PathType m_pathType;
+  QToolButton *m_browseBtn;
+  QDir m_defaultDir;
 };
 
 #endif // PATHLINEEDIT_H

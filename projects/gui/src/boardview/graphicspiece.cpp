@@ -21,82 +21,52 @@
 
 #include "graphicspiece.h"
 
-GraphicsPiece::GraphicsPiece(const Chess::Piece& piece,
-                             qreal squareSize,
-                             const QString& elementId,
-                             QSvgRenderer* renderer,
-                             QGraphicsItem* parent)
-    : QGraphicsObject(parent),
-      m_piece(piece),
-      m_rect(-squareSize / 2, -squareSize / 2,
-             squareSize, squareSize),
-      m_elementId(elementId),
-      m_renderer(renderer),
-      m_container(nullptr)
-{
-    setAcceptedMouseButtons(Qt::LeftButton);
-    setCacheMode(DeviceCoordinateCache);
+GraphicsPiece::GraphicsPiece(const Chess::Piece &piece, qreal squareSize,
+                             const QString &elementId, QSvgRenderer *renderer,
+                             QGraphicsItem *parent)
+    : QGraphicsObject(parent), m_piece(piece),
+      m_rect(-squareSize / 2, -squareSize / 2, squareSize, squareSize),
+      m_elementId(elementId), m_renderer(renderer), m_container(nullptr) {
+  setAcceptedMouseButtons(Qt::LeftButton);
+  setCacheMode(DeviceCoordinateCache);
 }
 
-int GraphicsPiece::type() const
-{
-    return Type;
+int GraphicsPiece::type() const { return Type; }
+
+QRectF GraphicsPiece::boundingRect() const { return m_rect; }
+
+void GraphicsPiece::paint(QPainter *painter,
+                          const QStyleOptionGraphicsItem *option,
+                          QWidget *widget) {
+  Q_UNUSED(option);
+  Q_UNUSED(widget);
+
+  QRectF bounds(m_renderer->boundsOnElement(m_elementId));
+  qreal ar = bounds.width() / bounds.height();
+  qreal width = m_rect.width() * 0.95; // was 0.8 棋子相对格子的比例
+
+  if (ar > 1.0) {
+    bounds.setWidth(width);
+    bounds.setHeight(width / ar);
+  } else {
+    bounds.setHeight(width);
+    bounds.setWidth(width * ar);
+  }
+  bounds.moveCenter(m_rect.center());
+
+  m_renderer->render(painter, m_elementId, bounds);
 }
 
+Chess::Piece GraphicsPiece::pieceType() const { return m_piece; }
 
+QGraphicsItem *GraphicsPiece::container() const { return m_container; }
 
-QRectF GraphicsPiece::boundingRect() const
-{
-    return m_rect;
-}
+void GraphicsPiece::setContainer(QGraphicsItem *item) { m_container = item; }
 
-void GraphicsPiece::paint(QPainter* painter,
-                          const QStyleOptionGraphicsItem* option,
-                          QWidget* widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    QRectF bounds(m_renderer->boundsOnElement(m_elementId));
-    qreal ar = bounds.width() / bounds.height();
-    qreal width = m_rect.width() * 0.95;  // was 0.8 棋子相对格子的比例
-
-    if (ar > 1.0)
-    {
-        bounds.setWidth(width);
-        bounds.setHeight(width / ar);
-    }
-    else
-    {
-        bounds.setHeight(width);
-        bounds.setWidth(width * ar);
-    }
-    bounds.moveCenter(m_rect.center());
-
-    m_renderer->render(painter, m_elementId, bounds);
-}
-
-Chess::Piece GraphicsPiece::pieceType() const
-{
-    return m_piece;
-}
-
-QGraphicsItem* GraphicsPiece::container() const
-{
-    return m_container;
-}
-
-void GraphicsPiece::setContainer(QGraphicsItem* item)
-{
-    m_container = item;
-}
-
-void GraphicsPiece::restoreParent()
-{
-    if (parentItem() == nullptr && m_container != nullptr)
-    {
-        QPointF point(m_container->mapFromScene(pos()));
-        setParentItem(m_container);
-        setPos(point);
-    }
+void GraphicsPiece::restoreParent() {
+  if (parentItem() == nullptr && m_container != nullptr) {
+    QPointF point(m_container->mapFromScene(pos()));
+    setParentItem(m_container);
+    setPos(point);
+  }
 }

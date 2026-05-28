@@ -17,115 +17,99 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QTimerEvent>
 #include <QLabel>
+#include <QTimerEvent>
 #include <QVBoxLayout>
 
 #include "chessclock.h"
 
-ChessClock::ChessClock(QWidget* parent)
-    : QWidget(parent),
-      m_totalTime(0),
-      m_timerId(-1),
-      m_infiniteTime(false),
-      m_nameLabel(new QLabel()),
-      m_timeLabel(new QLabel())
-{
-    m_defaultPalette = m_timeLabel->palette();
-    m_timeLabel->setAutoFillBackground(true);
+ChessClock::ChessClock(QWidget *parent)
+    : QWidget(parent), m_totalTime(0), m_timerId(-1), m_infiniteTime(false),
+      m_nameLabel(new QLabel()), m_timeLabel(new QLabel()) {
+  m_defaultPalette = m_timeLabel->palette();
+  m_timeLabel->setAutoFillBackground(true);
 
-    m_nameLabel->setTextFormat(Qt::RichText);
-    m_nameLabel->setAlignment(Qt::AlignHCenter);
+  m_nameLabel->setTextFormat(Qt::RichText);
+  m_nameLabel->setAlignment(Qt::AlignHCenter);
 
-    m_timeLabel->setTextFormat(Qt::RichText);
-    m_timeLabel->setAlignment(Qt::AlignHCenter);
+  m_timeLabel->setTextFormat(Qt::RichText);
+  m_timeLabel->setAlignment(Qt::AlignHCenter);
 
-    QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(m_nameLabel);
-    layout->addWidget(m_timeLabel);
-    setLayout(layout);
+  QVBoxLayout *layout = new QVBoxLayout();
+  layout->addWidget(m_nameLabel);
+  layout->addWidget(m_timeLabel);
+  setLayout(layout);
 }
 
-void ChessClock::setPlayerName(const QString& name)
-{
-    if (name.isEmpty())
-        m_nameLabel->clear();
-    else
-        m_nameLabel->setText(QString("<h3>%1</h3>").arg(name));
+void ChessClock::setPlayerName(const QString &name) {
+  if (name.isEmpty())
+    m_nameLabel->clear();
+  else
+    m_nameLabel->setText(QString("<h3>%1</h3>").arg(name));
 }
 
-void ChessClock::setInfiniteTime(bool infinite) 
-{
-    m_infiniteTime = infinite;
-    if (!infinite)
-        return;
+void ChessClock::setInfiniteTime(bool infinite) {
+  m_infiniteTime = infinite;
+  if (!infinite)
+    return;
 
-    stopTimer();
-    m_timeLabel->setText(QString::fromUtf8("<h1>\xE2\x88\x9E</h1>"));
+  stopTimer();
+  m_timeLabel->setText(QString::fromUtf8("<h1>\xE2\x88\x9E</h1>"));
 }
 
-void ChessClock::setTime(int totalTime)
-{
-    if (m_infiniteTime)
-        return;
+void ChessClock::setTime(int totalTime) {
+  if (m_infiniteTime)
+    return;
 
-    QTime timeLeft = QTime(0, 0).addMSecs(abs(totalTime + 500));
+  QTime timeLeft = QTime(0, 0).addMSecs(abs(totalTime + 500));
 
-    QString format;
-    if (timeLeft.hour() > 0)
-        format = "hh:mm:ss";
-    else
-        format = "mm:ss";
+  QString format;
+  if (timeLeft.hour() > 0)
+    format = "hh:mm:ss";
+  else
+    format = "mm:ss";
 
-    QString str;
-    if (totalTime <= -500)
-        str.append("-");
-    str.append(timeLeft.toString(format));
+  QString str;
+  if (totalTime <= -500)
+    str.append("-");
+  str.append(timeLeft.toString(format));
 
-    m_timeLabel->setText(QString("<h1>%1</h1>").arg(str));
+  m_timeLabel->setText(QString("<h1>%1</h1>").arg(str));
 }
 
-void ChessClock::start(int totalTime)
-{
-    QPalette tmp = m_timeLabel->palette();
-    tmp.setColor(QPalette::WindowText,
-                 m_defaultPalette.color(QPalette::Window));
-    tmp.setColor(QPalette::Window,
-                 m_defaultPalette.color(QPalette::WindowText));
-    m_timeLabel->setPalette(tmp);
+void ChessClock::start(int totalTime) {
+  QPalette tmp = m_timeLabel->palette();
+  tmp.setColor(QPalette::WindowText, m_defaultPalette.color(QPalette::Window));
+  tmp.setColor(QPalette::Window, m_defaultPalette.color(QPalette::WindowText));
+  m_timeLabel->setPalette(tmp);
 
-    if (!m_infiniteTime)
-    {
-        m_time.start();
-        m_totalTime = totalTime;
-        m_timerId = startTimer(1000);
-        setTime(totalTime);
-    }
+  if (!m_infiniteTime) {
+    m_time.start();
+    m_totalTime = totalTime;
+    m_timerId = startTimer(1000);
+    setTime(totalTime);
+  }
 }
 
-void ChessClock::stop()
-{
-    m_timeLabel->setPalette(m_defaultPalette);
+void ChessClock::stop() {
+  m_timeLabel->setPalette(m_defaultPalette);
 
-    stopTimer();
-    if (!m_infiniteTime)
-        setTime(m_totalTime - m_time.elapsed());
+  stopTimer();
+  if (!m_infiniteTime)
+    setTime(m_totalTime - m_time.elapsed());
 }
 
-void ChessClock::timerEvent(QTimerEvent* event)
-{
-    if (!event)
-        return;
+void ChessClock::timerEvent(QTimerEvent *event) {
+  if (!event)
+    return;
 
-    if (event->timerId() == m_timerId)
-        setTime(m_totalTime - m_time.elapsed());
+  if (event->timerId() == m_timerId)
+    setTime(m_totalTime - m_time.elapsed());
 }
 
-void ChessClock::stopTimer()
-{
-    if (m_timerId != -1)
-    {
-        killTimer(m_timerId);
-        m_timerId = -1;
-    }
+void ChessClock::stopTimer() {
+  if (m_timerId != -1) {
+    killTimer(m_timerId);
+    m_timerId = -1;
+  }
 }

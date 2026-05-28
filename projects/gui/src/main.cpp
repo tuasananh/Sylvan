@@ -18,42 +18,40 @@
 */
 
 #include <QLoggingCategory>
-#include <QTextStream>
-#include <QStringList>
 #include <QMetaType>
+#include <QStringList>
+#include <QTextStream>
 #include <QTranslator>
 
 #include <board/genericmove.h>
 #include <board/move.h>
-#include <board/side.h>
 #include <board/result.h>
+#include <board/side.h>
 #include <moveevaluation.h>
 
 #include "sylvanapp.h"
 
-int main(int argc, char* argv[])
-{
-    // Register types for signal / slot connections
-    qRegisterMetaType<Chess::GenericMove>("Chess::GenericMove");
-    qRegisterMetaType<Chess::Move>("Chess::Move");
-    qRegisterMetaType<Chess::Side>("Chess::Side");
-    qRegisterMetaType<Chess::Result>("Chess::Result");
-    qRegisterMetaType<MoveEvaluation>("MoveEvaluation");
+int main(int argc, char *argv[]) {
+  // Register types for signal / slot connections
+  qRegisterMetaType<Chess::GenericMove>("Chess::GenericMove");
+  qRegisterMetaType<Chess::Move>("Chess::Move");
+  qRegisterMetaType<Chess::Side>("Chess::Side");
+  qRegisterMetaType<Chess::Result>("Chess::Result");
+  qRegisterMetaType<MoveEvaluation>("MoveEvaluation");
 
-    SylvanApplication app(argc, argv);
+  SylvanApplication app(argc, argv);
 
-    QTranslator translator[3];
-    QString prefix[3] = { "sylvan", "qtbase", "widgets" };
-    QString dir = app.applicationDirPath() + "/" + "translations";
-    QLoggingCategory::defaultCategory()->setEnabled(QtDebugMsg, true);
+  QTranslator translator[3];
+  QString prefix[3] = {"sylvan", "qtbase", "widgets"};
+  QString dir = app.applicationDirPath() + "/" + "translations";
+  QLoggingCategory::defaultCategory()->setEnabled(QtDebugMsg, true);
 
-    for (int i = 0; i < 3; i++)
-    {
-        translator[i].load(QLocale(), prefix[i], "_", dir, ".qm");
-        app.installTranslator(&translator[i]);
-    }
+  for (int i = 0; i < 3; i++) {
+    translator[i].load(QLocale(), prefix[i], "_", dir, ".qm");
+    app.installTranslator(&translator[i]);
+  }
 
-    app.newDefaultGame();
+  app.newDefaultGame();
 
-    return app.exec();
+  return app.exec();
 }

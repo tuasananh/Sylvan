@@ -20,64 +20,52 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include <pgnstream.h>
 #include <pgngameentry.h>
+#include <pgnstream.h>
 
 #include "pgndatabase.h"
 #include "pgnimporter.h"
 
-PgnImporter::PgnImporter(const QString& fileName)
-    : Worker(QString("PGN import: %1").arg(fileName)),
-      m_fileName(fileName)
-{
-}
+PgnImporter::PgnImporter(const QString &fileName)
+    : Worker(QString("PGN import: %1").arg(fileName)), m_fileName(fileName) {}
 
-QString PgnImporter::fileName() const
-{
-    return m_fileName;
-}
+QString PgnImporter::fileName() const { return m_fileName; }
 
-void PgnImporter::work()
-{
-    QFile file(m_fileName);
-    QFileInfo fileInfo(m_fileName);
-    static const int updateInterval = 1024;
-    int numReadGames = 0;
+void PgnImporter::work() {
+  QFile file(m_fileName);
+  QFileInfo fileInfo(m_fileName);
+  static const int updateInterval = 1024;
+  int numReadGames = 0;
 
-    if (!fileInfo.exists())
-    {
-        emit error(PgnImporter::FileDoesNotExist);
-        return;
+  if (!fileInfo.exists()) {
+    emit error(PgnImporter::FileDoesNotExist);
+    return;
+  }
+
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    emit error(PgnImporter::IoError);
+    return;
+  }
+
+  PgnStream pgnStream(&file);
+  QList<const PgnGameEntry *> games;
+
+  for (;;) {
+    PgnGameEntry *game = new PgnGameEntry;
+    if (cancelRequested() || !game->read(pgnStream)) {
+      delete game;
+      break;
     }
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        emit error(PgnImporter::IoError);
-        return;
-    }
+    games << game;
+    numReadGames++;
 
-    PgnStream pgnStream(&file);
-    QList<const PgnGameEntry*> games;
+    if (numReadGames % updateInterval == 0)
+      emit databaseReadStatus(startTime(), numReadGames, pgnStream.pos());
+  }
+  PgnDatabase *db = new PgnDatabase(m_fileName);
+  db->setEntries(games);
+  db->setLastModified(fileInfo.lastModified());
 
-    for (;;)
-    {
-        PgnGameEntry* game = new PgnGameEntry;
-        if (cancelRequested() || !game->read(pgnStream))
-        {
-            delete game;
-            break;
-        }
-
-        games << game;
-        numReadGames++;
-
-        if (numReadGames % updateInterval == 0)
-            emit databaseReadStatus(startTime(), numReadGames,
-                                    pgnStream.pos());
-    }
-    PgnDatabase* db = new PgnDatabase(m_fileName);
-    db->setEntries(games);
-    db->setLastModified(fileInfo.lastModified());
-
-    emit databaseRead(db);
+  emit databaseRead(db);
 }

@@ -25,23 +25,22 @@
 class QPlainTextEdit;
 class Tournament;
 
-class TournamentResultsDialog : public QDialog
-{
-    Q_OBJECT
+class TournamentResultsDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /* Creates a new TournamentResultsDialog. */
-    TournamentResultsDialog(QWidget* parent = nullptr);
-    virtual ~TournamentResultsDialog();
+  /* Creates a new TournamentResultsDialog. */
+  TournamentResultsDialog(QWidget *parent = nullptr);
+  virtual ~TournamentResultsDialog();
 
-    /*! Sets \a tournament as the current tournament. */
-    void setTournament(Tournament* tournament);
+  /*! Sets \a tournament as the current tournament. */
+  void setTournament(Tournament *tournament);
 
 public slots:
-    void update();
+  void update();
 
 private:
-    QPlainTextEdit* m_resultsEdit;
+  QPlainTextEdit *m_resultsEdit;
 };
 
 #endif // TOURNAMENTRESULTSDIALOG_H

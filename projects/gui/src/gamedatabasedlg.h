@@ -21,8 +21,8 @@
 #define GAME_DATABASE_DIALOG_H
 
 #include <QDialog>
-#include <QTimer>
 #include <QItemSelection>
+#include <QTimer>
 
 #include <pgngame.h>
 
@@ -41,47 +41,45 @@ class GameDatabaseDialog;
  *
  * \sa GameDatabaseManager
  */
-class GameDatabaseDialog : public QDialog
-{
-    Q_OBJECT
+class GameDatabaseDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /*! Constructs a new GameDatabaseDialog. */
-    GameDatabaseDialog(GameDatabaseManager* dbManager,
-                       QWidget* parent = nullptr);
-    /*! Destroys the dialog. */
-    virtual ~GameDatabaseDialog();
+  /*! Constructs a new GameDatabaseDialog. */
+  GameDatabaseDialog(GameDatabaseManager *dbManager, QWidget *parent = nullptr);
+  /*! Destroys the dialog. */
+  virtual ~GameDatabaseDialog();
 
 private slots:
-    void databaseSelectionChanged(const QItemSelection& selected,
-                                  const QItemSelection& deselected);
-    void gameSelectionChanged(const QModelIndex& current,
-                              const QModelIndex& previous);
-    void updateSearch(const QString& terms = QString());
-    void onSearchTimeout();
-    void onAdvancedSearch();
-    void exportPgn(const QString& filename);
-    void createOpeningBook();
-    void copyGame();
-    void copyFen();
-    void updateUi();
+  void databaseSelectionChanged(const QItemSelection &selected,
+                                const QItemSelection &deselected);
+  void gameSelectionChanged(const QModelIndex &current,
+                            const QModelIndex &previous);
+  void updateSearch(const QString &terms = QString());
+  void onSearchTimeout();
+  void onAdvancedSearch();
+  void exportPgn(const QString &filename);
+  void createOpeningBook();
+  void copyGame();
+  void copyFen();
+  void updateUi();
 
 private:
-    friend class PgnGameIterator;
-    int databaseIndexFromGame(int game) const;
+  friend class PgnGameIterator;
+  int databaseIndexFromGame(int game) const;
 
-    GameViewer* m_gameViewer;
-    PgnGame m_game;
-    QVector<PgnGame::MoveData> m_moves;
+  GameViewer *m_gameViewer;
+  PgnGame m_game;
+  QVector<PgnGame::MoveData> m_moves;
 
-    GameDatabaseManager* m_dbManager;
-    PgnDatabaseModel* m_pgnDatabaseModel;
-    PgnGameEntryModel* m_pgnGameEntryModel;
-    QMap<int, PgnDatabase*> m_selectedDatabases;
+  GameDatabaseManager *m_dbManager;
+  PgnDatabaseModel *m_pgnDatabaseModel;
+  PgnGameEntryModel *m_pgnGameEntryModel;
+  QMap<int, PgnDatabase *> m_selectedDatabases;
 
-    QTimer m_searchTimer;
-    QString m_searchTerms;
-    Ui::GameDatabaseDialog* ui;
+  QTimer m_searchTimer;
+  QString m_searchTerms;
+  Ui::GameDatabaseDialog *ui;
 };
 
 #endif // GAME_DATABASE_DIALOG_H

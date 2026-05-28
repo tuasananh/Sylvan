@@ -29,44 +29,41 @@ class PgnDatabase;
  *
  * \sa PgnDatabase
  */
-class PgnImporter : public Worker
-{
-    Q_OBJECT
+class PgnImporter : public Worker {
+  Q_OBJECT
 
 public:
-    /*! Import error. */
-    enum Error
-    {
-        FileDoesNotExist, //!< The PGN file was not found
-        IoError           //!< A generic I/O error
-    };
+  /*! Import error. */
+  enum Error {
+    FileDoesNotExist, //!< The PGN file was not found
+    IoError           //!< A generic I/O error
+  };
 
-    /*!
-         * Constructs a PgnImporter with \a fileName as
-         * database to be imported.
-         */
-    PgnImporter(const QString& fileName);
-    /*! Returns the file name of the database to be imported. */
-    QString fileName() const;
+  /*!
+   * Constructs a PgnImporter with \a fileName as
+   * database to be imported.
+   */
+  PgnImporter(const QString &fileName);
+  /*! Returns the file name of the database to be imported. */
+  QString fileName() const;
 
 protected:
-    void work() override;
+  void work() override;
 
 signals:
-    /*! Emitted when \a database is read. */
-    void databaseRead(PgnDatabase* database);
-    /*!
-         * Emitted periodically to give progress information about the import.
-         *
-         * The import was initiated at \a started and so far \a numReadGames games
-         * and \a numReadBytes bytes have been read.
-         */
-    void databaseReadStatus(const QTime& started, int numReadGames, qint64 numReadBytes);
+  /*! Emitted when \a database is read. */
+  void databaseRead(PgnDatabase *database);
+  /*!
+   * Emitted periodically to give progress information about the import.
+   *
+   * The import was initiated at \a started and so far \a numReadGames games
+   * and \a numReadBytes bytes have been read.
+   */
+  void databaseReadStatus(const QTime &started, int numReadGames,
+                          qint64 numReadBytes);
 
 private:
-    QString m_fileName;
-
+  QString m_fileName;
 };
 
 #endif // PGN_IMPORTER_H
-

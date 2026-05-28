@@ -32,22 +32,19 @@ class QAbstractItemView;
  * is positioned at the bottom and thus the user has always control of the
  * behavior.
  */
-class AutoVerticalScroller : QObject
-{
-    Q_OBJECT
+class AutoVerticalScroller : QObject {
+  Q_OBJECT
 
 public:
-    AutoVerticalScroller(QAbstractItemView* view, QObject* parent = nullptr);
+  AutoVerticalScroller(QAbstractItemView *view, QObject *parent = nullptr);
 
 private:
-    QAbstractItemView* m_view;
-    bool m_scrollToBottom;
+  QAbstractItemView *m_view;
+  bool m_scrollToBottom;
 
 private slots:
-    void onRowsAboutToBeInserted();
-    void onRowsInserted();
-
+  void onRowsAboutToBeInserted();
+  void onRowsInserted();
 };
 
 #endif // AUTO_VERTICAL_SCROLLER_H
-

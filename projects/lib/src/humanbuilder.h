@@ -20,31 +20,29 @@
 #ifndef HUMANBUILDER_H
 #define HUMANBUILDER_H
 
-#include <QString>
 #include "playerbuilder.h"
+#include <QString>
 
 /*! \brief A class for constructing human players. */
-class LIB_EXPORT HumanBuilder : public PlayerBuilder
-{
+class LIB_EXPORT HumanBuilder : public PlayerBuilder {
 public:
-    /*!
-         * Creates a new HumanBuilder.
-         *
-         * Any created players will have the name \a playerName,
-         * unless it's an empty string. They cannot forfeit on
-         * time if \a playAfterTimeout is true.
-         */
-    HumanBuilder(const QString& playerName = QString(),
-                 bool playAfterTimeout = true);
+  /*!
+   * Creates a new HumanBuilder.
+   *
+   * Any created players will have the name \a playerName,
+   * unless it's an empty string. They cannot forfeit on
+   * time if \a playAfterTimeout is true.
+   */
+  HumanBuilder(const QString &playerName = QString(),
+               bool playAfterTimeout = true);
 
-    // Inherited from PlayerBuilder
-    virtual bool isHuman() const;
-    virtual ChessPlayer* create(QObject* receiver,
-                                const char* method,
-                                QObject* parent,
-                                QString* error) const;
+  // Inherited from PlayerBuilder
+  virtual bool isHuman() const;
+  virtual ChessPlayer *create(QObject *receiver, const char *method,
+                              QObject *parent, QString *error) const;
+
 private:
-    bool m_playAfterTimeout;
+  bool m_playAfterTimeout;
 };
 
 #endif // HUMANBUILDER_H

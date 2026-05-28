@@ -28,28 +28,25 @@ class QAction;
 /*!
  * \brief Widget that is used to display log messages in plain text.
  */
-class PlainTextLog : public QPlainTextEdit
-{
-    Q_OBJECT
+class PlainTextLog : public QPlainTextEdit {
+  Q_OBJECT
 
 public:
-    /*! Constructs a new plain text log with the given \a parent. */
-    PlainTextLog(QWidget* parent = nullptr);
-    /*!
-         * Constructs a new plain text log with the initial text \a text and
-         * given \a parent.
-         */
-    PlainTextLog(const QString& text, QWidget* parent = nullptr);
+  /*! Constructs a new plain text log with the given \a parent. */
+  PlainTextLog(QWidget *parent = nullptr);
+  /*!
+   * Constructs a new plain text log with the initial text \a text and
+   * given \a parent.
+   */
+  PlainTextLog(const QString &text, QWidget *parent = nullptr);
 
 public slots:
-    /*! Save the log to file \a filename. */
-    void saveLogToFile(const QString& fileName);
+  /*! Save the log to file \a filename. */
+  void saveLogToFile(const QString &fileName);
 
 protected:
-    // Inherited from QPlainTextEdit
-    virtual void contextMenuEvent(QContextMenuEvent* event);
-
+  // Inherited from QPlainTextEdit
+  virtual void contextMenuEvent(QContextMenuEvent *event);
 };
 
 #endif // PLAIN_TEXT_LOG_H
-

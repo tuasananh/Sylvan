@@ -34,60 +34,58 @@ class GraphicsPiece;
  * pieces which can be brought back to the game. This class acts as
  * a kind of separate chessboard for the piece reserve.
  */
-class GraphicsPieceReserve : public QGraphicsItem
-{
+class GraphicsPieceReserve : public QGraphicsItem {
 public:
-    /*! The type value returned by type(). */
-    enum { Type = UserType + 3 };
+  /*! The type value returned by type(). */
+  enum { Type = UserType + 3 };
 
-    /*!
-         * Creates a new piece reserve.
-         *
-         * Each "square" has a width and height of \a squareSize,
-         * and squares are automatically added and removed when
-         * needed.
-         */
-    explicit GraphicsPieceReserve(qreal squareSize,
-                                  QGraphicsItem* parent = nullptr);
+  /*!
+   * Creates a new piece reserve.
+   *
+   * Each "square" has a width and height of \a squareSize,
+   * and squares are automatically added and removed when
+   * needed.
+   */
+  explicit GraphicsPieceReserve(qreal squareSize,
+                                QGraphicsItem *parent = nullptr);
 
-    // Inherited from QGraphicsItem
-    virtual int type() const;
-    virtual QRectF boundingRect() const;
-    virtual void paint(QPainter* painter,
-                       const QStyleOptionGraphicsItem* option,
-                       QWidget* widget = nullptr);
+  // Inherited from QGraphicsItem
+  virtual int type() const;
+  virtual QRectF boundingRect() const;
+  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                     QWidget *widget = nullptr);
 
-    /*! Returns the number of pieces of type \a piece. */
-    int pieceCount(const Chess::Piece& piece) const;
-    /*!
-         * Returns a GraphicsPiece object of type \a piece.
-         * Returns 0 if no pieces of type \a piece exist.
-         */
-    GraphicsPiece* piece(const Chess::Piece& piece) const;
-    /*!
-         * Removes a GraphicsPiece of type \a piece and returns it.
-         * Returns 0 if no pieces of type \a exist.
-         */
-    GraphicsPiece* takePiece(const Chess::Piece& piece);
-    /*!
-         * Adds \a piece to the reserve.
-         * This object becomes the parent item and container of \a piece.
-         */
-    void addPiece(GraphicsPiece* piece);
+  /*! Returns the number of pieces of type \a piece. */
+  int pieceCount(const Chess::Piece &piece) const;
+  /*!
+   * Returns a GraphicsPiece object of type \a piece.
+   * Returns 0 if no pieces of type \a piece exist.
+   */
+  GraphicsPiece *piece(const Chess::Piece &piece) const;
+  /*!
+   * Removes a GraphicsPiece of type \a piece and returns it.
+   * Returns 0 if no pieces of type \a exist.
+   */
+  GraphicsPiece *takePiece(const Chess::Piece &piece);
+  /*!
+   * Adds \a piece to the reserve.
+   * This object becomes the parent item and container of \a piece.
+   */
+  void addPiece(GraphicsPiece *piece);
 
 private:
-    QPointF piecePos(Chess::Side side, int index) const;
-    QRectF textRect(Chess::Side side, int index) const;
-    QRectF textRect(const Chess::Piece& piece) const;
-    void updateTiles();
-    typedef QMultiMap<Chess::Piece, GraphicsPiece*> PieceMap;
+  QPointF piecePos(Chess::Side side, int index) const;
+  QRectF textRect(Chess::Side side, int index) const;
+  QRectF textRect(const Chess::Piece &piece) const;
+  void updateTiles();
+  typedef QMultiMap<Chess::Piece, GraphicsPiece *> PieceMap;
 
-    qreal m_tileWidth;
-    qreal m_tileHeight;
-    QRectF m_rect;
-    PieceMap m_pieces;
-    int m_rowCount;
-    QList<Chess::Piece> m_tiles[2];
+  qreal m_tileWidth;
+  qreal m_tileHeight;
+  QRectF m_rect;
+  PieceMap m_pieces;
+  int m_rowCount;
+  QList<Chess::Piece> m_tiles[2];
 };
 
 #endif // GRAPHICSPIECERESERVE_H

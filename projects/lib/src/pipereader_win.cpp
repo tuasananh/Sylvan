@@ -20,107 +20,89 @@
 #include "pipereader_win.h"
 #include <QMutexLocker>
 
-
-PipeReader::PipeReader(HANDLE pipe, QObject* parent)
-    : QThread(parent),
-      m_pipe(pipe),
-      m_bufEnd(m_buf + BufSize),
-      m_start(m_buf),
-      m_end(m_buf),
-      m_freeBytes(BufSize),
-      m_usedBytes(0),
-      m_lastNewLine(1)
-{
-    Q_ASSERT(m_pipe != INVALID_HANDLE_VALUE);
+PipeReader::PipeReader(HANDLE pipe, QObject *parent)
+    : QThread(parent), m_pipe(pipe), m_bufEnd(m_buf + BufSize), m_start(m_buf),
+      m_end(m_buf), m_freeBytes(BufSize), m_usedBytes(0), m_lastNewLine(1) {
+  Q_ASSERT(m_pipe != INVALID_HANDLE_VALUE);
 }
 
-qint64 PipeReader::bytesAvailable() const
-{
-    return qint64(m_usedBytes.available());
+qint64 PipeReader::bytesAvailable() const {
+  return qint64(m_usedBytes.available());
 }
 
-bool PipeReader::canReadLine() const
-{
-    QMutexLocker locker(&m_mutex);
-    return m_lastNewLine <= m_usedBytes.available();
+bool PipeReader::canReadLine() const {
+  QMutexLocker locker(&m_mutex);
+  return m_lastNewLine <= m_usedBytes.available();
 }
 
-qint64 PipeReader::readData(char* data, qint64 maxSize)
-{
-    int n = qMin(int(maxSize), m_usedBytes.available());
-    if (n <= 0)
-        return -1;
-    m_usedBytes.acquire(n);
+qint64 PipeReader::readData(char *data, qint64 maxSize) {
+  int n = qMin(int(maxSize), m_usedBytes.available());
+  if (n <= 0)
+    return -1;
+  m_usedBytes.acquire(n);
 
-    // Copy the first (possibly the only) block of data
-    int size1 = qMin(int(m_bufEnd - m_start), n);
-    memcpy(data, m_start, size_t(size1));
-    m_start += size1;
+  // Copy the first (possibly the only) block of data
+  int size1 = qMin(int(m_bufEnd - m_start), n);
+  memcpy(data, m_start, size_t(size1));
+  m_start += size1;
+
+  Q_ASSERT(m_start <= m_bufEnd);
+  if (m_start == m_bufEnd)
+    m_start = m_buf;
+
+  // Copy the second block of data from the beginning
+  int size2 = n - size1;
+  if (size2 > 0) {
+    memcpy(data + size1, m_start, size_t(size2));
+    m_start += size2;
 
     Q_ASSERT(m_start <= m_bufEnd);
     if (m_start == m_bufEnd)
-        m_start = m_buf;
+      m_start = m_buf;
+  }
+  Q_ASSERT(n == size1 + size2);
 
-    // Copy the second block of data from the beginning
-    int size2 = n - size1;
-    if (size2 > 0)
-    {
-        memcpy(data + size1, m_start, size_t(size2));
-        m_start += size2;
-
-        Q_ASSERT(m_start <= m_bufEnd);
-        if (m_start == m_bufEnd)
-            m_start = m_buf;
-    }
-    Q_ASSERT(n == size1 + size2);
-
-    m_freeBytes.release(n);
-    return n;
+  m_freeBytes.release(n);
+  return n;
 }
 
-void PipeReader::run()
-{
-    DWORD dwRead = 0;
+void PipeReader::run() {
+  DWORD dwRead = 0;
 
-    for (;;)
-    {
-        int maxSize = qMin(BufSize / 10, int(m_bufEnd - m_end));
-        m_freeBytes.acquire(maxSize);
+  for (;;) {
+    int maxSize = qMin(BufSize / 10, int(m_bufEnd - m_end));
+    m_freeBytes.acquire(maxSize);
 
-        BOOL ok = ReadFile(m_pipe, m_end, maxSize, &dwRead, 0);
-        if (!ok || dwRead == 0)
-        {
-            DWORD err = GetLastError();
-            if (err != ERROR_INVALID_HANDLE
-                    &&  err != ERROR_BROKEN_PIPE)
-                qWarning("ReadFile failed with 0x%x", int(err));
-            return;
-        }
-
-        m_end += dwRead;
-        Q_ASSERT(m_end <= m_bufEnd);
-
-        QMutexLocker locker(&m_mutex);
-
-        m_lastNewLine += dwRead;
-        for (int i = 1; i <= int(dwRead); i++)
-        {
-            if (*(m_end - i) == '\n')
-            {
-                m_lastNewLine = i;
-                break;
-            }
-        }
-
-        if (m_end == m_bufEnd)
-            m_end = m_buf;
-
-        m_freeBytes.release(maxSize - dwRead);
-        m_usedBytes.release(dwRead);
-
-        // To avoid signal spam, send the 'readyRead' signal only
-        // if we have a whole line of new data
-        if (m_lastNewLine <= int(dwRead))
-            emit readyRead();
+    BOOL ok = ReadFile(m_pipe, m_end, maxSize, &dwRead, 0);
+    if (!ok || dwRead == 0) {
+      DWORD err = GetLastError();
+      if (err != ERROR_INVALID_HANDLE && err != ERROR_BROKEN_PIPE)
+        qWarning("ReadFile failed with 0x%x", int(err));
+      return;
     }
+
+    m_end += dwRead;
+    Q_ASSERT(m_end <= m_bufEnd);
+
+    QMutexLocker locker(&m_mutex);
+
+    m_lastNewLine += dwRead;
+    for (int i = 1; i <= int(dwRead); i++) {
+      if (*(m_end - i) == '\n') {
+        m_lastNewLine = i;
+        break;
+      }
+    }
+
+    if (m_end == m_bufEnd)
+      m_end = m_buf;
+
+    m_freeBytes.release(maxSize - dwRead);
+    m_usedBytes.release(dwRead);
+
+    // To avoid signal spam, send the 'readyRead' signal only
+    // if we have a whole line of new data
+    if (m_lastNewLine <= int(dwRead))
+      emit readyRead();
+  }
 }

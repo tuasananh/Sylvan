@@ -22,28 +22,28 @@
 
 #include <QStyledItemDelegate>
 
-class EngineOptionDelegate : public QStyledItemDelegate
-{
-    Q_OBJECT
+class EngineOptionDelegate : public QStyledItemDelegate {
+  Q_OBJECT
 
 public:
-    EngineOptionDelegate(QWidget* parent = nullptr);
+  EngineOptionDelegate(QWidget *parent = nullptr);
 
-    // Inherited from QStyledItemDelegate
-    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
-                                  const QModelIndex& index) const;
-    virtual void setEditorData(QWidget* editor, const QModelIndex& index) const;
-    virtual void setModelData(QWidget* editor, QAbstractItemModel* model,
-                              const QModelIndex& index) const;
+  // Inherited from QStyledItemDelegate
+  virtual QWidget *createEditor(QWidget *parent,
+                                const QStyleOptionViewItem &option,
+                                const QModelIndex &index) const;
+  virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  virtual void setModelData(QWidget *editor, QAbstractItemModel *model,
+                            const QModelIndex &index) const;
 
 public slots:
-    void setEngineDirectory(const QString& dir);
+  void setEngineDirectory(const QString &dir);
 
 protected:
-    virtual bool eventFilter(QObject* object, QEvent* event);
+  virtual bool eventFilter(QObject *object, QEvent *event);
 
 private:
-    QString m_engineDir;
+  QString m_engineDir;
 };
 
 #endif // ENGINE_OPTION_DELEGATE_H

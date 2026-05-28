@@ -26,60 +26,57 @@
 class OpeningBook;
 
 /*! \brief A class for storing a player's tournament-specific details. */
-class LIB_EXPORT TournamentPlayer
-{
+class LIB_EXPORT TournamentPlayer {
 public:
-    /*! Creates a new TournamentPlayer object. */
-    TournamentPlayer(PlayerBuilder* builder,
-                     const TimeControl& timeControl,
-                     const OpeningBook* book,
-                     int bookDepth);
+  /*! Creates a new TournamentPlayer object. */
+  TournamentPlayer(PlayerBuilder *builder, const TimeControl &timeControl,
+                   const OpeningBook *book, int bookDepth);
 
-    /*! Returns the player's builder object. */
-    const PlayerBuilder* builder() const;
-    /*! Returns the player's name. */
-    QString name() const;
-    /*! Sets the player's name to \a name. */
-    void setName(const QString& name);
-    /*! Returns the player's time control. */
-    const TimeControl& timeControl() const;
-    /*! Returns the player's opening book. */
-    const OpeningBook* book() const;
-    /*! Returns the player's maximum book depth. */
-    int bookDepth() const;
-    /*!
-         * Returns the total number of wins the player has in the
-         * tournament.
-         */
-    int wins() const;
-    /*!
-         * Returns the total number of draws the player has in the
-         * tournament.
-         */
-    int draws() const;
-    /*!
-         * Returns the total number of losses the player has in the
-         * tournament.
-         */
-    int losses() const;
-    /*! Returns the player's total score in the tournament. */
-    int score() const;
-    /*! Adds \a score to the player's score in the tournament. */
-    void addScore(int score);
-    /*!
-         * Returns the total number of games the player has finished
-         * in the tournament.
-         */
-    int gamesFinished() const;
+  /*! Returns the player's builder object. */
+  const PlayerBuilder *builder() const;
+  /*! Returns the player's name. */
+  QString name() const;
+  /*! Sets the player's name to \a name. */
+  void setName(const QString &name);
+  /*! Returns the player's time control. */
+  const TimeControl &timeControl() const;
+  /*! Returns the player's opening book. */
+  const OpeningBook *book() const;
+  /*! Returns the player's maximum book depth. */
+  int bookDepth() const;
+  /*!
+   * Returns the total number of wins the player has in the
+   * tournament.
+   */
+  int wins() const;
+  /*!
+   * Returns the total number of draws the player has in the
+   * tournament.
+   */
+  int draws() const;
+  /*!
+   * Returns the total number of losses the player has in the
+   * tournament.
+   */
+  int losses() const;
+  /*! Returns the player's total score in the tournament. */
+  int score() const;
+  /*! Adds \a score to the player's score in the tournament. */
+  void addScore(int score);
+  /*!
+   * Returns the total number of games the player has finished
+   * in the tournament.
+   */
+  int gamesFinished() const;
 
 private:
-    PlayerBuilder* m_builder;
-    TimeControl m_timeControl;
-    const OpeningBook* m_book;
-    int m_bookDepth;
-    int m_wins;
-    int m_draws;
-    int m_losses;
+  PlayerBuilder *m_builder;
+  TimeControl m_timeControl;
+  const OpeningBook *m_book;
+  int m_bookDepth;
+  int m_wins;
+  int m_draws;
+  int m_losses;
 };
 
 #endif // TOURNAMENTPLAYER_H

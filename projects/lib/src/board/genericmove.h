@@ -20,8 +20,8 @@
 #ifndef GENERICMOVE_H
 #define GENERICMOVE_H
 
-#include <QMetaType>
 #include "square.h"
+#include <QMetaType>
 
 namespace Chess {
 
@@ -32,36 +32,34 @@ namespace Chess {
  * kind, it will be in this format. Later it can be converted to Chess::Move
  * by a Chess::Board object.
  */
-class LIB_EXPORT GenericMove
-{
+class LIB_EXPORT GenericMove {
 public:
-    /*! Constructs a new null (empty) move. */
-    GenericMove();
-    /*! Constructs and initializes a new move. */
-    GenericMove(const Square& sourceSquare,
-                const Square& targetSquare);
+  /*! Constructs a new null (empty) move. */
+  GenericMove();
+  /*! Constructs and initializes a new move. */
+  GenericMove(const Square &sourceSquare, const Square &targetSquare);
 
-    /*! Returns true if \a other is the same as this move. */
-    bool operator==(const GenericMove& other) const;
-    /*! Returns true if \a other is different from this move. */
-    bool operator!=(const GenericMove& other) const;
+  /*! Returns true if \a other is the same as this move. */
+  bool operator==(const GenericMove &other) const;
+  /*! Returns true if \a other is different from this move. */
+  bool operator!=(const GenericMove &other) const;
 
-    /*! Returns true if this is a null move. */
-    bool isNull() const;
+  /*! Returns true if this is a null move. */
+  bool isNull() const;
 
-    /*! The source square. */
-    Square sourceSquare() const;
-    /*! The target square. */
-    Square targetSquare() const;
+  /*! The source square. */
+  Square sourceSquare() const;
+  /*! The target square. */
+  Square targetSquare() const;
 
-    /*! Sets the source square to \a square. */
-    void setSourceSquare(const Square& square);
-    /*! Sets the target square to \a square. */
-    void setTargetSquare(const Square& square);
+  /*! Sets the source square to \a square. */
+  void setSourceSquare(const Square &square);
+  /*! Sets the target square to \a square. */
+  void setTargetSquare(const Square &square);
 
 private:
-    Square m_sourceSquare;
-    Square m_targetSquare;
+  Square m_sourceSquare;
+  Square m_targetSquare;
 };
 
 } // namespace Chess

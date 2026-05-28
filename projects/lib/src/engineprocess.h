@@ -23,10 +23,10 @@
 #include <QtGlobal>
 
 #ifdef Q_OS_WIN32
-  #include "engineprocess_win.h"
+#include "engineprocess_win.h"
 #else // not Q_OS_WIN32
-  #include <QProcess>
-  #define EngineProcess QProcess
+#include <QProcess>
+#define EngineProcess QProcess
 #endif // not Q_OS_WIN32
 
 #endif // ENGINEPROCESS_H

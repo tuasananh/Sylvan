@@ -20,8 +20,8 @@
 #ifndef EVALWIDGET_H
 #define EVALWIDGET_H
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 #include <moveevaluation.h>
 
 class QTableWidget;
@@ -30,39 +30,37 @@ class ChessPlayer;
 /*!
  * \brief A widget that shows the engine's thinking in realtime.
  */
-class EvalWidget : public QWidget
-{
-    Q_OBJECT
+class EvalWidget : public QWidget {
+  Q_OBJECT
 
 public:
-    /*! Creates a new EvalWidget object. */
-    explicit EvalWidget(QWidget* parent = nullptr);
+  /*! Creates a new EvalWidget object. */
+  explicit EvalWidget(QWidget *parent = nullptr);
 
-    /*!
-         * Connects the widget to \a player and disconnects from
-         * the previous player (if any).
-         */
-    void setPlayer(ChessPlayer* player);
+  /*!
+   * Connects the widget to \a player and disconnects from
+   * the previous player (if any).
+   */
+  void setPlayer(ChessPlayer *player);
 
 private slots:
-    void clear();
-    void onEval(const MoveEvaluation& eval);
+  void clear();
+  void onEval(const MoveEvaluation &eval);
 
 private:
-    enum StatHeaders
-    {
-        NpsHeader,
-        HashHeader,
-        PonderMoveHeader,
-        PonderHitHeader,
-        TbHeader
-    };
+  enum StatHeaders {
+    NpsHeader,
+    HashHeader,
+    PonderMoveHeader,
+    PonderHitHeader,
+    TbHeader
+  };
 
-    QPointer<ChessPlayer> m_player;
-    QTableWidget* m_statsTable;
-    QTableWidget* m_pvTable;
-    int m_depth;
-    QString m_pv;
+  QPointer<ChessPlayer> m_player;
+  QTableWidget *m_statsTable;
+  QTableWidget *m_pvTable;
+  int m_depth;
+  QString m_pv;
 };
 
 #endif // EVALWIDGET_H

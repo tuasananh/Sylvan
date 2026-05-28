@@ -18,81 +18,68 @@
 */
 
 #include <QFileDialog>
-#include <QToolButton>
 #include <QResizeEvent>
+#include <QToolButton>
 
 #include "pathlineedit.h"
 
-PathLineEdit::PathLineEdit(PathType pathType, QWidget* parent)
-    : QLineEdit(parent),
-      m_pathType(pathType)
-{
-    m_browseBtn = new QToolButton(this);
-    m_browseBtn->setText("...");
+PathLineEdit::PathLineEdit(PathType pathType, QWidget *parent)
+    : QLineEdit(parent), m_pathType(pathType) {
+  m_browseBtn = new QToolButton(this);
+  m_browseBtn->setText("...");
 
-    // Focus must stay on the QLineEdit, otherwise the editor
-    // will be closed prematurely
-    m_browseBtn->setCursor(Qt::ArrowCursor);
-    m_browseBtn->setFocusPolicy(Qt::NoFocus);
+  // Focus must stay on the QLineEdit, otherwise the editor
+  // will be closed prematurely
+  m_browseBtn->setCursor(Qt::ArrowCursor);
+  m_browseBtn->setFocusPolicy(Qt::NoFocus);
 
-    connect(m_browseBtn, SIGNAL(clicked()), this, SLOT(browse()));
+  connect(m_browseBtn, SIGNAL(clicked()), this, SLOT(browse()));
 }
 
-PathLineEdit::~PathLineEdit()
-{
+PathLineEdit::~PathLineEdit() {}
+
+void PathLineEdit::setDefaultDirectory(const QString &dir) {
+  m_defaultDir.setPath(dir);
 }
 
-void PathLineEdit::setDefaultDirectory(const QString& dir)
-{
-    m_defaultDir.setPath(dir);
+void PathLineEdit::resizeEvent(QResizeEvent *event) {
+  int height = event->size().height();
+
+  // Place the browse button to the right
+  setContentsMargins(0, 0, height, 0);
+  m_browseBtn->resize(height, height);
+  m_browseBtn->move(width() - height, 0);
 }
 
-void PathLineEdit::resizeEvent(QResizeEvent* event)
-{
-    int height = event->size().height();
+void PathLineEdit::setPath(const QString &path) {
+  QString finalPath(path);
+  if (!path.isEmpty() && m_defaultDir.exists()) {
+    QString tmp = m_defaultDir.relativeFilePath(path);
+    if (!tmp.startsWith(".."))
+      finalPath = tmp;
+  }
 
-    // Place the browse button to the right
-    setContentsMargins(0, 0, height, 0);
-    m_browseBtn->resize(height, height);
-    m_browseBtn->move(width() - height, 0);
+  if (!finalPath.isEmpty())
+    setText(finalPath);
 }
 
-void PathLineEdit::setPath(const QString& path)
-{
-    QString finalPath(path);
-    if (!path.isEmpty() && m_defaultDir.exists())
-    {
-        QString tmp = m_defaultDir.relativeFilePath(path);
-        if (!tmp.startsWith(".."))
-            finalPath = tmp;
-    }
+void PathLineEdit::browse() {
+  auto dlg = new QFileDialog(this);
+  dlg->setAttribute(Qt::WA_DeleteOnClose);
+  dlg->setAcceptMode(QFileDialog::AcceptOpen);
 
-    if (!finalPath.isEmpty())
-        setText(finalPath);
-}
+  connect(dlg, &QFileDialog::fileSelected, this, &PathLineEdit::setPath);
 
-void PathLineEdit::browse()
-{
-    auto dlg = new QFileDialog(this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setAcceptMode(QFileDialog::AcceptOpen);
+  if (m_pathType == FilePath) {
+    dlg->setFileMode(QFileDialog::AnyFile);
+  } else {
+    dlg->setFileMode(QFileDialog::Directory);
+    dlg->setOption(QFileDialog::ShowDirsOnly);
+  }
 
-    connect(dlg, &QFileDialog::fileSelected,
-            this, &PathLineEdit::setPath);
+  if (m_defaultDir.exists())
+    dlg->setDirectory(m_defaultDir);
 
-    if (m_pathType == FilePath)
-    {
-        dlg->setFileMode(QFileDialog::AnyFile);
-    }
-    else
-    {
-        dlg->setFileMode(QFileDialog::Directory);
-        dlg->setOption(QFileDialog::ShowDirsOnly);
-    }
-
-    if (m_defaultDir.exists())
-        dlg->setDirectory(m_defaultDir);
-
-    dlg->setWindowModality(Qt::WindowModal);
-    dlg->open();
+  dlg->setWindowModality(Qt::WindowModal);
+  dlg->open();
 }

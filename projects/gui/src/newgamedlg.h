@@ -38,48 +38,45 @@ class NewGameDialog;
 /*!
  * \brief The NewGameDialog class provides a dialog for creating a new game.
  */
-class NewGameDialog : public QDialog
-{
-    Q_OBJECT
+class NewGameDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    /*! Player's type. */
-    enum PlayerType
-    {
-        /*! Human player. */
-        Human,
-        /*! Computer controlled player. */
-        CPU
-    };
+  /*! Player's type. */
+  enum PlayerType {
+    /*! Human player. */
+    Human,
+    /*! Computer controlled player. */
+    CPU
+  };
 
-    /*!
-         * Creates a "New Game" dialog with \a engineManager as the
-         * source of engine configurations.
-         */
-    NewGameDialog(EngineManager* engineManager,
-                  QWidget* parent = nullptr);
-    /*! Destroys the dialog. */
-    virtual ~NewGameDialog();
+  /*!
+   * Creates a "New Game" dialog with \a engineManager as the
+   * source of engine configurations.
+   */
+  NewGameDialog(EngineManager *engineManager, QWidget *parent = nullptr);
+  /*! Destroys the dialog. */
+  virtual ~NewGameDialog();
 
-    /*! Creates and returns the ChessGame object. */
-    ChessGame* createGame() const;
-    /*! Creates and returns the PlayerBuilder for \a side. */
-    PlayerBuilder* createPlayerBuilder(Chess::Side side) const;
+  /*! Creates and returns the ChessGame object. */
+  ChessGame *createGame() const;
+  /*! Creates and returns the PlayerBuilder for \a side. */
+  PlayerBuilder *createPlayerBuilder(Chess::Side side) const;
 
 private slots:
-    void configureEngine();
-    void onVariantChanged(const QString& variant);
-    void onEngineChanged(int index, Chess::Side = Chess::Side::NoSide);
+  void configureEngine();
+  void onVariantChanged(const QString &variant);
+  void onEngineChanged(int index, Chess::Side = Chess::Side::NoSide);
 
 private:
-    void setPlayerType(Chess::Side side, PlayerType type);
-    PlayerType playerType(Chess::Side side) const;
+  void setPlayerType(Chess::Side side, PlayerType type);
+  PlayerType playerType(Chess::Side side) const;
 
-    EngineManager* m_engineManager;
-    EngineConfigurationModel* m_engines;
-    EngineConfigurationProxyModel* m_proxyModel;
-    EngineConfiguration m_engineConfig[2];
-    Ui::NewGameDialog* ui;
+  EngineManager *m_engineManager;
+  EngineConfigurationModel *m_engines;
+  EngineConfigurationProxyModel *m_proxyModel;
+  EngineConfiguration m_engineConfig[2];
+  Ui::NewGameDialog *ui;
 };
 
 #endif // NEWGAMEDIALOG_H

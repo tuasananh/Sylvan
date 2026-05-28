@@ -21,45 +21,32 @@
 
 namespace Chess {
 
-BoardTransition::BoardTransition()
-{
+BoardTransition::BoardTransition() {}
+
+bool BoardTransition::isEmpty() const {
+  return (m_moves.isEmpty() && m_squares.isEmpty());
 }
 
-bool BoardTransition::isEmpty() const
-{
-    return (m_moves.isEmpty() &&
-            m_squares.isEmpty());
+void BoardTransition::clear() {
+  m_moves.clear();
+  m_squares.clear();
 }
 
-void BoardTransition::clear()
-{
-    m_moves.clear();
-    m_squares.clear();
+QList<BoardTransition::Move> BoardTransition::moves() const { return m_moves; }
+
+QList<Square> BoardTransition::squares() const { return m_squares; }
+
+void BoardTransition::addMove(const Square &source, const Square &target) {
+  Move move = {source, target};
+  m_moves.append(move);
+
+  addSquare(source);
+  addSquare(target);
 }
 
-QList<BoardTransition::Move> BoardTransition::moves() const
-{
-    return m_moves;
-}
-
-QList<Square> BoardTransition::squares() const
-{
-    return m_squares;
-}
-
-void BoardTransition::addMove(const Square& source, const Square& target)
-{
-    Move move = { source, target };
-    m_moves.append(move);
-
-    addSquare(source);
-    addSquare(target);
-}
-
-void BoardTransition::addSquare(const Square& square)
-{
-    if (!m_squares.contains(square))
-        m_squares.append(square);
+void BoardTransition::addSquare(const Square &square) {
+  if (!m_squares.contains(square))
+    m_squares.append(square);
 }
 
 } // namespace Chess

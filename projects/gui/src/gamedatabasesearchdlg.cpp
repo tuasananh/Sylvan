@@ -20,56 +20,47 @@
 #include "gamedatabasesearchdlg.h"
 #include "ui_gamedatabasesearchdlg.h"
 
-GameDatabaseSearchDialog::GameDatabaseSearchDialog(QWidget* parent)
-    : QDialog(parent, Qt::Window),
-      ui(new Ui::GameDatabaseSearchDialog)
-{
-    ui->setupUi(this);
+GameDatabaseSearchDialog::GameDatabaseSearchDialog(QWidget *parent)
+    : QDialog(parent, Qt::Window), ui(new Ui::GameDatabaseSearchDialog) {
+  ui->setupUi(this);
 
-    ui->m_maxDateEdit->setDate(QDate::currentDate());
-    connect(ui->m_resultCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(onResultChanged(int)));
+  ui->m_maxDateEdit->setDate(QDate::currentDate());
+  connect(ui->m_resultCombo, SIGNAL(currentIndexChanged(int)), this,
+          SLOT(onResultChanged(int)));
 }
 
-GameDatabaseSearchDialog::~GameDatabaseSearchDialog()
-{
-    delete ui;
+GameDatabaseSearchDialog::~GameDatabaseSearchDialog() { delete ui; }
+
+void GameDatabaseSearchDialog::onResultChanged(int index) {
+  if (index == PgnGameFilter::AnyResult) {
+    ui->m_invertResultCheck->setCheckState(Qt::Unchecked);
+    ui->m_invertResultCheck->setEnabled(false);
+  } else
+    ui->m_invertResultCheck->setEnabled(true);
 }
 
-void GameDatabaseSearchDialog::onResultChanged(int index)
-{
-    if (index == PgnGameFilter::AnyResult)
-    {
-        ui->m_invertResultCheck->setCheckState(Qt::Unchecked);
-        ui->m_invertResultCheck->setEnabled(false);
-    }
-    else
-        ui->m_invertResultCheck->setEnabled(true);
-}
+PgnGameFilter GameDatabaseSearchDialog::filter() const {
+  PgnGameFilter filter;
 
-PgnGameFilter GameDatabaseSearchDialog::filter() const
-{
-    PgnGameFilter filter;
+  filter.setEvent(ui->m_eventEdit->text());
+  filter.setSite(ui->m_siteEdit->text());
 
-    filter.setEvent(ui->m_eventEdit->text());
-    filter.setSite(ui->m_siteEdit->text());
+  if (ui->m_minDateCheck->isChecked())
+    filter.setMinDate(ui->m_minDateEdit->date());
+  if (ui->m_maxDateCheck->isChecked())
+    filter.setMaxDate(ui->m_maxDateEdit->date());
 
-    if (ui->m_minDateCheck->isChecked())
-        filter.setMinDate(ui->m_minDateEdit->date());
-    if (ui->m_maxDateCheck->isChecked())
-        filter.setMaxDate(ui->m_maxDateEdit->date());
+  filter.setMinRound(ui->m_minRoundSpin->value());
+  filter.setMaxRound(ui->m_maxRoundSpin->value());
 
-    filter.setMinRound(ui->m_minRoundSpin->value());
-    filter.setMaxRound(ui->m_maxRoundSpin->value());
+  filter.setResult(PgnGameFilter::Result(ui->m_resultCombo->currentIndex()));
+  filter.setResultInverted(ui->m_invertResultCheck->isChecked());
 
-    filter.setResult(PgnGameFilter::Result(ui->m_resultCombo->currentIndex()));
-    filter.setResultInverted(ui->m_invertResultCheck->isChecked());
+  int side = ui->m_playerSideCombo->currentIndex() - 1;
+  if (side == -1)
+    side = Chess::Side::NoSide;
+  filter.setPlayer(ui->m_playerEdit->text(), Chess::Side::Type(side));
+  filter.setOpponent(ui->m_opponentEdit->text());
 
-    int side = ui->m_playerSideCombo->currentIndex() - 1;
-    if (side == -1)
-        side = Chess::Side::NoSide;
-    filter.setPlayer(ui->m_playerEdit->text(), Chess::Side::Type(side));
-    filter.setOpponent(ui->m_opponentEdit->text());
-
-    return filter;
+  return filter;
 }

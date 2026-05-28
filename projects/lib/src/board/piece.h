@@ -20,8 +20,8 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <QtGlobal>
 #include "side.h"
+#include <QtGlobal>
 
 namespace Chess {
 
@@ -38,116 +38,85 @@ namespace Chess {
  *
  * \note A Board object is needed to convert between a Piece and a string.
  */
-class Piece
-{
+class Piece {
 public:
-    /*! No piece. Used for empty squares. */
-    static const int NoPiece = 0;
-    /*! A wall square outside of board. */
-    static const int WallPiece = 100;
+  /*! No piece. Used for empty squares. */
+  static const int NoPiece = 0;
+  /*! A wall square outside of board. */
+  static const int WallPiece = 100;
 
-    /*! Creates a new piece of type \a type for \a NoSide. */
-    Piece(int type = NoPiece);
-    /*! Creates a new piece of type \a type for \a side. */
-    Piece(Side side, int type);
+  /*! Creates a new piece of type \a type for \a NoSide. */
+  Piece(int type = NoPiece);
+  /*! Creates a new piece of type \a type for \a side. */
+  Piece(Side side, int type);
 
-    /*! Returns true if \a other is the same as this piece. */
-    bool operator==(const Piece& other) const;
-    /*! Returns true if \a other is different from this piece. */
-    bool operator!=(const Piece& other) const;
-    /*! Returns true if this piece is less than \a other. */
-    bool operator<(const Piece& other) const;
-    /*! Returns true if this piece is more than \a other. */
-    bool operator>(const Piece& other) const;
+  /*! Returns true if \a other is the same as this piece. */
+  bool operator==(const Piece &other) const;
+  /*! Returns true if \a other is different from this piece. */
+  bool operator!=(const Piece &other) const;
+  /*! Returns true if this piece is less than \a other. */
+  bool operator<(const Piece &other) const;
+  /*! Returns true if this piece is more than \a other. */
+  bool operator>(const Piece &other) const;
 
-    /*! Returns true if the piece is empty (type is NoPiece). */
-    bool isEmpty() const;
-    /*! Returns true if this is a valid chess piece. */
-    bool isValid() const;
-    /*! Returns true if this is a wall piece (inaccessible square). */
-    bool isWall() const;
+  /*! Returns true if the piece is empty (type is NoPiece). */
+  bool isEmpty() const;
+  /*! Returns true if this is a valid chess piece. */
+  bool isValid() const;
+  /*! Returns true if this is a wall piece (inaccessible square). */
+  bool isWall() const;
 
-    /*! Returns the side the piece belongs to. */
-    Side side() const;
-    /*! Returns the type of the piece. */
-    int type() const;
+  /*! Returns the side the piece belongs to. */
+  Side side() const;
+  /*! Returns the type of the piece. */
+  int type() const;
 
-    /*! Sets the side to \a side. */
-    void setSide(Side side);
-    /*! Sets the type to \a type. */
-    void setType(int type);
+  /*! Sets the side to \a side. */
+  void setSide(Side side);
+  /*! Sets the type to \a type. */
+  void setType(int type);
 
 private:
-    quint16 m_data;
+  quint16 m_data;
 };
 
-inline Piece::Piece(int type)
-    : m_data(type | (Side::NoSide << 10))
-{
+inline Piece::Piece(int type) : m_data(type | (Side::NoSide << 10)) {}
+
+inline Piece::Piece(Side side, int type) : m_data(type | (side << 10)) {
+  Q_ASSERT(!side.isNull());
+  Q_ASSERT(type != WallPiece);
+  Q_ASSERT(type != NoPiece);
 }
 
-inline Piece::Piece(Side side, int type)
-    : m_data(type | (side << 10))
-{
-    Q_ASSERT(!side.isNull());
-    Q_ASSERT(type != WallPiece);
-    Q_ASSERT(type != NoPiece);
+inline bool Piece::operator==(const Piece &other) const {
+  return m_data == other.m_data;
 }
 
-inline bool Piece::operator==(const Piece& other) const
-{
-    return m_data == other.m_data;
+inline bool Piece::operator!=(const Piece &other) const {
+  return m_data != other.m_data;
 }
 
-inline bool Piece::operator!=(const Piece& other) const
-{
-    return m_data != other.m_data;
+inline bool Piece::operator<(const Piece &other) const {
+  return m_data < other.m_data;
 }
 
-inline bool Piece::operator<(const Piece& other) const
-{
-    return m_data < other.m_data;
+inline bool Piece::operator>(const Piece &other) const {
+  return m_data > other.m_data;
 }
 
-inline bool Piece::operator>(const Piece& other) const
-{
-    return m_data > other.m_data;
-}
+inline bool Piece::isEmpty() const { return type() == NoPiece; }
 
-inline bool Piece::isEmpty() const
-{
-    return type() == NoPiece;
-}
+inline bool Piece::isValid() const { return !side().isNull(); }
 
-inline bool Piece::isValid() const
-{
-    return !side().isNull();
-}
+inline bool Piece::isWall() const { return type() == WallPiece; }
 
-inline bool Piece::isWall() const
-{
-    return type() == WallPiece;
-}
+inline Side Piece::side() const { return Side(Side::Type(m_data >> 10)); }
 
-inline Side Piece::side() const
-{
-    return Side(Side::Type(m_data >> 10));
-}
+inline int Piece::type() const { return m_data & 0x3ff; }
 
-inline int Piece::type() const
-{
-    return m_data & 0x3ff;
-}
+inline void Piece::setSide(Side side) { m_data = type() | (side << 10); }
 
-inline void Piece::setSide(Side side)
-{
-    m_data = type() | (side << 10);
-}
-
-inline void Piece::setType(int type)
-{
-    m_data = type | (m_data & 0xc00);
-}
+inline void Piece::setType(int type) { m_data = type | (m_data & 0xc00); }
 
 } // namespace Chess
 #endif // PIECE_H

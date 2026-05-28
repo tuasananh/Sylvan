@@ -30,21 +30,20 @@ namespace Ui {
 class EngineSelectionDialog;
 }
 
-class EngineSelectionDialog : public QDialog
-{
-    Q_OBJECT
+class EngineSelectionDialog : public QDialog {
+  Q_OBJECT
 
 public:
-    explicit EngineSelectionDialog(EngineConfigurationProxyModel* model,
-                                   QWidget* parent = nullptr);
-    virtual ~EngineSelectionDialog();
+  explicit EngineSelectionDialog(EngineConfigurationProxyModel *model,
+                                 QWidget *parent = nullptr);
+  virtual ~EngineSelectionDialog();
 
-    QItemSelection selection() const;
-    QListView * enginesList() const;
+  QItemSelection selection() const;
+  QListView *enginesList() const;
 
 private:
-    EngineConfigurationProxyModel* m_model;
-    Ui::EngineSelectionDialog* ui;
+  EngineConfigurationProxyModel *m_model;
+  Ui::EngineSelectionDialog *ui;
 };
 
 #endif // ENGINESELECTIONDLG_H

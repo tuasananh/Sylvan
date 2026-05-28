@@ -19,54 +19,28 @@
 
 #include "square.h"
 
-
 namespace Chess {
 
-Square::Square()
-    : m_file(-1),
-      m_rank(-1)
-{
+Square::Square() : m_file(-1), m_rank(-1) {}
+
+Square::Square(int file, int rank) : m_file(file), m_rank(rank) {}
+
+bool Square::operator==(const Square &other) const {
+  return (m_file == other.m_file) && (m_rank == other.m_rank);
 }
 
-Square::Square(int file, int rank)
-    : m_file(file),
-      m_rank(rank)
-{
+bool Square::operator!=(const Square &other) const {
+  return (m_file != other.m_file) || (m_rank != other.m_rank);
 }
 
-bool Square::operator==(const Square& other) const
-{
-    return (m_file == other.m_file) && (m_rank == other.m_rank);
-}
+bool Square::isValid() const { return (m_file >= 0) && (m_rank >= 0); }
 
-bool Square::operator!=(const Square& other) const
-{
-    return (m_file != other.m_file) || (m_rank != other.m_rank);
-}
+int Square::file() const { return m_file; }
 
-bool Square::isValid() const
-{
-    return (m_file >= 0) && (m_rank >= 0);
-}
+int Square::rank() const { return m_rank; }
 
-int Square::file() const
-{
-    return m_file;
-}
+void Square::setFile(int file) { m_file = file; }
 
-int Square::rank() const
-{
-    return m_rank;
-}
-
-void Square::setFile(int file)
-{
-    m_file = file;
-}
-
-void Square::setRank(int rank)
-{
-    m_rank = rank;
-}
+void Square::setRank(int rank) { m_rank = rank; }
 
 } // namespace Chess

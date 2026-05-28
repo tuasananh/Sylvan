@@ -23,187 +23,162 @@
 
 #include "pgngameentrymodel.h"
 
-struct EntryContains
-{
-    EntryContains(const QList<const PgnGameEntry*>& entries,
-                  const PgnGameFilter& filter)
-        : m_entries(entries), m_filter(filter) { }
+struct EntryContains {
+  EntryContains(const QList<const PgnGameEntry *> &entries,
+                const PgnGameFilter &filter)
+      : m_entries(entries), m_filter(filter) {}
 
-    typedef bool result_type;
+  typedef bool result_type;
 
-    inline bool operator()(int index)
-    {
-        return m_entries.at(index)->match(m_filter);
-    }
+  inline bool operator()(int index) {
+    return m_entries.at(index)->match(m_filter);
+  }
 
-    const QList<const PgnGameEntry*>& m_entries;
-    PgnGameFilter m_filter;
+  const QList<const PgnGameEntry *> &m_entries;
+  PgnGameFilter m_filter;
 };
 
-
-PgnGameEntryModel::PgnGameEntryModel(QObject* parent)
-    : QAbstractItemModel(parent),
-      m_entryCount(0)
-{
-    connect(&m_watcher, SIGNAL(resultsReadyAt(int,int)),
-            this, SLOT(onResultsReady()));
+PgnGameEntryModel::PgnGameEntryModel(QObject *parent)
+    : QAbstractItemModel(parent), m_entryCount(0) {
+  connect(&m_watcher, SIGNAL(resultsReadyAt(int, int)), this,
+          SLOT(onResultsReady()));
 }
 
-const PgnGameEntry* PgnGameEntryModel::entryAt(int row) const
-{
-    return m_entries.at(m_filtered.resultAt(row));
+const PgnGameEntry *PgnGameEntryModel::entryAt(int row) const {
+  return m_entries.at(m_filtered.resultAt(row));
 }
 
-int PgnGameEntryModel::sourceIndex(int row) const
-{
-    return m_filtered.resultAt(row);
+int PgnGameEntryModel::sourceIndex(int row) const {
+  return m_filtered.resultAt(row);
 }
 
-int PgnGameEntryModel::entryCount() const
-{
-    return m_filtered.resultCount();
+int PgnGameEntryModel::entryCount() const { return m_filtered.resultCount(); }
+
+void PgnGameEntryModel::setEntries(const QList<const PgnGameEntry *> &entries) {
+  m_watcher.cancel();
+  m_watcher.waitForFinished();
+
+  m_entries = entries;
+
+  if (entries.size() > m_indexes.size()) {
+    m_indexes.reserve(entries.size());
+    for (int i = m_indexes.size(); i < entries.size(); i++)
+      m_indexes.append(i);
+  }
+
+  applyFilter(m_filter);
 }
 
-void PgnGameEntryModel::setEntries(const QList<const PgnGameEntry*>& entries)
-{
-    m_watcher.cancel();
-    m_watcher.waitForFinished();
-
-    m_entries = entries;
-
-    if (entries.size() > m_indexes.size())
-    {
-        m_indexes.reserve(entries.size());
-        for (int i = m_indexes.size(); i < entries.size(); i++)
-            m_indexes.append(i);
-    }
-
-    applyFilter(m_filter);
+void PgnGameEntryModel::onResultsReady() {
+  if (m_entryCount < 1024)
+    fetchMore(QModelIndex());
 }
 
-void PgnGameEntryModel::onResultsReady()
-{
-    if (m_entryCount < 1024)
-        fetchMore(QModelIndex());
+void PgnGameEntryModel::applyFilter(const PgnGameFilter &filter) {
+  beginResetModel();
+  m_entryCount = 0;
+
+  m_filtered = QtConcurrent::filtered(m_indexes.constBegin(),
+                                      m_indexes.constBegin() + m_entries.size(),
+                                      EntryContains(m_entries, filter));
+
+  m_watcher.setFuture(m_filtered);
+  endResetModel();
 }
 
-void PgnGameEntryModel::applyFilter(const PgnGameFilter& filter)
-{
-    beginResetModel();
-    m_entryCount = 0;
+void PgnGameEntryModel::setFilter(const PgnGameFilter &filter) {
+  m_watcher.cancel();
+  m_watcher.waitForFinished();
 
-    m_filtered = QtConcurrent::filtered(m_indexes.constBegin(),
-                                        m_indexes.constBegin() + m_entries.size(),
-                                        EntryContains(m_entries, filter));
-
-    m_watcher.setFuture(m_filtered);
-    endResetModel();
-}
-
-void PgnGameEntryModel::setFilter(const PgnGameFilter& filter)
-{
-    m_watcher.cancel();
-    m_watcher.waitForFinished();
-
-    m_filter = filter;
-    applyFilter(filter);
+  m_filter = filter;
+  applyFilter(filter);
 }
 
 QModelIndex PgnGameEntryModel::index(int row, int column,
-                                     const QModelIndex& parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    return createIndex(row, column);
-}
-
-QModelIndex PgnGameEntryModel::parent(const QModelIndex& index) const
-{
-    Q_UNUSED(index);
-
+                                     const QModelIndex &parent) const {
+  if (!hasIndex(row, column, parent))
     return QModelIndex();
+
+  return createIndex(row, column);
 }
 
-int PgnGameEntryModel::rowCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
+QModelIndex PgnGameEntryModel::parent(const QModelIndex &index) const {
+  Q_UNUSED(index);
 
-    return qMin(m_entryCount, m_filtered.resultCount());
+  return QModelIndex();
 }
 
-int PgnGameEntryModel::columnCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
+int PgnGameEntryModel::rowCount(const QModelIndex &parent) const {
+  if (parent.isValid())
+    return 0;
 
-    return 7;
+  return qMin(m_entryCount, m_filtered.resultCount());
 }
 
-QVariant PgnGameEntryModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
+int PgnGameEntryModel::columnCount(const QModelIndex &parent) const {
+  if (parent.isValid())
+    return 0;
 
-    if (index.row() >= m_filtered.resultCount() || index.row() < 0)
-        return QVariant();
+  return 7;
+}
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        PgnGameEntry::TagType tagType = PgnGameEntry::TagType(index.column());
-        return entryAt(index.row())->tagValue(tagType);
-    }
-
+QVariant PgnGameEntryModel::data(const QModelIndex &index, int role) const {
+  if (!index.isValid())
     return QVariant();
+
+  if (index.row() >= m_filtered.resultCount() || index.row() < 0)
+    return QVariant();
+
+  if (role == Qt::DisplayRole || role == Qt::EditRole) {
+    PgnGameEntry::TagType tagType = PgnGameEntry::TagType(index.column());
+    return entryAt(index.row())->tagValue(tagType);
+  }
+
+  return QVariant();
 }
 
 QVariant PgnGameEntryModel::headerData(int section, Qt::Orientation orientation,
-                                       int role) const
-{
-    if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
-    {
-        switch (section)
-        {
-        case 0:
-            return tr("Event");
-        case 1:
-            return tr("Site");
-        case 2:
-            return tr("Date");
-        case 3:
-            return tr("Round");
-        case 4:
-            return tr("Red");
-        case 5:
-            return tr("Black");
-        case 6:
-            return tr("Result");
-        default:
-            return QVariant();
-        }
+                                       int role) const {
+  if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
+    switch (section) {
+    case 0:
+      return tr("Event");
+    case 1:
+      return tr("Site");
+    case 2:
+      return tr("Date");
+    case 3:
+      return tr("Round");
+    case 4:
+      return tr("Red");
+    case 5:
+      return tr("Black");
+    case 6:
+      return tr("Result");
+    default:
+      return QVariant();
     }
+  }
 
-    return QVariant();
+  return QVariant();
 }
 
-bool PgnGameEntryModel::canFetchMore(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent);
+bool PgnGameEntryModel::canFetchMore(const QModelIndex &parent) const {
+  Q_UNUSED(parent);
 
-    return m_entryCount < m_filtered.resultCount();
+  return m_entryCount < m_filtered.resultCount();
 }
 
-void PgnGameEntryModel::fetchMore(const QModelIndex& parent)
-{
-    Q_UNUSED(parent);
+void PgnGameEntryModel::fetchMore(const QModelIndex &parent) {
+  Q_UNUSED(parent);
 
-    int remainder = m_filtered.resultCount() - m_entryCount;
-    int entriesToFetch = qMin(1024, remainder);
-    if (entriesToFetch <= 0)
-        return;
+  int remainder = m_filtered.resultCount() - m_entryCount;
+  int entriesToFetch = qMin(1024, remainder);
+  if (entriesToFetch <= 0)
+    return;
 
-    beginInsertRows(QModelIndex(), m_entryCount, m_entryCount + entriesToFetch - 1);
-    m_entryCount += entriesToFetch;
-    endInsertRows();
+  beginInsertRows(QModelIndex(), m_entryCount,
+                  m_entryCount + entriesToFetch - 1);
+  m_entryCount += entriesToFetch;
+  endInsertRows();
 }

@@ -20,9 +20,9 @@
 #ifndef SIDE_H
 #define SIDE_H
 
-#include <QString>
-#include <QMetaType>
 #include <QCoreApplication>
+#include <QMetaType>
+#include <QString>
 
 namespace Chess {
 
@@ -33,74 +33,59 @@ namespace Chess {
  * Side objects can be used just like one would use an enum type
  * (eg. as an array index).
  */
-class LIB_EXPORT Side
-{
-    Q_DECLARE_TR_FUNCTIONS(Side)
+class LIB_EXPORT Side {
+  Q_DECLARE_TR_FUNCTIONS(Side)
 
 public:
-    /*! The enumerated type for the side. */
-    enum Type
-    {
-        Red,	//!< The side with the red pieces.
-        Black,	//!< The side with the black pieces.
-        NoSide	//!< No side
-    };
+  /*! The enumerated type for the side. */
+  enum Type {
+    Red,   //!< The side with the red pieces.
+    Black, //!< The side with the black pieces.
+    NoSide //!< No side
+  };
 
-    /*! Constructs a new, null Side object. */
-    Side();
-    /*! Constructs a new Side object of type \a type. */
-    Side(Type type);
-    /*!
-         * Constructs a new Side object from a symbol.
-         *
-         * The symbol can be "w" for \a Red, "b" for \a Black,
-         * or anything else for \a NoSide.
-         */
-    explicit Side(const QString& symbol);
+  /*! Constructs a new, null Side object. */
+  Side();
+  /*! Constructs a new Side object of type \a type. */
+  Side(Type type);
+  /*!
+   * Constructs a new Side object from a symbol.
+   *
+   * The symbol can be "w" for \a Red, "b" for \a Black,
+   * or anything else for \a NoSide.
+   */
+  explicit Side(const QString &symbol);
 
-    /*! Returns true if the side is \a NoSide. */
-    bool isNull() const;
-    /*! Operator for the \a Type value of the side. */
-    operator Type() const;
+  /*! Returns true if the side is \a NoSide. */
+  bool isNull() const;
+  /*! Operator for the \a Type value of the side. */
+  operator Type() const;
 
-    /*!
-         * Returns the opposite side.
-         * \note The side must not be null.
-         */
-    Side opposite() const;
-    /*! Returns the text symbol for the side. */
-    QString symbol() const;
-    /*! Returns a localized name of the side. */
-    QString toString() const;
+  /*!
+   * Returns the opposite side.
+   * \note The side must not be null.
+   */
+  Side opposite() const;
+  /*! Returns the text symbol for the side. */
+  QString symbol() const;
+  /*! Returns a localized name of the side. */
+  QString toString() const;
 
 private:
-    Type m_type;
+  Type m_type;
 };
 
-inline Side::Side()
-    : m_type(NoSide)
-{
-}
+inline Side::Side() : m_type(NoSide) {}
 
-inline Side::Side(Type type)
-    : m_type(type)
-{
-}
+inline Side::Side(Type type) : m_type(type) {}
 
-inline bool Side::isNull() const
-{
-    return (m_type == NoSide);
-}
+inline bool Side::isNull() const { return (m_type == NoSide); }
 
-inline Side::operator Type() const
-{
-    return m_type;
-}
+inline Side::operator Type() const { return m_type; }
 
-inline Side Side::opposite() const
-{
-    Q_ASSERT(!isNull());
-    return Side(Type(int(m_type) ^ 1));
+inline Side Side::opposite() const {
+  Q_ASSERT(!isNull());
+  return Side(Type(int(m_type) ^ 1));
 }
 
 } // namespace Chess

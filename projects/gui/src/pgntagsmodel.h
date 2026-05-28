@@ -27,31 +27,30 @@
 /*!
  * \brief Supplies PGN tag information to views.
  */
-class PgnTagsModel : public QAbstractItemModel
-{
-    Q_OBJECT
+class PgnTagsModel : public QAbstractItemModel {
+  Q_OBJECT
 
 public:
-    /*! Constructs a model with the given \a parent. */
-    PgnTagsModel(QObject* parent = nullptr);
-    /*! Associates \a tags with this model. */
-    void setTags(const QList<QPair<QString, QString> >& tags);
+  /*! Constructs a model with the given \a parent. */
+  PgnTagsModel(QObject *parent = nullptr);
+  /*! Associates \a tags with this model. */
+  void setTags(const QList<QPair<QString, QString>> &tags);
 
-    // Inherited from QAbstractItemModel
-    virtual QModelIndex index(int row, int column,
-                              const QModelIndex& parent = QModelIndex()) const;
-    virtual QModelIndex parent(const QModelIndex& index) const;
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex& index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation,
-                                int role = Qt::DisplayRole) const;
+  // Inherited from QAbstractItemModel
+  virtual QModelIndex index(int row, int column,
+                            const QModelIndex &parent = QModelIndex()) const;
+  virtual QModelIndex parent(const QModelIndex &index) const;
+  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex &index, int role) const;
+  virtual QVariant headerData(int section, Qt::Orientation orientation,
+                              int role = Qt::DisplayRole) const;
 
 public slots:
-    void setTag(const QString& name, const QString& value);
+  void setTag(const QString &name, const QString &value);
 
 private:
-    QList< QPair<QString, QString> > m_tags;
+  QList<QPair<QString, QString>> m_tags;
 };
 
 #endif // PGN_TAGS_MODEL_H

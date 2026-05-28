@@ -20,9 +20,9 @@
 #ifndef BOARDTRANSITION_H
 #define BOARDTRANSITION_H
 
-#include <QList>
-#include "square.h"
 #include "piece.h"
+#include "square.h"
+#include <QList>
 
 namespace Chess {
 
@@ -38,47 +38,45 @@ namespace Chess {
  *
  * \sa Board::makeMove()
  */
-class LIB_EXPORT BoardTransition
-{
+class LIB_EXPORT BoardTransition {
 public:
-    /*! \brief Movement on the board. */
-    struct Move
-    {
-        Square source;	//!< Source square
-        Square target;	//!< Target square
-    };
+  /*! \brief Movement on the board. */
+  struct Move {
+    Square source; //!< Source square
+    Square target; //!< Target square
+  };
 
-    /*! Creates a new empty BoardTransition object. */
-    BoardTransition();
+  /*! Creates a new empty BoardTransition object. */
+  BoardTransition();
 
-    /*! Returns true if there are no transitions. */
-    bool isEmpty() const;
-    /*! Clears all data, ie. empties the transition. */
-    void clear();
+  /*! Returns true if there are no transitions. */
+  bool isEmpty() const;
+  /*! Clears all data, ie. empties the transition. */
+  void clear();
 
-    /*!
-         * Returns a list of "moves".
-         *
-         * One chessmove can involve several moving pieces, and
-         * the actual chessmove may not be on the returned list.
-         */
-    QList<Move> moves() const;
-    /*! Returns a list of changed squares. */
-    QList<Square> squares() const;
+  /*!
+   * Returns a list of "moves".
+   *
+   * One chessmove can involve several moving pieces, and
+   * the actual chessmove may not be on the returned list.
+   */
+  QList<Move> moves() const;
+  /*! Returns a list of changed squares. */
+  QList<Square> squares() const;
 
-    /*! Adds a new "move" from \a source to \a target. */
-    void addMove(const Square& source, const Square& target);
-    /*!
-         * Adds a new changed square.
-         *
-         * If \a square already exists in the transition, this
-         * function does nothing.
-         */
-    void addSquare(const Square& square);
+  /*! Adds a new "move" from \a source to \a target. */
+  void addMove(const Square &source, const Square &target);
+  /*!
+   * Adds a new changed square.
+   *
+   * If \a square already exists in the transition, this
+   * function does nothing.
+   */
+  void addSquare(const Square &square);
 
 private:
-    QList<Move> m_moves;
-    QList<Square> m_squares;
+  QList<Move> m_moves;
+  QList<Square> m_squares;
 };
 
 } // namespace Chess

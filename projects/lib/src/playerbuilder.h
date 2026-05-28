@@ -36,40 +36,37 @@ class ChessPlayer;
  *
  * \sa GameManager
  */
-class LIB_EXPORT PlayerBuilder
-{
+class LIB_EXPORT PlayerBuilder {
 public:
-    /*! Creates a new player builder with name \a name. */
-    PlayerBuilder(const QString& name);
-    /*! Destroys the player builder. */
-    virtual ~PlayerBuilder();
+  /*! Creates a new player builder with name \a name. */
+  PlayerBuilder(const QString &name);
+  /*! Destroys the player builder. */
+  virtual ~PlayerBuilder();
 
-    /*!
-         * Returns true if the builder is for a human player;
-         * otherwise returns false.
-         */
-    virtual bool isHuman() const = 0;
-    /*! Returns the player's name. */
-    QString name() const;
-    /*! Sets the player's name to \a name. */
-    void setName(const QString& name);
-    /*!
-         * Creates a new player and sets its parent to \a parent.
-         *
-         * \param receiver The receiver of the player's debugging messages.
-         * \param method The receiver's method the \a debugMessage(QString)
-         *               signal will connect to.
-         * \param parent The player's parent object.
-         * \param error If an error occurs and \a error is not 0, the error
-         *              description is written here.
-         */
-    virtual ChessPlayer* create(QObject* receiver,
-                                const char* method,
-                                QObject* parent,
-                                QString* error) const = 0;
+  /*!
+   * Returns true if the builder is for a human player;
+   * otherwise returns false.
+   */
+  virtual bool isHuman() const = 0;
+  /*! Returns the player's name. */
+  QString name() const;
+  /*! Sets the player's name to \a name. */
+  void setName(const QString &name);
+  /*!
+   * Creates a new player and sets its parent to \a parent.
+   *
+   * \param receiver The receiver of the player's debugging messages.
+   * \param method The receiver's method the \a debugMessage(QString)
+   *               signal will connect to.
+   * \param parent The player's parent object.
+   * \param error If an error occurs and \a error is not 0, the error
+   *              description is written here.
+   */
+  virtual ChessPlayer *create(QObject *receiver, const char *method,
+                              QObject *parent, QString *error) const = 0;
 
 private:
-    QString m_name;
+  QString m_name;
 };
 
 #endif // PLAYERBUILDER_H

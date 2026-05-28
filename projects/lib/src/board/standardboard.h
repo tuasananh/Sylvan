@@ -36,18 +36,16 @@ namespace Chess {
  * \note Rules: http://www.fide.com/component/handbook/?id=124&view=article
  * \sa PolyglotBook
  */
-class LIB_EXPORT StandardBoard : public WesternBoard
-{
+class LIB_EXPORT StandardBoard : public WesternBoard {
 public:
-    /*! Creates a new StandardBoard object. */
-    StandardBoard();
+  /*! Creates a new StandardBoard object. */
+  StandardBoard();
 
-    // Inherited from WesternBoard
-    virtual Board* copy() const;
-    virtual QString variant() const;
-    virtual QString defaultFenString() const;
-    virtual Result tablebaseResult(unsigned int* dtm = nullptr) const;
-
+  // Inherited from WesternBoard
+  virtual Board *copy() const;
+  virtual QString variant() const;
+  virtual QString defaultFenString() const;
+  virtual Result tablebaseResult(unsigned int *dtm = nullptr) const;
 };
 
 } // namespace Chess

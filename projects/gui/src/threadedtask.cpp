@@ -15,88 +15,68 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QProgressDialog>
 #include "threadedtask.h"
+#include <QProgressDialog>
 
-ThreadedTask::ThreadedTask(const QString& title,
-                           const QString& labelText,
-                           int minimum,
-                           int maximum,
-                           QWidget* parent)
-    : QThread(parent),
-      m_cancel(false),
-      m_statusMessage(labelText),
-      m_taskStart(QTime::currentTime())
-{
-    m_dlg = new QProgressDialog(tr("%1 - Undefined time remaining").arg(labelText),
-                                tr("Cancel"),
-                                minimum,
-                                maximum,
-                                parent);
-    m_dlg->setWindowModality(Qt::WindowModal);
-    m_dlg->setWindowTitle(title);
-    m_dlg->setMinimumDuration(1000);
-    m_dlg->setValue(0);
+ThreadedTask::ThreadedTask(const QString &title, const QString &labelText,
+                           int minimum, int maximum, QWidget *parent)
+    : QThread(parent), m_cancel(false), m_statusMessage(labelText),
+      m_taskStart(QTime::currentTime()) {
+  m_dlg =
+      new QProgressDialog(tr("%1 - Undefined time remaining").arg(labelText),
+                          tr("Cancel"), minimum, maximum, parent);
+  m_dlg->setWindowModality(Qt::WindowModal);
+  m_dlg->setWindowTitle(title);
+  m_dlg->setMinimumDuration(1000);
+  m_dlg->setValue(0);
 
-    m_lastUpdate = 0;
+  m_lastUpdate = 0;
 
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(this, SIGNAL(destroyed()), m_dlg, SLOT(deleteLater()));
-    connect(this, SIGNAL(progressValueChanged(int)),
-            this, SLOT(updateProgress(int)));
-    connect(this, SIGNAL(statusMessageChanged(QString)),
-            this, SLOT(setStatusMessage(QString)));
-    connect(m_dlg, SIGNAL(canceled()), this, SLOT(cancel()));
+  connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+  connect(this, SIGNAL(destroyed()), m_dlg, SLOT(deleteLater()));
+  connect(this, SIGNAL(progressValueChanged(int)), this,
+          SLOT(updateProgress(int)));
+  connect(this, SIGNAL(statusMessageChanged(QString)), this,
+          SLOT(setStatusMessage(QString)));
+  connect(m_dlg, SIGNAL(canceled()), this, SLOT(cancel()));
 }
 
-ThreadedTask::~ThreadedTask()
-{
+ThreadedTask::~ThreadedTask() {}
+
+void ThreadedTask::cancel() { m_cancel = true; }
+
+bool ThreadedTask::cancelRequested() const { return m_cancel; }
+
+void ThreadedTask::updateProgress(int value) {
+  int elapsed = m_taskStart.secsTo(QTime::currentTime());
+
+  if (elapsed > m_lastUpdate) {
+    m_lastUpdate = elapsed;
+    int remainingSecs = (m_dlg->maximum() - value) / (value / elapsed);
+
+    m_dlg->setLabelText(
+        QString("%1 - %2").arg(m_statusMessage, humaniseTime(remainingSecs)));
+  }
+
+  m_dlg->setValue(value);
 }
 
-void ThreadedTask::cancel()
-{
-    m_cancel = true;
+void ThreadedTask::setStatusMessage(const QString &msg) {
+  m_statusMessage = msg;
 }
 
-bool ThreadedTask::cancelRequested() const
-{
-    return m_cancel;
-}
+QString ThreadedTask::humaniseTime(int sec) const {
+  if (sec <= 5)
+    return QString(tr("About 5 seconds"));
 
-void ThreadedTask::updateProgress(int value)
-{
-    int elapsed = m_taskStart.secsTo(QTime::currentTime());
+  if (sec <= 10)
+    return QString(tr("About 10 seconds"));
 
-    if (elapsed > m_lastUpdate)
-    {
-        m_lastUpdate = elapsed;
-        int remainingSecs = (m_dlg->maximum() - value) / (value / elapsed);
+  if (sec <= 60)
+    return QString(tr("Less than a minute"));
 
-        m_dlg->setLabelText(QString("%1 - %2").arg(m_statusMessage,
-                                                   humaniseTime(remainingSecs)));
-    }
+  if (sec <= 120)
+    return QString(tr("About a minute"));
 
-    m_dlg->setValue(value);
-}
-
-void ThreadedTask::setStatusMessage(const QString& msg)
-{
-    m_statusMessage = msg;
-}
-
-QString ThreadedTask::humaniseTime(int sec) const
-{
-    if (sec <= 5)
-        return QString(tr("About 5 seconds"));
-
-    if (sec <= 10)
-        return QString(tr("About 10 seconds"));
-
-    if (sec <= 60)
-        return QString(tr("Less than a minute"));
-
-    if (sec <= 120)
-        return QString(tr("About a minute"));
-
-    return QString(tr("About %1 minutes").arg(sec / 60));
+  return QString(tr("About %1 minutes").arg(sec / 60));
 }

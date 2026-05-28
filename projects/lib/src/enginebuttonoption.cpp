@@ -19,32 +19,24 @@
 
 #include "enginebuttonoption.h"
 
-EngineButtonOption::EngineButtonOption(const QString& name)
-    : EngineOption(name, QVariant::Invalid)
-{
+EngineButtonOption::EngineButtonOption(const QString &name)
+    : EngineOption(name, QVariant::Invalid) {}
+
+EngineOption *EngineButtonOption::copy() const {
+  return new EngineButtonOption(*this);
 }
 
-EngineOption* EngineButtonOption::copy() const
-{
-    return new EngineButtonOption(*this);
+bool EngineButtonOption::isValid(const QVariant &value) const {
+  return value.isNull();
 }
 
-bool EngineButtonOption::isValid(const QVariant& value) const
-{
-    return value.isNull();
-}
+bool EngineButtonOption::isEditable() const { return false; }
 
-bool EngineButtonOption::isEditable() const
-{
-    return false;
-}
+QVariant EngineButtonOption::toVariant() const {
+  QVariantMap map;
 
-QVariant EngineButtonOption::toVariant() const
-{
-    QVariantMap map;
+  map.insert("type", "button");
+  map.insert("name", name());
 
-    map.insert("type", "button");
-    map.insert("name", name());
-
-    return map;
+  return map;
 }

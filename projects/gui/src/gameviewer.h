@@ -20,12 +20,12 @@
 #ifndef GAMEVIEWER_H
 #define GAMEVIEWER_H
 
-#include <QWidget>
-#include <QVector>
 #include <QPointer>
+#include <QVector>
+#include <QWidget>
 
-#include <board/side.h>
 #include <board/genericmove.h>
+#include <board/side.h>
 
 class QToolButton;
 class QSlider;
@@ -35,67 +35,64 @@ class BoardScene;
 class BoardView;
 class ChessClock;
 
-namespace Chess
-{
+namespace Chess {
 class Board;
 }
 
-class GameViewer : public QWidget
-{
-    Q_OBJECT
+class GameViewer : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit GameViewer(Qt::Orientation orientation = Qt::Horizontal,
-                        QWidget* parent = nullptr,
-                        bool addChessClock = false);
+  explicit GameViewer(Qt::Orientation orientation = Qt::Horizontal,
+                      QWidget *parent = nullptr, bool addChessClock = false);
 
-    void setGame(ChessGame* game);
-    void setGame(const PgnGame* pgn);
-    void disconnectGame();
-    Chess::Board* board() const;
-    BoardScene* boardScene() const;
-    ChessClock* chessClock(Chess::Side side);
+  void setGame(ChessGame *game);
+  void setGame(const PgnGame *pgn);
+  void disconnectGame();
+  Chess::Board *board() const;
+  BoardScene *boardScene() const;
+  ChessClock *chessClock(Chess::Side side);
 
-    //void copyBoard(Chess::Board* orgBoard);   // 把棋子复制过来
+  // void copyBoard(Chess::Board* orgBoard);   // 把棋子复制过来
 
-    void viewPreviousMove2(Chess::Board* orgBoard);
+  void viewPreviousMove2(Chess::Board *orgBoard);
 
 public slots:
-    void viewMove(int index, bool keyLeft = false);
+  void viewMove(int index, bool keyLeft = false);
 
 signals:
-    void moveSelected(int moveNumber);
+  void moveSelected(int moveNumber);
 
 private slots:
-    void viewFirstMoveClicked();
-    void viewPreviousMoveClicked();
-    void viewNextMoveClicked();
-    void viewLastMoveClicked();
-    void viewPositionClicked(int index);
+  void viewFirstMoveClicked();
+  void viewPreviousMoveClicked();
+  void viewNextMoveClicked();
+  void viewLastMoveClicked();
+  void viewPositionClicked(int index);
 
-    void onFenChanged(const QString& fen);
-    void onMoveMade(const Chess::GenericMove& move);
+  void onFenChanged(const QString &fen);
+  void onMoveMade(const Chess::GenericMove &move);
 
 private:
-    void viewFirstMove();
-    void viewPreviousMove();
-    void viewNextMove();
-    void viewLastMove();
-    void viewPosition(int index);
+  void viewFirstMove();
+  void viewPreviousMove();
+  void viewNextMove();
+  void viewLastMove();
+  void viewPosition(int index);
 
-    BoardScene* m_boardScene;
-    BoardView* m_boardView;
-    QSlider* m_moveNumberSlider;
-    ChessClock* m_chessClock[2];
+  BoardScene *m_boardScene;
+  BoardView *m_boardView;
+  QSlider *m_moveNumberSlider;
+  ChessClock *m_chessClock[2];
 
-    QToolButton* m_viewFirstMoveBtn;
-    QToolButton* m_viewPreviousMoveBtn;
-    QToolButton* m_viewNextMoveBtn;
-    QToolButton* m_viewLastMoveBtn;
+  QToolButton *m_viewFirstMoveBtn;
+  QToolButton *m_viewPreviousMoveBtn;
+  QToolButton *m_viewNextMoveBtn;
+  QToolButton *m_viewLastMoveBtn;
 
-    QPointer<ChessGame> m_game;
-    QVector<Chess::GenericMove> m_moves;
-    int m_moveIndex;
+  QPointer<ChessGame> m_game;
+  QVector<Chess::GenericMove> m_moves;
+  int m_moveIndex;
 };
 
 #endif // GAMEVIEWER_H

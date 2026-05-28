@@ -30,27 +30,26 @@
  * features, eg. the chess variants they support. This is useful when
  * setting up games or tournaments.
  */
-class EngineConfigurationProxyModel : public QSortFilterProxyModel
-{
-    Q_OBJECT
+class EngineConfigurationProxyModel : public QSortFilterProxyModel {
+  Q_OBJECT
 
 public:
-    /*! Creates a new EngineConfigurationProxyModel. */
-    explicit EngineConfigurationProxyModel(QObject *parent = nullptr);
+  /*! Creates a new EngineConfigurationProxyModel. */
+  explicit EngineConfigurationProxyModel(QObject *parent = nullptr);
 
-    /*!
-         * Sets the chess variant used to filter the contents
-         * of the source model to \a variant.
-         */
-    void setFilterVariant(const QString& variant);
+  /*!
+   * Sets the chess variant used to filter the contents
+   * of the source model to \a variant.
+   */
+  void setFilterVariant(const QString &variant);
 
 protected:
-    // Reimplemented from QSortFilterProxyModel
-    virtual bool filterAcceptsRow(int sourceRow,
-                                  const QModelIndex& sourceParent) const;
+  // Reimplemented from QSortFilterProxyModel
+  virtual bool filterAcceptsRow(int sourceRow,
+                                const QModelIndex &sourceParent) const;
 
 private:
-    QString m_filterVariant;
+  QString m_filterVariant;
 };
 
 #endif // ENGINECONFIGPROXYMODEL_H

@@ -17,241 +17,210 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QString>
-#include <QFile>
 #include <QDataStream>
+#include <QFile>
+#include <QString>
 #include <QtDebug>
 
 #include <pgnstream.h>
 
+#include "mersenne.h"
 #include "openingbook.h"
 #include "pgngame.h"
-#include "mersenne.h"
 
-//#include "ConnectionPool.h"
-//#include "databasemanager.h"
+// #include "ConnectionPool.h"
+// #include "databasemanager.h"
 
-QDataStream& operator>>(QDataStream& in, OpeningBook* book)
-{
-    while (in.status() == QDataStream::Ok)
-    {
-        quint64 key;
-        OpeningBook::Entry entry = book->readEntry(in, &key);
-        book->addEntry(entry, key);
-    }
+QDataStream &operator>>(QDataStream &in, OpeningBook *book) {
+  while (in.status() == QDataStream::Ok) {
+    quint64 key;
+    OpeningBook::Entry entry = book->readEntry(in, &key);
+    book->addEntry(entry, key);
+  }
 
-    return in;
+  return in;
 }
 
-QDataStream& operator<<(QDataStream& out, const OpeningBook* book)
-{
-    OpeningBook::Map::const_iterator it;
-    for (it = book->m_map.constBegin(); it != book->m_map.constEnd(); ++it)
-        book->writeEntry(it, out);
+QDataStream &operator<<(QDataStream &out, const OpeningBook *book) {
+  OpeningBook::Map::const_iterator it;
+  for (it = book->m_map.constBegin(); it != book->m_map.constEnd(); ++it)
+    book->writeEntry(it, out);
 
-    return out;
+  return out;
 }
 
-OpeningBook::OpeningBook(BookMoveMode mode)
-    : m_mode(mode)
-{
+OpeningBook::OpeningBook(BookMoveMode mode) : m_mode(mode) {}
+
+OpeningBook::~OpeningBook() {}
+
+QString getRandomString(int length) {
+  qsrand(QDateTime::currentMSecsSinceEpoch()); // 为随机值设定一个seed
+
+  const char chrs[] =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  int chrs_size = sizeof(chrs);
+
+  char *ch = new char[length + 1];
+  memset(ch, 0, length + 1);
+  int randomx = 0;
+  for (int i = 0; i < length; ++i) {
+    randomx = rand() % (chrs_size - 1);
+    ch[i] = chrs[randomx];
+  }
+
+  QString ret(ch);
+  delete[] ch;
+  return ret;
 }
 
-OpeningBook::~OpeningBook()
-{
+bool OpeningBook::read(const QString &filename) {
+  this->m_filename = filename;
+  return false;
 }
 
-QString getRandomString(int length)
-{
-    qsrand(QDateTime::currentMSecsSinceEpoch());//为随机值设定一个seed
-
-    const char chrs[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    int chrs_size = sizeof(chrs);
-
-    char* ch = new char[length + 1];
-    memset(ch, 0, length + 1);
-    int randomx = 0;
-    for (int i = 0; i < length; ++i)
-    {
-        randomx = rand() % (chrs_size - 1);
-        ch[i] = chrs[randomx];
-    }
-
-    QString ret(ch);
-    delete[] ch;
-    return ret;
-}
-
-bool OpeningBook::read(const QString& filename)
-{
-    this->m_filename = filename;
+bool OpeningBook::write(const QString &filename) const {
+  QFile file(filename);
+  if (!file.open(QIODevice::WriteOnly))
     return false;
+
+  QDataStream out(&file);
+  out << this;
+
+  return true;
 }
 
-bool OpeningBook::write(const QString& filename) const
-{
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly))
-        return false;
-
-    QDataStream out(&file);
-    out << this;
-
-    return true;
-}
-
-
-
-void OpeningBook::addEntry(const Entry& entry, quint64 key)
-{
-    Map::iterator it = m_map.find(key);
-    while (it != m_map.end() && it.key() == key)
-    {
-        Entry& tmp = it.value();
-        if (tmp.move == entry.move)
-        {
-            //tmp.weight += entry.weight;
-            return;
-        }
-        ++it;
+void OpeningBook::addEntry(const Entry &entry, quint64 key) {
+  Map::iterator it = m_map.find(key);
+  while (it != m_map.end() && it.key() == key) {
+    Entry &tmp = it.value();
+    if (tmp.move == entry.move) {
+      // tmp.weight += entry.weight;
+      return;
     }
+    ++it;
+  }
 
-    m_map.insert(key, entry);
+  m_map.insert(key, entry);
 }
 
-int OpeningBook::import(const PgnGame& pgn, int maxMoves)
-{
-    Q_ASSERT(maxMoves > 0);
+int OpeningBook::import(const PgnGame &pgn, int maxMoves) {
+  Q_ASSERT(maxMoves > 0);
 
-    Chess::Side winner(pgn.result().winner());
-    int loserMod = -1;
-    quint16 weight = 1;
-    maxMoves = qMin(maxMoves, pgn.moves().size());
-    int ret = maxMoves;
+  Chess::Side winner(pgn.result().winner());
+  int loserMod = -1;
+  quint16 weight = 1;
+  maxMoves = qMin(maxMoves, pgn.moves().size());
+  int ret = maxMoves;
 
-    if (!winner.isNull())
-    {
-        loserMod = int(pgn.startingSide() == winner);
-        weight = 2;
-        ret = (ret - loserMod) / 2 + loserMod;
+  if (!winner.isNull()) {
+    loserMod = int(pgn.startingSide() == winner);
+    weight = 2;
+    ret = (ret - loserMod) / 2 + loserMod;
+  }
+
+  const QVector<PgnGame::MoveData> &moves = pgn.moves();
+  for (int i = 0; i < maxMoves; i++) {
+    // Skip the loser's moves
+    if ((i % 2) != loserMod) {
+      Entry entry = {moves.at(i).move, weight};
+      addEntry(entry, moves.at(i).key);
     }
+  }
 
-    const QVector<PgnGame::MoveData>& moves = pgn.moves();
-    for (int i = 0; i < maxMoves; i++)
-    {
-        // Skip the loser's moves
-        if ((i % 2) != loserMod)
-        {
-            Entry entry = { moves.at(i).move, weight };
-            addEntry(entry, moves.at(i).key);
-        }
-    }
-
-    return ret;
+  return ret;
 }
 
-int OpeningBook::import(PgnStream& in, int maxMoves)
-{
-    Q_ASSERT(maxMoves > 0);
+int OpeningBook::import(PgnStream &in, int maxMoves) {
+  Q_ASSERT(maxMoves > 0);
 
-    if (!in.isOpen())
-        return 0;
+  if (!in.isOpen())
+    return 0;
 
-    int moveCount = 0;
-    while (in.status() == PgnStream::Ok)
-    {
-        PgnGame game;
-        game.read(in, maxMoves);
-        if (game.moves().isEmpty())
-            break;
+  int moveCount = 0;
+  while (in.status() == PgnStream::Ok) {
+    PgnGame game;
+    game.read(in, maxMoves);
+    if (game.moves().isEmpty())
+      break;
 
-        moveCount += import(game, maxMoves);
-    }
+    moveCount += import(game, maxMoves);
+  }
 
-    return moveCount;
+  return moveCount;
 }
 
-QList<OpeningBook::Entry> OpeningBook::entriesFromDisk(quint64 key) const
-{
-    QList<Entry> entries;
+QList<OpeningBook::Entry> OpeningBook::entriesFromDisk(quint64 key) const {
+  QList<Entry> entries;
 
-
-    return entries;
-
+  return entries;
 }
 
-QList<OpeningBook::Entry> OpeningBook::entries(quint64 key) const
-{
-    return entriesFromDisk(key);
+QList<OpeningBook::Entry> OpeningBook::entries(quint64 key) const {
+  return entriesFromDisk(key);
 }
 
+Chess::GenericMove OpeningBook::move(quint64 key) const {
+  Chess::GenericMove move;
 
-Chess::GenericMove OpeningBook::move(quint64 key) const
-{
-    Chess::GenericMove move;
-
-    // There can be multiple entries/moves with the same key.
-    // We need to find them all to choose the best one
-    const auto entries = this->entries(key);
-    if (entries.isEmpty())
-        return move;
-
-    // Calculate the total weight of all available moves
-    //int totalWeight = 0;
-    //for (const Entry& entry : entries)
-    //	totalWeight += entry.weight;
-    //if (totalWeight <= 0)
-    //	return move;
-
-    int totalWeight = 0;
-    for (const Entry& entry : entries)
-        totalWeight += entry.vscore;
-    if (totalWeight < 0)
-        return move;
-
-    // Pick a move randomly, with the highest-weighted move having
-    // the highest probability of getting picked.
-    if (m_mode == BookRandom) {
-        int pick = Mersenne::random() % totalWeight;
-        int currentWeight = 0;
-        for (const Entry& entry : entries)
-        {
-            currentWeight += entry.vscore;
-            if (currentWeight > pick)
-                return entry.move;
-        }
-    }
-    else {
-        int bestScore = 0;
-        // 1. 求得最高分
-        for (const Entry& entry : entries) {
-            if (entry.vscore >= bestScore) {
-                bestScore = entry.vscore;
-            }
-        }
-        // 2. 将全部的最高分集中起来
-        QList<Entry> BestEntries;
-        for (const Entry& entry : entries) {
-            if (entry.vscore == bestScore) {
-                BestEntries << entry;
-            }
-        }
-        // 3. 再在几个最佳步中随机选择
-        int totalWeight = 0;
-        for (const Entry& entry : BestEntries)
-            totalWeight += entry.vscore;
-        if (totalWeight < 0)
-            return move;
-
-        int pick = Mersenne::random() % totalWeight;
-        int currentWeight = 0;
-        for (const Entry& entry : BestEntries)
-        {
-            currentWeight += entry.vscore;
-            if (currentWeight > pick)
-                return entry.move;
-        }
-    }
-
+  // There can be multiple entries/moves with the same key.
+  // We need to find them all to choose the best one
+  const auto entries = this->entries(key);
+  if (entries.isEmpty())
     return move;
+
+  // Calculate the total weight of all available moves
+  // int totalWeight = 0;
+  // for (const Entry& entry : entries)
+  //	totalWeight += entry.weight;
+  // if (totalWeight <= 0)
+  //	return move;
+
+  int totalWeight = 0;
+  for (const Entry &entry : entries)
+    totalWeight += entry.vscore;
+  if (totalWeight < 0)
+    return move;
+
+  // Pick a move randomly, with the highest-weighted move having
+  // the highest probability of getting picked.
+  if (m_mode == BookRandom) {
+    int pick = Mersenne::random() % totalWeight;
+    int currentWeight = 0;
+    for (const Entry &entry : entries) {
+      currentWeight += entry.vscore;
+      if (currentWeight > pick)
+        return entry.move;
+    }
+  } else {
+    int bestScore = 0;
+    // 1. 求得最高分
+    for (const Entry &entry : entries) {
+      if (entry.vscore >= bestScore) {
+        bestScore = entry.vscore;
+      }
+    }
+    // 2. 将全部的最高分集中起来
+    QList<Entry> BestEntries;
+    for (const Entry &entry : entries) {
+      if (entry.vscore == bestScore) {
+        BestEntries << entry;
+      }
+    }
+    // 3. 再在几个最佳步中随机选择
+    int totalWeight = 0;
+    for (const Entry &entry : BestEntries)
+      totalWeight += entry.vscore;
+    if (totalWeight < 0)
+      return move;
+
+    int pick = Mersenne::random() % totalWeight;
+    int currentWeight = 0;
+    for (const Entry &entry : BestEntries) {
+      currentWeight += entry.vscore;
+      if (currentWeight > pick)
+        return entry.move;
+    }
+  }
+
+  return move;
 }
