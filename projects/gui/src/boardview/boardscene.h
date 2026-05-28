@@ -20,21 +20,21 @@
 #ifndef BOARDSCENE_H
 #define BOARDSCENE_H
 
-#include <QGraphicsScene>
-#include <QMultiMap>
-#include <QPointer>
-
 #include <board/boardtransition.h>
 #include <board/genericmove.h>
 #include <board/result.h>
 #include <board/square.h>
+
+#include <QGraphicsScene>
+#include <QMultiMap>
+#include <QPointer>
 
 namespace Chess {
 class Board;
 class Move;
 class Side;
 class Piece;
-} // namespace Chess
+}  // namespace Chess
 
 class ChessGame;
 class QSvgRenderer;
@@ -59,23 +59,23 @@ class PieceChooser;
 class BoardScene : public QGraphicsScene {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new BoardScene object. */
-  explicit BoardScene(QObject *parent = nullptr);
+  explicit BoardScene(QObject* parent = nullptr);
   /*! Destroys the scene and all its items. */
   virtual ~BoardScene();
 
   /*! Returns the current internal board object. */
-  Chess::Board *board() const;
+  Chess::Board* board() const;
   /*!
    * Clears the scene and sets \a board as the internal board.
    *
    * The scene takes ownerGuardp of the board, so it's usually
    * best to give the scene its own copy of a board.
    */
-  void setBoard(Chess::Board *board);
+  void setBoard(Chess::Board* board);
 
-public slots:
+ public slots:
   /*!
    * Clears the scene, creates a new board, and populates
    * it with chess pieces.
@@ -86,11 +86,11 @@ public slots:
    */
   void populate();
   /*! Re-populates the scene according to \a fenString. */
-  void setFenString(const QString &fenString);
+  void setFenString(const QString& fenString);
   /*! Makes the move \a move in the scene. */
-  void makeMove(const Chess::Move &move);
+  void makeMove(const Chess::Move& move);
   /*! Makes the move \a move in the scene. */
-  void makeMove(const Chess::GenericMove &move);
+  void makeMove(const Chess::GenericMove& move);
   /*! Reverses the last move that was made in the scene. */
   void undoMove();
   /*! Flips the board, with animation. */
@@ -99,60 +99,60 @@ public slots:
    * Cancels any ongoing user move and flashes \a result
    * over the board.
    */
-  void onGameFinished(ChessGame *game, Chess::Result result);
+  void onGameFinished(ChessGame* game, Chess::Result result);
 
-signals:
+ signals:
   /*!
    * This signal is emitted when a human player has made a move.
    *
    * The move is guaranteed to be legal.
    * The move was made by the player on \a side side.
    */
-  void humanMove(const Chess::GenericMove &move, const Chess::Side &side);
+  void humanMove(const Chess::GenericMove& move, const Chess::Side& side);
 
-protected:
+ protected:
   // Inherited from QGraphicsScene
-  virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+  virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
-private slots:
+ private slots:
   void onTransitionFinished();
   // void onPromotionChosen(const Chess::Piece& promotion);
 
-private:
+ private:
   void cancelUserMove();
 
   enum MoveDirection { Forward, Backward };
 
-  QPointF squarePos(const Chess::Square &square) const;
-  GraphicsPiece *pieceAt(const QPointF &pos) const;
-  GraphicsPiece *createPiece(const Chess::Piece &piece);
-  QPropertyAnimation *pieceAnimation(GraphicsPiece *piece,
-                                     const QPointF &endPoint) const;
+  QPointF squarePos(const Chess::Square& square) const;
+  GraphicsPiece* pieceAt(const QPointF& pos) const;
+  GraphicsPiece* createPiece(const Chess::Piece& piece);
+  QPropertyAnimation* pieceAnimation(GraphicsPiece* piece,
+                                     const QPointF& endPoint) const;
   void stopAnimation();
-  void tryMove(GraphicsPiece *piece, const QPointF &targetPos);
-  void selectPiece(const QList<Chess::Piece> &types, const char *member);
-  void addMoveArrow(const QPointF &sourcePos, const QPointF &targetPos);
-  void applyTransition(const Chess::BoardTransition &transition,
+  void tryMove(GraphicsPiece* piece, const QPointF& targetPos);
+  void selectPiece(const QList<Chess::Piece>& types, const char* member);
+  void addMoveArrow(const QPointF& sourcePos, const QPointF& targetPos);
+  void applyTransition(const Chess::BoardTransition& transition,
                        MoveDirection direction);
   void updateMoves();
 
-  Chess::Board *m_board;
+  Chess::Board* m_board;
   MoveDirection m_direction;
   Chess::BoardTransition m_transition;
   QList<Chess::BoardTransition> m_history;
   QPointF m_sourcePos;
-  GraphicsBoard *m_squares;
+  GraphicsBoard* m_squares;
   // GraphicsPieceReserve* m_reserve;
   QPointer<PieceChooser> m_chooser;
   QPointer<QAbstractAnimation> m_anim;
-  QSvgRenderer *m_renderer;
-  QMultiMap<GraphicsPiece *, Chess::Square> m_targets;
+  QSvgRenderer* m_renderer;
+  QMultiMap<GraphicsPiece*, Chess::Square> m_targets;
   QList<Chess::GenericMove> m_moves;
   Chess::GenericMove m_promotionMove;
-  GraphicsPiece *m_highlightPiece;
-  QGraphicsItemGroup *m_moveArrows;
+  GraphicsPiece* m_highlightPiece;
+  QGraphicsItemGroup* m_moveArrows;
 };
 
-#endif // BOARDSCENE_H
+#endif  // BOARDSCENE_H

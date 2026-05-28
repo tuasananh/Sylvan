@@ -18,18 +18,19 @@
 */
 
 #include "chessengine.h"
-#include "engineoption.h"
+
 #include <QIODevice>
 #include <QStringRef>
 #include <QTimer>
 #include <QtAlgorithms>
 
+#include "engineoption.h"
+
 int ChessEngine::s_count = 0;
 
-QStringRef ChessEngine::nextToken(const QStringRef &previous, bool untilEnd) {
-  const QString *str = previous.string();
-  if (str == nullptr)
-    return QStringRef();
+QStringRef ChessEngine::nextToken(const QStringRef& previous, bool untilEnd) {
+  const QString* str = previous.string();
+  if (str == nullptr) return QStringRef();
 
   int i;
   int start = -1;
@@ -37,36 +38,40 @@ QStringRef ChessEngine::nextToken(const QStringRef &previous, bool untilEnd) {
 
   for (i = firstPos; i < str->size(); i++) {
     if (str->at(i).isSpace()) {
-      if (start == -1)
-        continue;
+      if (start == -1) continue;
       break;
     } else if (start == -1) {
       start = i;
       if (untilEnd) {
         int end = str->size();
-        while (str->at(--end).isSpace())
-          ;
+        while (str->at(--end).isSpace());
         i = end + 1;
         break;
       }
     }
   }
 
-  if (start == -1)
-    return QStringRef();
+  if (start == -1) return QStringRef();
   return QStringRef(str, start, i - start);
 }
 
-QStringRef ChessEngine::firstToken(const QString &str, bool untilEnd) {
+QStringRef ChessEngine::firstToken(const QString& str, bool untilEnd) {
   return nextToken(QStringRef(&str, 0, 0), untilEnd);
 }
 
-ChessEngine::ChessEngine(QObject *parent)
-    : ChessPlayer(parent), m_id(s_count++), m_pingState(NotStarted),
-      m_pinging(false), m_redEvalPov(false), m_pondering(false),
-      m_pingTimer(new QTimer(this)), m_quitTimer(new QTimer(this)),
-      m_idleTimer(new QTimer(this)), m_protocolStartTimer(new QTimer(this)),
-      m_ioDevice(nullptr), m_restartMode(EngineConfiguration::RestartAuto) {
+ChessEngine::ChessEngine(QObject* parent)
+    : ChessPlayer(parent),
+      m_id(s_count++),
+      m_pingState(NotStarted),
+      m_pinging(false),
+      m_redEvalPov(false),
+      m_pondering(false),
+      m_pingTimer(new QTimer(this)),
+      m_quitTimer(new QTimer(this)),
+      m_idleTimer(new QTimer(this)),
+      m_protocolStartTimer(new QTimer(this)),
+      m_ioDevice(nullptr),
+      m_restartMode(EngineConfiguration::RestartAuto) {
   m_pingTimer->setSingleShot(true);
   m_pingTimer->setInterval(15000);
   connect(m_pingTimer, SIGNAL(timeout()), this, SLOT(onPingTimeout()));
@@ -87,9 +92,9 @@ ChessEngine::ChessEngine(QObject *parent)
 
 ChessEngine::~ChessEngine() { qDeleteAll(m_options); }
 
-QIODevice *ChessEngine::device() const { return m_ioDevice; }
+QIODevice* ChessEngine::device() const { return m_ioDevice; }
 
-void ChessEngine::setDevice(QIODevice *device) {
+void ChessEngine::setDevice(QIODevice* device) {
   Q_ASSERT(device != nullptr);
 
   m_ioDevice = device;
@@ -99,18 +104,15 @@ void ChessEngine::setDevice(QIODevice *device) {
   connect(m_ioDevice, SIGNAL(readChannelFinished()), this, SLOT(onCrashed()));
 }
 
-void ChessEngine::applyConfiguration(const EngineConfiguration &configuration) {
-  if (!configuration.name().isEmpty())
-    setName(configuration.name());
+void ChessEngine::applyConfiguration(const EngineConfiguration& configuration) {
+  if (!configuration.name().isEmpty()) setName(configuration.name());
 
   const auto initStrings = configuration.initStrings();
-  for (const QString &str : initStrings)
-    write(str);
+  for (const QString& str : initStrings) write(str);
 
   const auto options = configuration.options();
   for (const auto option : options) {
-    if (option->isEditable())
-      setOption(option->name(), option->value());
+    if (option->isEditable()) setOption(option->name(), option->value());
   }
 
   m_redEvalPov = configuration.redEvalPov();
@@ -119,27 +121,26 @@ void ChessEngine::applyConfiguration(const EngineConfiguration &configuration) {
   setClaimsValidated(configuration.areClaimsValidated());
 }
 
-void ChessEngine::addOption(EngineOption *option) {
+void ChessEngine::addOption(EngineOption* option) {
   Q_ASSERT(option != nullptr);
   m_options.append(option);
 }
 
-EngineOption *ChessEngine::getOption(const QString &name) const {
-  for (EngineOption *option : qAsConst(m_options)) {
-    if (option->alias() == name || option->name() == name)
-      return option;
+EngineOption* ChessEngine::getOption(const QString& name) const {
+  for (EngineOption* option : qAsConst(m_options)) {
+    if (option->alias() == name || option->name() == name) return option;
   }
 
   return nullptr;
 }
 
-void ChessEngine::setOption(const QString &name, const QVariant &value) {
+void ChessEngine::setOption(const QString& name, const QVariant& value) {
   if (state() == Starting || state() == NotStarted) {
     m_optionBuffer[name] = value;
     return;
   }
 
-  EngineOption *option = getOption(name);
+  EngineOption* option = getOption(name);
   if (option == nullptr) {
     qWarning("%s doesn't have option %s", qUtf8Printable(this->name()),
              qUtf8Printable(name));
@@ -156,20 +157,18 @@ void ChessEngine::setOption(const QString &name, const QVariant &value) {
   sendOption(option->name(), option->value());
 }
 
-QList<EngineOption *> ChessEngine::options() const { return m_options; }
+QList<EngineOption*> ChessEngine::options() const { return m_options; }
 
 QStringList ChessEngine::variants() const { return m_variants; }
 
-void ChessEngine::addVariant(const QString &variant) {
-  if (!m_variants.contains(variant))
-    m_variants << variant;
+void ChessEngine::addVariant(const QString& variant) {
+  if (!m_variants.contains(variant)) m_variants << variant;
 }
 
 void ChessEngine::clearVariants() { m_variants.clear(); }
 
 void ChessEngine::start() {
-  if (state() != NotStarted)
-    return;
+  if (state() != NotStarted) return;
 
   m_pinging = false;
   setState(Starting);
@@ -198,8 +197,7 @@ void ChessEngine::onProtocolStart() {
 }
 
 void ChessEngine::go() {
-  if (state() == Observing && !isPondering())
-    ping();
+  if (state() == Observing && !isPondering()) ping();
   ChessPlayer::go();
 }
 
@@ -217,7 +215,7 @@ bool ChessEngine::redEvalPov() const { return m_redEvalPov; }
 
 bool ChessEngine::pondering() const { return m_pondering; }
 
-void ChessEngine::endGame(const Chess::Result &result) {
+void ChessEngine::endGame(const Chess::Result& result) {
   ChessPlayer::endGame(result);
 
   if (restartsBetweenGames())
@@ -229,12 +227,11 @@ void ChessEngine::endGame(const Chess::Result &result) {
 bool ChessEngine::isHuman() const { return false; }
 
 bool ChessEngine::isReady() const {
-  if (m_pinging)
-    return false;
+  if (m_pinging) return false;
   return ChessPlayer::isReady();
 }
 
-bool ChessEngine::supportsVariant(const QString &variant) const {
+bool ChessEngine::supportsVariant(const QString& variant) const {
   return m_variants.contains(variant);
 }
 
@@ -258,8 +255,7 @@ bool ChessEngine::stopThinking() {
 
 void ChessEngine::onIdleTimeout() {
   m_idleTimer->stop();
-  if (state() != Thinking || m_pinging)
-    return;
+  if (state() != Thinking || m_pinging) return;
 
   m_writeBuffer.clear();
   kill();
@@ -268,8 +264,7 @@ void ChessEngine::onIdleTimeout() {
 }
 
 void ChessEngine::kill() {
-  if (state() == Disconnected)
-    return;
+  if (state() == Disconnected) return;
 
   qInfo("Terminating process of engine %s(%d)", qUtf8Printable(name()), m_id);
 
@@ -298,8 +293,7 @@ void ChessEngine::ping(bool sendCommand) {
 }
 
 void ChessEngine::pong(bool emitReady) {
-  if (!m_pinging)
-    return;
+  if (!m_pinging) return;
 
   m_pingTimer->stop();
   m_pinging = false;
@@ -318,8 +312,7 @@ void ChessEngine::pong(bool emitReady) {
     }
   }
 
-  if (emitReady)
-    emit ready();
+  if (emitReady) emit ready();
 }
 
 void ChessEngine::onPingTimeout() {
@@ -334,9 +327,8 @@ void ChessEngine::onPingTimeout() {
   forfeit(Chess::Result::StalledConnection);
 }
 
-void ChessEngine::write(const QString &data, WriteMode mode) {
-  if (state() == Disconnected)
-    return;
+void ChessEngine::write(const QString& data, WriteMode mode) {
+  if (state() == Disconnected) return;
   if (state() == NotStarted || (m_pinging && mode == Buffered)) {
     m_writeBuffer.append(data);
     return;
@@ -352,12 +344,9 @@ void ChessEngine::write(const QString &data, WriteMode mode) {
 void ChessEngine::onReadyRead() {
   while (m_ioDevice->isReadable() && m_ioDevice->canReadLine()) {
     QString line = QString(m_ioDevice->readLine());
-    if (line.endsWith('\n'))
-      line.chop(1);
-    if (line.endsWith('\r'))
-      line.chop(1);
-    if (line.isEmpty())
-      continue;
+    if (line.endsWith('\n')) line.chop(1);
+    if (line.endsWith('\r')) line.chop(1);
+    if (line.isEmpty()) continue;
 
     emit debugMessage(QString("<%1(%2): %3").arg(name()).arg(m_id).arg(line));
     parseLine(line);
@@ -372,19 +361,16 @@ void ChessEngine::onReadyRead() {
 }
 
 void ChessEngine::flushWriteBuffer() {
-  if (m_pinging || state() == NotStarted)
-    return;
+  if (m_pinging || state() == NotStarted) return;
 
-  for (const QString &line : qAsConst(m_writeBuffer))
-    write(line);
+  for (const QString& line : qAsConst(m_writeBuffer)) write(line);
   m_writeBuffer.clear();
 }
 
 void ChessEngine::clearWriteBuffer() { m_writeBuffer.clear(); }
 
 void ChessEngine::onProtocolStartTimeout() {
-  if (state() != Starting)
-    return;
+  if (state() != Starting) return;
 
   setError(tr("Chess protocol was not started in time"));
   qWarning("Engine %s(%d): %s", qUtf8Printable(name()), m_id,
@@ -408,7 +394,7 @@ void ChessEngine::onQuitTimeout() {
 
 void ChessEngine::quit() {
   if (!m_ioDevice || !m_ioDevice->isOpen() || state() == Disconnected)
-    return ChessPlayer::quit(); // clazy:exclude=returning-void-expression
+    return ChessPlayer::quit();  // clazy:exclude=returning-void-expression
 
   disconnect(m_ioDevice, SIGNAL(readChannelFinished()), this,
              SLOT(onCrashed()));

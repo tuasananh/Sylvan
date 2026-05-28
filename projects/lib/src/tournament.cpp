@@ -15,6 +15,8 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "tournament.h"
+
 #include <QFile>
 #include <QMultiMap>
 #include <QSet>
@@ -29,18 +31,36 @@
 #include "pgnstream.h"
 #include "playerbuilder.h"
 #include "sprt.h"
-#include "tournament.h"
 
-Tournament::Tournament(GameManager *gameManager, QObject *parent)
-    : QObject(parent), m_gameManager(gameManager), m_lastGame(nullptr),
-      m_variant("standard"), m_round(0), m_oldRound(-1), m_nextGameNumber(0),
-      m_finishedGameCount(0), m_savedGameCount(0), m_finalGameCount(0),
-      m_gamesPerEncounter(1), m_roundMultiplier(1), m_startDelay(0),
-      m_openingDepth(1024), m_seedCount(0), m_stopping(false),
-      m_openingRepetitions(1), m_openingPolicy(DefaultPolicy), m_recover(false),
-      m_pgnCleanup(true), m_pgnWriteUnfinishedGames(true), m_finished(false),
-      m_bookOwnerGuardp(false), m_openingSuite(nullptr), m_sprt(new Sprt),
-      m_repetitionCounter(0), m_swapSides(true), m_pgnOutMode(PgnGame::Verbose),
+Tournament::Tournament(GameManager* gameManager, QObject* parent)
+    : QObject(parent),
+      m_gameManager(gameManager),
+      m_lastGame(nullptr),
+      m_variant("standard"),
+      m_round(0),
+      m_oldRound(-1),
+      m_nextGameNumber(0),
+      m_finishedGameCount(0),
+      m_savedGameCount(0),
+      m_finalGameCount(0),
+      m_gamesPerEncounter(1),
+      m_roundMultiplier(1),
+      m_startDelay(0),
+      m_openingDepth(1024),
+      m_seedCount(0),
+      m_stopping(false),
+      m_openingRepetitions(1),
+      m_openingPolicy(DefaultPolicy),
+      m_recover(false),
+      m_pgnCleanup(true),
+      m_pgnWriteUnfinishedGames(true),
+      m_finished(false),
+      m_bookOwnerGuardp(false),
+      m_openingSuite(nullptr),
+      m_sprt(new Sprt),
+      m_repetitionCounter(0),
+      m_swapSides(true),
+      m_pgnOutMode(PgnGame::Verbose),
       m_pair(nullptr) {
   Q_ASSERT(gameManager != nullptr);
 }
@@ -52,26 +72,23 @@ Tournament::~Tournament() {
   qDeleteAll(m_gameData);
   qDeleteAll(m_pairs);
 
-  QSet<const OpeningBook *> books;
-  for (const TournamentPlayer &player : qAsConst(m_players)) {
+  QSet<const OpeningBook*> books;
+  for (const TournamentPlayer& player : qAsConst(m_players)) {
     books.insert(player.book());
     delete player.builder();
   }
 
-  if (m_bookOwnerGuardp)
-    qDeleteAll(books);
+  if (m_bookOwnerGuardp) qDeleteAll(books);
 
   delete m_openingSuite;
   delete m_sprt;
 
-  if (m_pgnFile.isOpen())
-    m_pgnFile.close();
+  if (m_pgnFile.isOpen()) m_pgnFile.close();
 
-  if (m_epdFile.isOpen())
-    m_epdFile.close();
+  if (m_epdFile.isOpen()) m_epdFile.close();
 }
 
-GameManager *Tournament::gameManager() const { return m_gameManager; }
+GameManager* Tournament::gameManager() const { return m_gameManager; }
 
 bool Tournament::isFinished() const { return m_finished; }
 
@@ -93,7 +110,7 @@ int Tournament::finishedGameCount() const { return m_finishedGameCount; }
 
 int Tournament::finalGameCount() const { return m_finalGameCount; }
 
-const TournamentPlayer &Tournament::playerAt(int index) const {
+const TournamentPlayer& Tournament::playerAt(int index) const {
   return m_players.at(index);
 }
 
@@ -101,15 +118,15 @@ int Tournament::playerCount() const { return m_players.size(); }
 
 int Tournament::seedCount() const { return m_seedCount; }
 
-Sprt *Tournament::sprt() const { return m_sprt; }
+Sprt* Tournament::sprt() const { return m_sprt; }
 
 bool Tournament::canSetRoundMultiplier() const { return true; }
 
-void Tournament::setName(const QString &name) { m_name = name; }
+void Tournament::setName(const QString& name) { m_name = name; }
 
-void Tournament::setSite(const QString &site) { m_site = site; }
+void Tournament::setSite(const QString& site) { m_site = site; }
 
-void Tournament::setVariant(const QString &variant) {
+void Tournament::setVariant(const QString& variant) {
   Q_ASSERT(Chess::BoardFactory::variants().contains(variant));
   m_variant = variant;
 }
@@ -141,11 +158,11 @@ void Tournament::setStartDelay(int delay) {
 
 void Tournament::setRecoveryMode(bool recover) { m_recover = recover; }
 
-void Tournament::setAdjudicator(const GameAdjudicator &adjudicator) {
+void Tournament::setAdjudicator(const GameAdjudicator& adjudicator) {
   m_adjudicator = adjudicator;
 }
 
-void Tournament::setOpeningSuite(OpeningSuite *suite) {
+void Tournament::setOpeningSuite(OpeningSuite* suite) {
   delete m_openingSuite;
   m_openingSuite = suite;
 }
@@ -154,7 +171,7 @@ void Tournament::setOpeningDepth(int plies) { m_openingDepth = plies; }
 
 void Tournament::setSeedCount(int seedCount) { m_seedCount = seedCount; }
 
-void Tournament::setPgnOutput(const QString &fileName, PgnGame::PgnMode mode) {
+void Tournament::setPgnOutput(const QString& fileName, PgnGame::PgnMode mode) {
   if (fileName != m_pgnFile.fileName()) {
     m_pgnFile.close();
     m_pgnFile.setFileName(fileName);
@@ -168,7 +185,7 @@ void Tournament::setPgnWriteUnfinishedGames(bool enabled) {
 
 void Tournament::setPgnCleanupEnabled(bool enabled) { m_pgnCleanup = enabled; }
 
-void Tournament::setEpdOutput(const QString &fileName) {
+void Tournament::setEpdOutput(const QString& fileName) {
   if (fileName != m_epdFile.fileName()) {
     m_epdFile.close();
     m_epdFile.setFileName(fileName);
@@ -189,26 +206,25 @@ void Tournament::setOpeningBookOwnerGuardp(bool enabled) {
   m_bookOwnerGuardp = enabled;
 }
 
-void Tournament::addPlayer(PlayerBuilder *builder,
-                           const TimeControl &timeControl,
-                           const OpeningBook *book, int bookDepth) {
+void Tournament::addPlayer(PlayerBuilder* builder,
+                           const TimeControl& timeControl,
+                           const OpeningBook* book, int bookDepth) {
   Q_ASSERT(builder != nullptr);
 
   TournamentPlayer player(builder, timeControl, book, bookDepth);
   m_players.append(player);
 }
 
-TournamentPair *Tournament::currentPair() const { return m_pair; }
+TournamentPair* Tournament::currentPair() const { return m_pair; }
 
-TournamentPair *Tournament::pair(int player1, int player2) {
+TournamentPair* Tournament::pair(int player1, int player2) {
   Q_ASSERT(player1 || player2);
 
   const QPair<int, int> pairs[] = {qMakePair(player1, player2),
                                    qMakePair(player2, player1)};
 
-  for (const auto &p : pairs) {
-    if (m_pairs.contains(p))
-      return m_pairs[p];
+  for (const auto& p : pairs) {
+    if (m_pairs.contains(p)) return m_pairs[p];
   }
 
   // Existing pair not found -> create a new one
@@ -224,22 +240,22 @@ bool Tournament::areAllGamesFinished() const {
 
 bool Tournament::hasGauntletRatingsOrder() const { return false; }
 
-void Tournament::startGame(TournamentPair *pair) {
+void Tournament::startGame(TournamentPair* pair) {
   Q_ASSERT(pair->isValid());
   m_pair = pair;
   m_pair->addStartedGame();
 
-  const TournamentPlayer &red = m_players[m_pair->firstPlayer()];
-  const TournamentPlayer &black = m_players[m_pair->secondPlayer()];
+  const TournamentPlayer& red = m_players[m_pair->firstPlayer()];
+  const TournamentPlayer& black = m_players[m_pair->secondPlayer()];
 
-  Chess::Board *board = Chess::BoardFactory::create(m_variant);
+  Chess::Board* board = Chess::BoardFactory::create(m_variant);
   Q_ASSERT(board != nullptr);
-  ChessGame *game = new ChessGame(board, new PgnGame());
+  ChessGame* game = new ChessGame(board, new PgnGame());
 
-  connect(game, SIGNAL(started(ChessGame *)), this,
-          SLOT(onGameStarted(ChessGame *)));
-  connect(game, SIGNAL(finished(ChessGame *)), this,
-          SLOT(onGameFinished(ChessGame *)));
+  connect(game, SIGNAL(started(ChessGame*)), this,
+          SLOT(onGameStarted(ChessGame*)));
+  connect(game, SIGNAL(finished(ChessGame*)), this,
+          SLOT(onGameFinished(ChessGame*)));
 
   game->setTimeControl(red.timeControl(), Chess::Side::Red);
   game->setTimeControl(black.timeControl(), Chess::Side::Black);
@@ -257,8 +273,9 @@ void Tournament::startGame(TournamentPair *pair) {
     m_repetitionCounter = 1;
     if (m_openingSuite != nullptr) {
       if (!game->setMoves(m_openingSuite->nextGame(m_openingDepth)))
-        qWarning("The opening suite is incompatible with the "
-                 "current chess variant");
+        qWarning(
+            "The opening suite is incompatible with the "
+            "current chess variant");
     }
   }
 
@@ -277,53 +294,48 @@ void Tournament::startGame(TournamentPair *pair) {
   game->pgn()->setSite(m_site);
   game->pgn()->setRound(m_round);
 
-  if (m_finishedGameCount > 0)
-    game->setStartDelay(m_startDelay);
+  if (m_finishedGameCount > 0) game->setStartDelay(m_startDelay);
   game->setAdjudicator(m_adjudicator);
 
-  GameData *data = new GameData;
+  GameData* data = new GameData;
   data->number = ++m_nextGameNumber;
   data->redIndex = m_pair->firstPlayer();
   data->blackIndex = m_pair->secondPlayer();
   m_gameData[game] = data;
 
   // Some tournament types may require more games than expected
-  if (m_nextGameNumber > m_finalGameCount)
-    m_finalGameCount = m_nextGameNumber;
+  if (m_nextGameNumber > m_finalGameCount) m_finalGameCount = m_nextGameNumber;
 
   // Make sure the next game (if any) between the pair will
   // start with reversed colors.
-  if (m_swapSides)
-    m_pair->swapPlayers();
+  if (m_swapSides) m_pair->swapPlayers();
 
   auto redBuilder = red.builder();
   auto blackBuilder = black.builder();
   onGameAboutToStart(game, redBuilder, blackBuilder);
-  connect(game, SIGNAL(startFailed(ChessGame *)), this,
-          SLOT(onGameStartFailed(ChessGame *)));
+  connect(game, SIGNAL(startFailed(ChessGame*)), this,
+          SLOT(onGameStartFailed(ChessGame*)));
   m_gameManager->newGame(game, redBuilder, blackBuilder, GameManager::Enqueue,
                          GameManager::ReusePlayers);
 }
 
-void Tournament::onGameAboutToStart(ChessGame *game, const PlayerBuilder *red,
-                                    const PlayerBuilder *black) {
+void Tournament::onGameAboutToStart(ChessGame* game, const PlayerBuilder* red,
+                                    const PlayerBuilder* black) {
   Q_UNUSED(game);
   Q_UNUSED(red);
   Q_UNUSED(black);
 }
 
-int Tournament::playerIndex(ChessGame *game, Chess::Side side) const {
+int Tournament::playerIndex(ChessGame* game, Chess::Side side) const {
   auto gd = m_gameData[game];
   return side == Chess::Side::Red ? gd->redIndex : gd->blackIndex;
 }
 
 void Tournament::startNextGame() {
-  if (m_stopping)
-    return;
+  if (m_stopping) return;
 
-  TournamentPair *pair(nextPair(m_nextGameNumber));
-  if (!pair || !pair->isValid())
-    return;
+  TournamentPair* pair(nextPair(m_nextGameNumber));
+  if (!pair || !pair->isValid()) return;
 
   if ((!pair->hasSamePlayers(m_pair) && m_players.size() > 2 &&
        m_openingPolicy != OpeningPolicy::RoundPolicy) ||
@@ -337,19 +349,18 @@ void Tournament::startNextGame() {
   startGame(pair);
 }
 
-inline bool faulty(const Chess::Result::Type &type) {
+inline bool faulty(const Chess::Result::Type& type) {
   return type == Chess::Result::NoResult ||
          type == Chess::Result::ResultError ||
          type == Chess::Result::Disconnection ||
          type == Chess::Result::StalledConnection;
 }
 
-bool Tournament::writePgn(PgnGame *pgn, int gameNumber) {
+bool Tournament::writePgn(PgnGame* pgn, int gameNumber) {
   Q_ASSERT(pgn != nullptr);
   Q_ASSERT(gameNumber > 0);
 
-  if (m_pgnFile.fileName().isEmpty())
-    return true;
+  if (m_pgnFile.fileName().isEmpty()) return true;
 
   bool isOpen = m_pgnFile.isOpen();
   if (!isOpen || !m_pgnFile.exists()) {
@@ -387,11 +398,10 @@ bool Tournament::writePgn(PgnGame *pgn, int gameNumber) {
   return ok;
 }
 
-bool Tournament::writeEpd(ChessGame *game) {
+bool Tournament::writeEpd(ChessGame* game) {
   Q_ASSERT(game != nullptr);
 
-  if (m_epdFile.fileName().isEmpty())
-    return true;
+  if (m_epdFile.fileName().isEmpty()) return true;
 
   bool isOpen = m_epdFile.isOpen();
   if (!isOpen || !m_epdFile.exists()) {
@@ -409,7 +419,7 @@ bool Tournament::writeEpd(ChessGame *game) {
     m_epdOut.setDevice(&m_epdFile);
   }
 
-  const QString &epdPos = game->board()->fenString();
+  const QString& epdPos = game->board()->fenString();
   m_epdOut << epdPos << "\n";
   m_epdOut.flush();
   bool ok = true;
@@ -425,11 +435,11 @@ void Tournament::addScore(int player, int score) {
   m_players[player].addScore(score);
 }
 
-void Tournament::onGameStarted(ChessGame *game) {
+void Tournament::onGameStarted(ChessGame* game) {
   Q_ASSERT(game != nullptr);
   Q_ASSERT(m_gameData.contains(game));
 
-  GameData *data = m_gameData[game];
+  GameData* data = m_gameData[game];
   int iRed = data->redIndex;
   int iBlack = data->blackIndex;
   m_players[iRed].setName(game->player(Chess::Side::Red)->name());
@@ -438,45 +448,43 @@ void Tournament::onGameStarted(ChessGame *game) {
   emit gameStarted(game, data->number, iRed, iBlack);
 }
 
-void Tournament::onGameFinished(ChessGame *game) {
+void Tournament::onGameFinished(ChessGame* game) {
   Q_ASSERT(game != nullptr);
 
-  PgnGame *pgn(game->pgn());
+  PgnGame* pgn(game->pgn());
 
   m_finishedGameCount++;
 
   Q_ASSERT(m_gameData.contains(game));
-  GameData *data = m_gameData.take(game);
+  GameData* data = m_gameData.take(game);
   int gameNumber = data->number;
   Sprt::GameResult sprtResult = Sprt::NoResult;
 
   int iRed = data->redIndex;
   int iBlack = data->blackIndex;
   const auto redName = pgn->playerName(Chess::Side::Red);
-  if (!redName.isEmpty())
-    m_players[iRed].setName(redName);
+  if (!redName.isEmpty()) m_players[iRed].setName(redName);
   const auto blackName = pgn->playerName(Chess::Side::Black);
-  if (!blackName.isEmpty())
-    m_players[iBlack].setName(blackName);
+  if (!blackName.isEmpty()) m_players[iBlack].setName(blackName);
 
   switch (game->result().winner()) {
-  case Chess::Side::Red:
-    addScore(iRed, 2);
-    addScore(iBlack, 0);
-    sprtResult = (iRed == 0) ? Sprt::Win : Sprt::Loss;
-    break;
-  case Chess::Side::Black:
-    addScore(iBlack, 2);
-    addScore(iRed, 0);
-    sprtResult = (iBlack == 0) ? Sprt::Win : Sprt::Loss;
-    break;
-  default:
-    if (game->result().isDraw()) {
-      addScore(iRed, 1);
-      addScore(iBlack, 1);
-      sprtResult = Sprt::Draw;
-    }
-    break;
+    case Chess::Side::Red:
+      addScore(iRed, 2);
+      addScore(iBlack, 0);
+      sprtResult = (iRed == 0) ? Sprt::Win : Sprt::Loss;
+      break;
+    case Chess::Side::Black:
+      addScore(iBlack, 2);
+      addScore(iRed, 0);
+      sprtResult = (iBlack == 0) ? Sprt::Win : Sprt::Loss;
+      break;
+    default:
+      if (game->result().isDraw()) {
+        addScore(iRed, 1);
+        addScore(iBlack, 1);
+        sprtResult = Sprt::Draw;
+      }
+      break;
   }
 
   writeEpd(game);
@@ -485,8 +493,7 @@ void Tournament::onGameFinished(ChessGame *game) {
   Chess::Result::Type resultType(game->result().type());
   bool crashed = (resultType == Chess::Result::Disconnection ||
                   resultType == Chess::Result::StalledConnection);
-  if (!m_recover && crashed)
-    stop();
+  if (!m_recover && crashed) stop();
 
   if (!m_sprt->isNull() && sprtResult != Sprt::NoResult) {
     m_sprt->addGameResult(sprtResult);
@@ -496,29 +503,27 @@ void Tournament::onGameFinished(ChessGame *game) {
 
   emit gameFinished(game, gameNumber, iRed, iBlack);
 
-  if (m_pgnCleanup)
-    delete pgn;
+  if (m_pgnCleanup) delete pgn;
 
   if (areAllGamesFinished() || (m_stopping && m_gameData.isEmpty())) {
     m_stopping = false;
     m_lastGame = game;
-    connect(m_gameManager, SIGNAL(gameDestroyed(ChessGame *)), this,
-            SLOT(onGameDestroyed(ChessGame *)));
+    connect(m_gameManager, SIGNAL(gameDestroyed(ChessGame*)), this,
+            SLOT(onGameDestroyed(ChessGame*)));
   }
 
   delete data;
   game->deleteLater();
 }
 
-void Tournament::onGameDestroyed(ChessGame *game) {
-  if (game != m_lastGame)
-    return;
+void Tournament::onGameDestroyed(ChessGame* game) {
+  if (game != m_lastGame) return;
 
   m_lastGame = nullptr;
   onFinished();
 }
 
-void Tournament::onGameStartFailed(ChessGame *game) {
+void Tournament::onGameStartFailed(ChessGame* game) {
   m_error = game->errorString();
 
   delete game->pgn();
@@ -561,8 +566,7 @@ void Tournament::start() {
 }
 
 void Tournament::stop() {
-  if (m_stopping)
-    return;
+  if (m_stopping) return;
 
   disconnect(m_gameManager, SIGNAL(ready()), this, SLOT(startNextGame()));
 
@@ -573,7 +577,7 @@ void Tournament::stop() {
 
   m_stopping = true;
   const auto games = m_gameData.keys();
-  for (ChessGame *game : games)
+  for (ChessGame* game : games)
     QMetaObject::invokeMethod(game, "stop", Qt::QueuedConnection);
 }
 
@@ -582,7 +586,7 @@ QString Tournament::results() const {
   QString ret;
 
   for (int i = 0; i < playerCount(); i++) {
-    const TournamentPlayer &player(playerAt(i));
+    const TournamentPlayer& player(playerAt(i));
     Elo elo(player.wins(), player.losses(), player.draws());
 
     if (playerCount() == 2) {
@@ -624,7 +628,7 @@ QString Tournament::results() const {
 
   int rank = hasGauntletRatingsOrder() ? -1 : 0;
   for (auto it = ranking.constBegin(); it != ranking.constEnd(); ++it) {
-    const RankingData &data = it.value();
+    const RankingData& data = it.value();
     ret += QString("\n%1 %2 %3 %4 %5 %6% %7%")
                .arg(++rank, 4)
                .arg(data.name, -25)

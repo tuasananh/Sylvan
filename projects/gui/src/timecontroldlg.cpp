@@ -18,9 +18,10 @@
 */
 
 #include "timecontroldlg.h"
+
 #include "ui_timecontroldlg.h"
 
-TimeControlDialog::TimeControlDialog(const TimeControl &tc, QWidget *parent)
+TimeControlDialog::TimeControlDialog(const TimeControl& tc, QWidget* parent)
     : QDialog(parent), ui(new Ui::TimeControlDialog) {
   ui->setupUi(this);
 
@@ -31,8 +32,7 @@ TimeControlDialog::TimeControlDialog(const TimeControl &tc, QWidget *parent)
   connect(ui->m_infiniteRadio, SIGNAL(clicked()), this,
           SLOT(onInfiniteSelected()));
 
-  if (!tc.isValid())
-    return;
+  if (!tc.isValid()) return;
 
   if (tc.isInfinite()) {
     ui->m_infiniteRadio->setChecked(true);
@@ -82,14 +82,14 @@ void TimeControlDialog::onInfiniteSelected() {
 
 int TimeControlDialog::timeToMs() const {
   switch (ui->m_timeUnitCombo->currentIndex()) {
-  case Seconds:
-    return ui->m_timeSpin->value() * 1000.0;
-  case Minutes:
-    return ui->m_timeSpin->value() * 60000.0;
-  case Hours:
-    return ui->m_timeSpin->value() * 3600000.0;
-  default:
-    return 0;
+    case Seconds:
+      return ui->m_timeSpin->value() * 1000.0;
+    case Minutes:
+      return ui->m_timeSpin->value() * 60000.0;
+    case Hours:
+      return ui->m_timeSpin->value() * 3600000.0;
+    default:
+      return 0;
   }
 }
 

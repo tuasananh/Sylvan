@@ -19,10 +19,10 @@
 
 #include "playerbuilder.h"
 
-PlayerBuilder::PlayerBuilder(const QString &name) : m_name(name) {}
+PlayerBuilder::PlayerBuilder(const QString& name) : m_name(name) {}
 
 PlayerBuilder::~PlayerBuilder() {}
 
 QString PlayerBuilder::name() const { return m_name; }
 
-void PlayerBuilder::setName(const QString &name) { m_name = name; }
+void PlayerBuilder::setName(const QString& name) { m_name = name; }

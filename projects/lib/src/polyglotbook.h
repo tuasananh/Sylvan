@@ -32,16 +32,16 @@
  * Specs: http://alpha.uhasselt.be/Research/Algebra/Toga/book_format.html
  */
 class LIB_EXPORT PolyglotBook : public OpeningBook {
-public:
+ public:
   /*! Creates a new PolyglotBook with access mode \a mode. */
   PolyglotBook(BookMoveMode mode = BookRandom);
 
-protected:
+ protected:
   // Inherited from OpeningBook
   virtual int entrySize() const;
-  virtual Entry readEntry(QDataStream &in, quint64 *key) const;
-  virtual void writeEntry(const Map::const_iterator &it,
-                          QDataStream &out) const;
+  virtual Entry readEntry(QDataStream& in, quint64* key) const;
+  virtual void writeEntry(const Map::const_iterator& it,
+                          QDataStream& out) const;
 };
 
-#endif // POLYGLOT_BOOK_H
+#endif  // POLYGLOT_BOOK_H

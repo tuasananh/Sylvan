@@ -32,16 +32,16 @@ namespace Chess {
  * classes like GenericMove.
  */
 class LIB_EXPORT Square {
-public:
+ public:
   /*! Creates a new square with invalid defaults. */
   Square();
   /*! Creates a new square from \a file and \a rank. */
   Square(int file, int rank);
 
   /*! Returns true if \a other is the same as this square. */
-  bool operator==(const Square &other) const;
+  bool operator==(const Square& other) const;
   /*! Returns true if \a other is different from this square. */
-  bool operator!=(const Square &other) const;
+  bool operator!=(const Square& other) const;
 
   /*! Returns true if both file and rank have non-negative values. */
   bool isValid() const;
@@ -56,10 +56,10 @@ public:
   /*! Sets the rank to \a rank. */
   void setRank(int rank);
 
-private:
+ private:
   int m_file;
   int m_rank;
 };
 
-} // namespace Chess
-#endif // SQUARE_H
+}  // namespace Chess
+#endif  // SQUARE_H

@@ -35,28 +35,28 @@ class PgnDatabase;
 class GameDatabaseManager : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs an empty GameDatabaseManager with \a parent. */
-  GameDatabaseManager(QObject *parent = nullptr);
+  GameDatabaseManager(QObject* parent = nullptr);
   virtual ~GameDatabaseManager();
 
   /*!
    * Returns the list of currently managed databases.
    */
-  QList<PgnDatabase *> databases() const;
+  QList<PgnDatabase*> databases() const;
 
   /*!
    * Writes the state to a file pointed by \a fileName.
    *
    * \sa readState
    */
-  bool writeState(const QString &fileName);
+  bool writeState(const QString& fileName);
   /*!
    * Reads the state from a file pointed by \a fileName.
    *
    * \sa writeState
    */
-  bool readState(const QString &fileName);
+  bool readState(const QString& fileName);
 
   /*! Returns true if the current state has been modified. */
   bool isModified() const;
@@ -64,9 +64,9 @@ public:
   /*! Sets the state modified flag to \a modified. */
   void setModified(bool modified);
 
-public slots:
+ public slots:
   /*! Adds \a database to the list of managed databases. */
-  void addDatabase(PgnDatabase *database);
+  void addDatabase(PgnDatabase* database);
   /*!
    * Remove database at \a index from the list of managed
    * databases.
@@ -84,8 +84,8 @@ public slots:
    *
    * \sa importStarted
    */
-  void importPgnFile(const QString &fileName);
-signals:
+  void importPgnFile(const QString& fileName);
+ signals:
   /*!
    * Emitted when database is added at \a index.
    *
@@ -108,9 +108,9 @@ signals:
    */
   void databasesReset();
 
-private:
-  QList<PgnDatabase *> m_databases;
+ private:
+  QList<PgnDatabase*> m_databases;
   bool m_modified;
 };
 
-#endif // GAME_DATABASE_MANAGER_H
+#endif  // GAME_DATABASE_MANAGER_H

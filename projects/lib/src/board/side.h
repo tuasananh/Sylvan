@@ -36,12 +36,12 @@ namespace Chess {
 class LIB_EXPORT Side {
   Q_DECLARE_TR_FUNCTIONS(Side)
 
-public:
+ public:
   /*! The enumerated type for the side. */
   enum Type {
-    Red,   //!< The side with the red pieces.
-    Black, //!< The side with the black pieces.
-    NoSide //!< No side
+    Red,    //!< The side with the red pieces.
+    Black,  //!< The side with the black pieces.
+    NoSide  //!< No side
   };
 
   /*! Constructs a new, null Side object. */
@@ -54,7 +54,7 @@ public:
    * The symbol can be "w" for \a Red, "b" for \a Black,
    * or anything else for \a NoSide.
    */
-  explicit Side(const QString &symbol);
+  explicit Side(const QString& symbol);
 
   /*! Returns true if the side is \a NoSide. */
   bool isNull() const;
@@ -71,7 +71,7 @@ public:
   /*! Returns a localized name of the side. */
   QString toString() const;
 
-private:
+ private:
   Type m_type;
 };
 
@@ -88,8 +88,8 @@ inline Side Side::opposite() const {
   return Side(Type(int(m_type) ^ 1));
 }
 
-} // namespace Chess
+}  // namespace Chess
 
 Q_DECLARE_METATYPE(Chess::Side)
 
-#endif // SIDE_H
+#endif  // SIDE_H

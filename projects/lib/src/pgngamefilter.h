@@ -20,9 +20,10 @@
 #ifndef PGNGAMEFILTER_H
 #define PGNGAMEFILTER_H
 
-#include "board/side.h"
 #include <QByteArray>
 #include <QDate>
+
+#include "board/side.h"
 
 class QString;
 class PgnGameEntry;
@@ -37,7 +38,7 @@ class PgnGameEntry;
  * \sa PgnGameEntry
  */
 class LIB_EXPORT PgnGameFilter {
-public:
+ public:
   /*! The type of the filter. */
   enum Type {
     /*! Filter all tags with a single fixed string. */
@@ -48,14 +49,14 @@ public:
 
   /*! The result of the game. */
   enum Result {
-    AnyResult,        //!< Any result (no filtering)
-    EitherPlayerWins, //!< Either player wins
-    RedWins,          //!< The red player wins
-    BlackWins,        //!< The black player wins
-    FirstPlayerWins,  //!< The first player wins
-    FirstPlayerLoses, //!< The first player loses
-    Draw,             //!< The game is a draw
-    Unfinished        //!< The game wasn't completed
+    AnyResult,         //!< Any result (no filtering)
+    EitherPlayerWins,  //!< Either player wins
+    RedWins,           //!< The red player wins
+    BlackWins,         //!< The black player wins
+    FirstPlayerWins,   //!< The first player wins
+    FirstPlayerLoses,  //!< The first player loses
+    Draw,              //!< The game is a draw
+    Unfinished         //!< The game wasn't completed
   };
 
   /*!
@@ -71,27 +72,27 @@ public:
    * Games that have tags matching \a pattern will be filtered in.
    * The filter's type is \a FixedString.
    */
-  PgnGameFilter(const QString &pattern);
+  PgnGameFilter(const QString& pattern);
 
   /*! Returns the type of the filter. */
   Type type() const;
 
   /*! Returns the pattern for \a FixedString mode. */
-  const char *pattern() const;
+  const char* pattern() const;
 
   /*! Returns the filter for the \a Event tag. */
-  const char *event() const;
+  const char* event() const;
   /*! Returns the filter for the \a Site tag. */
-  const char *site() const;
+  const char* site() const;
   /*!
    * Returns the filter for the first player.
    *
    * The first player's side/color is determined by the
    * playerSide() member function.
    */
-  const char *player() const;
+  const char* player() const;
   /*! Returns the filter for the opponent of the first player. */
-  const char *opponent() const;
+  const char* opponent() const;
   /*! Returns the filter for the side/color of the first player. */
   Chess::Side playerSide() const;
   /*!
@@ -99,13 +100,13 @@ public:
    *
    * \note A null QDate won't filter out any games.
    */
-  const QDate &minDate() const;
+  const QDate& minDate() const;
   /*!
    * Returns the filter for the game's maximum starting date.
    *
    * \note A null QDate won't filter out any games.
    */
-  const QDate &maxDate() const;
+  const QDate& maxDate() const;
   /*! Returns the filter for the minimum round ordinal. */
   int minRound() const;
   /*! Returns the filter for the maximum round ordinal. */
@@ -123,30 +124,30 @@ public:
    *
    * This function will change the filter type to \a FixedString.
    */
-  void setPattern(const QString &pattern);
+  void setPattern(const QString& pattern);
 
   /*! Sets the \a Event tag filter to \a event. */
-  void setEvent(const QString &event);
+  void setEvent(const QString& event);
   /*! Sets the \a Site tag filter to \a site. */
-  void setSite(const QString &site);
+  void setSite(const QString& site);
   /*! Sets the minimum starting date filter to \a date. */
-  void setMinDate(const QDate &date);
+  void setMinDate(const QDate& date);
   /*! Sets the maximum starting date filter to \a date. */
-  void setMaxDate(const QDate &date);
+  void setMaxDate(const QDate& date);
   /*! Sets the minimum round ordinal filter to \a round. */
   void setMinRound(int round);
   /*! Sets the maximum round ordinal filter to \a round. */
   void setMaxRound(int round);
   /*! Sets the \a side player's filter to \a name. */
-  void setPlayer(const QString &name, Chess::Side side);
+  void setPlayer(const QString& name, Chess::Side side);
   /*! Sets the first player's opponent filter to \a name. */
-  void setOpponent(const QString &name);
+  void setOpponent(const QString& name);
   /*! Sets the \a Result tag filter to \a result. */
   void setResult(Result result);
   /*! Sets the \a resultInverted value to \a invert. */
   void setResultInverted(bool invert);
 
-private:
+ private:
   Type m_type;
   QByteArray m_pattern;
   QByteArray m_event;
@@ -164,17 +165,17 @@ private:
 
 inline PgnGameFilter::Type PgnGameFilter::type() const { return m_type; }
 
-inline const char *PgnGameFilter::pattern() const {
+inline const char* PgnGameFilter::pattern() const {
   return m_pattern.constData();
 }
 
-inline const char *PgnGameFilter::event() const { return m_event.constData(); }
+inline const char* PgnGameFilter::event() const { return m_event.constData(); }
 
-inline const char *PgnGameFilter::site() const { return m_site.constData(); }
+inline const char* PgnGameFilter::site() const { return m_site.constData(); }
 
-inline const QDate &PgnGameFilter::minDate() const { return m_minDate; }
+inline const QDate& PgnGameFilter::minDate() const { return m_minDate; }
 
-inline const QDate &PgnGameFilter::maxDate() const { return m_maxDate; }
+inline const QDate& PgnGameFilter::maxDate() const { return m_maxDate; }
 
 inline int PgnGameFilter::minRound() const { return m_minRound; }
 
@@ -184,14 +185,14 @@ inline PgnGameFilter::Result PgnGameFilter::result() const { return m_result; }
 
 inline bool PgnGameFilter::isResultInverted() const { return m_resultInverted; }
 
-inline const char *PgnGameFilter::player() const {
+inline const char* PgnGameFilter::player() const {
   return m_player.constData();
 }
 
-inline const char *PgnGameFilter::opponent() const {
+inline const char* PgnGameFilter::opponent() const {
   return m_opponent.constData();
 }
 
 inline Chess::Side PgnGameFilter::playerSide() const { return m_playerSide; }
 
-#endif // PGNGAMEFILTER_H
+#endif  // PGNGAMEFILTER_H

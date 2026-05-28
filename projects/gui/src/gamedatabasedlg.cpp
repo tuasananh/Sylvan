@@ -17,6 +17,13 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "gamedatabasedlg.h"
+
+#include <pgngame.h>
+#include <pgngameentry.h>
+#include <pgnstream.h>
+#include <polyglotbook.h>
+
 #include <QClipboard>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -25,15 +32,9 @@
 #include <QVBoxLayout>
 #include <QtAlgorithms>
 
-#include <pgngame.h>
-#include <pgngameentry.h>
-#include <pgnstream.h>
-#include <polyglotbook.h>
-
 #include "board/board.h"
 #include "boardview/boardscene.h"
 #include "boardview/boardview.h"
-#include "gamedatabasedlg.h"
 #include "gamedatabasemanager.h"
 #include "gamedatabasesearchdlg.h"
 #include "gameviewer.h"
@@ -49,15 +50,15 @@
 #endif
 
 class PgnGameIterator {
-public:
-  PgnGameIterator(const GameDatabaseDialog *dlg);
+ public:
+  PgnGameIterator(const GameDatabaseDialog* dlg);
 
   int count() const;
   bool hasNext() const;
-  PgnGame next(bool *ok, int depth = INT_MAX - 1);
+  PgnGame next(bool* ok, int depth = INT_MAX - 1);
 
-private:
-  const GameDatabaseDialog *m_dlg;
+ private:
+  const GameDatabaseDialog* m_dlg;
   int m_dbIndex;
   int m_gameIndex;
   int m_gameCount;
@@ -65,15 +66,17 @@ private:
   PgnStream m_in;
 };
 
-PgnGameIterator::PgnGameIterator(const GameDatabaseDialog *dlg)
-    : m_dlg(dlg), m_dbIndex(-1), m_gameIndex(0),
+PgnGameIterator::PgnGameIterator(const GameDatabaseDialog* dlg)
+    : m_dlg(dlg),
+      m_dbIndex(-1),
+      m_gameIndex(0),
       m_gameCount(dlg->m_pgnGameEntryModel->entryCount()) {}
 
 int PgnGameIterator::count() const { return m_gameCount; }
 
 bool PgnGameIterator::hasNext() const { return m_gameIndex < m_gameCount; }
 
-PgnGame PgnGameIterator::next(bool *ok, int depth) {
+PgnGame PgnGameIterator::next(bool* ok, int depth) {
   Q_ASSERT(hasNext());
 
   int newDbIndex = m_dlg->databaseIndexFromGame(m_gameIndex);
@@ -83,7 +86,7 @@ PgnGame PgnGameIterator::next(bool *ok, int depth) {
     m_dbIndex = newDbIndex;
     m_file.close();
 
-    const PgnDatabase *db = m_dlg->m_dbManager->databases().at(m_dbIndex);
+    const PgnDatabase* db = m_dlg->m_dbManager->databases().at(m_dbIndex);
     if (db->status() == PgnDatabase::Ok) {
       m_file.setFileName(db->fileName());
       if (m_file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -100,7 +103,7 @@ PgnGame PgnGameIterator::next(bool *ok, int depth) {
     return game;
   }
 
-  const PgnGameEntry *entry =
+  const PgnGameEntry* entry =
       m_dlg->m_pgnGameEntryModel->entryAt(m_gameIndex++);
   *ok = m_in.seek(entry->pos(), entry->lineNumber()) && game.read(m_in, depth);
 
@@ -108,21 +111,21 @@ PgnGame PgnGameIterator::next(bool *ok, int depth) {
 }
 
 class BookExportTask : public ThreadedTask {
-public:
-  BookExportTask(PgnGameIterator *it, QFile *file, int maxDepth,
-                 QWidget *parent);
+ public:
+  BookExportTask(PgnGameIterator* it, QFile* file, int maxDepth,
+                 QWidget* parent);
 
-protected:
+ protected:
   virtual void run();
 
-private:
-  PgnGameIterator *m_it;
-  QFile *m_file;
+ private:
+  PgnGameIterator* m_it;
+  QFile* m_file;
   int m_depth;
 };
 
-BookExportTask::BookExportTask(PgnGameIterator *it, QFile *file, int maxDepth,
-                               QWidget *parent)
+BookExportTask::BookExportTask(PgnGameIterator* it, QFile* file, int maxDepth,
+                               QWidget* parent)
     : ThreadedTask(tr("Export Opening Book"),
                    tr("Parsing %1 PGN games").arg(it->count()), 0, it->count(),
                    parent) {
@@ -166,18 +169,18 @@ void BookExportTask::run() {
 }
 
 class PgnExportTask : public ThreadedTask {
-public:
-  PgnExportTask(PgnGameIterator *it, QFile *file, QWidget *parent);
+ public:
+  PgnExportTask(PgnGameIterator* it, QFile* file, QWidget* parent);
 
-protected:
+ protected:
   virtual void run();
 
-private:
-  PgnGameIterator *m_it;
-  QFile *m_file;
+ private:
+  PgnGameIterator* m_it;
+  QFile* m_file;
 };
 
-PgnExportTask::PgnExportTask(PgnGameIterator *it, QFile *file, QWidget *parent)
+PgnExportTask::PgnExportTask(PgnGameIterator* it, QFile* file, QWidget* parent)
     : ThreadedTask(tr("Export Games"),
                    tr("Writing %1 games to file").arg(it->count()), 0,
                    it->count(), parent)
@@ -200,8 +203,7 @@ void PgnExportTask::run() {
     if (ok) {
       out << game;
       if (++i % 512 == 0) {
-        if (cancelRequested())
-          break;
+        if (cancelRequested()) break;
         emit progressValueChanged(i);
       }
     }
@@ -213,11 +215,15 @@ void PgnExportTask::run() {
   emit progressValueChanged(i);
 }
 
-GameDatabaseDialog::GameDatabaseDialog(GameDatabaseManager *dbManager,
-                                       QWidget *parent)
-    : QDialog(parent, Qt::Window), m_gameViewer(nullptr), m_game(),
-      m_dbManager(dbManager), m_pgnDatabaseModel(nullptr),
-      m_pgnGameEntryModel(nullptr), ui(new Ui::GameDatabaseDialog) {
+GameDatabaseDialog::GameDatabaseDialog(GameDatabaseManager* dbManager,
+                                       QWidget* parent)
+    : QDialog(parent, Qt::Window),
+      m_gameViewer(nullptr),
+      m_game(),
+      m_dbManager(dbManager),
+      m_pgnDatabaseModel(nullptr),
+      m_pgnGameEntryModel(nullptr),
+      ui(new Ui::GameDatabaseDialog) {
   Q_ASSERT(dbManager != nullptr);
   ui->setupUi(this);
 
@@ -276,18 +282,17 @@ GameDatabaseDialog::GameDatabaseDialog(GameDatabaseManager *dbManager,
 
   connect(
       ui->m_databasesListView->selectionModel(),
-      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+      SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
       this,
-      SLOT(databaseSelectionChanged(const QItemSelection &,
-                                    const QItemSelection &)));
+      SLOT(databaseSelectionChanged(const QItemSelection&,
+                                    const QItemSelection&)));
 
   connect(ui->m_gamesListView->selectionModel(),
-          SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-          this,
-          SLOT(gameSelectionChanged(const QModelIndex &, const QModelIndex &)));
+          SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this,
+          SLOT(gameSelectionChanged(const QModelIndex&, const QModelIndex&)));
 
-  connect(ui->m_searchEdit, SIGNAL(textEdited(const QString &)), this,
-          SLOT(updateSearch(const QString &)));
+  connect(ui->m_searchEdit, SIGNAL(textEdited(const QString&)), this,
+          SLOT(updateSearch(const QString&)));
 
   connect(ui->m_clearBtn, SIGNAL(clicked()), this, SLOT(updateSearch()));
 
@@ -296,7 +301,7 @@ GameDatabaseDialog::GameDatabaseDialog(GameDatabaseManager *dbManager,
 
   connect(m_pgnGameEntryModel, SIGNAL(modelReset()), this, SLOT(updateUi()));
   connect(m_pgnGameEntryModel,
-          SIGNAL(rowsInserted(const QModelIndex &, int, int)), this,
+          SIGNAL(rowsInserted(const QModelIndex&, int, int)), this,
           SLOT(updateUi()));
 
   m_searchTimer.setSingleShot(true);
@@ -306,22 +311,22 @@ GameDatabaseDialog::GameDatabaseDialog(GameDatabaseManager *dbManager,
 GameDatabaseDialog::~GameDatabaseDialog() { delete ui; }
 
 void GameDatabaseDialog::databaseSelectionChanged(
-    const QItemSelection &selected, const QItemSelection &deselected) {
+    const QItemSelection& selected, const QItemSelection& deselected) {
   const auto deselectedIndexes = deselected.indexes();
-  for (const QModelIndex &index : deselectedIndexes)
+  for (const QModelIndex& index : deselectedIndexes)
     m_selectedDatabases.remove(index.row());
 
   const auto selectedIndexes = selected.indexes();
-  for (const QModelIndex &index : selectedIndexes)
+  for (const QModelIndex& index : selectedIndexes)
     m_selectedDatabases[index.row()] = m_dbManager->databases().at(index.row());
 
   if (m_selectedDatabases.isEmpty()) {
-    m_pgnGameEntryModel->setEntries(QList<const PgnGameEntry *>());
+    m_pgnGameEntryModel->setEntries(QList<const PgnGameEntry*>());
     return;
   }
 
-  QList<const PgnGameEntry *> entries;
-  QMap<int, PgnDatabase *>::const_iterator it;
+  QList<const PgnGameEntry*> entries;
+  QMap<int, PgnDatabase*>::const_iterator it;
   for (it = m_selectedDatabases.constBegin();
        it != m_selectedDatabases.constEnd(); ++it)
     entries.append(it.value()->entries());
@@ -330,28 +335,26 @@ void GameDatabaseDialog::databaseSelectionChanged(
   ui->m_advancedSearchBtn->setEnabled(true);
 }
 
-void GameDatabaseDialog::gameSelectionChanged(const QModelIndex &current,
-                                              const QModelIndex &previous) {
+void GameDatabaseDialog::gameSelectionChanged(const QModelIndex& current,
+                                              const QModelIndex& previous) {
   Q_UNUSED(previous);
 
-  if (!current.isValid())
-    return;
+  if (!current.isValid()) return;
 
   int databaseIndex;
-  if ((databaseIndex = databaseIndexFromGame(current.row())) == -1)
-    return;
+  if ((databaseIndex = databaseIndexFromGame(current.row())) == -1) return;
 
-  PgnDatabase *selectedDatabase = m_dbManager->databases().at(databaseIndex);
+  PgnDatabase* selectedDatabase = m_dbManager->databases().at(databaseIndex);
 
   PgnDatabase::Status status;
-  const PgnGameEntry *entry = m_pgnGameEntryModel->entryAt(current.row());
+  const PgnGameEntry* entry = m_pgnGameEntryModel->entryAt(current.row());
 
   if ((status = selectedDatabase->game(entry, &m_game)) != PgnDatabase::Ok) {
     if (status == PgnDatabase::DoesNotExist) {
       // Ask the user if the database should be deleted from the
       // list
       QMessageBox msgBox(this);
-      QPushButton *removeDbButton =
+      QPushButton* removeDbButton =
           msgBox.addButton(tr("Remove"), QMessageBox::ActionRole);
       msgBox.addButton(QMessageBox::Cancel);
 
@@ -368,7 +371,7 @@ void GameDatabaseDialog::gameSelectionChanged(const QModelIndex &current,
     } else {
       // Ask the user to re-import the database
       QMessageBox msgBox(this);
-      QPushButton *importDbButton =
+      QPushButton* importDbButton =
           msgBox.addButton(tr("Import"), QMessageBox::ActionRole);
       msgBox.addButton(QMessageBox::Cancel);
 
@@ -407,7 +410,7 @@ void GameDatabaseDialog::gameSelectionChanged(const QModelIndex &current,
   m_gameViewer->setGame(&m_game);
 }
 
-void GameDatabaseDialog::updateSearch(const QString &terms) {
+void GameDatabaseDialog::updateSearch(const QString& terms) {
   ui->m_clearBtn->setEnabled(!terms.isEmpty());
   m_searchTerms = terms;
   m_searchTimer.start(500);
@@ -419,8 +422,7 @@ void GameDatabaseDialog::onSearchTimeout() {
 
 void GameDatabaseDialog::onAdvancedSearch() {
   GameDatabaseSearchDialog dlg;
-  if (dlg.exec() != QDialog::Accepted)
-    return;
+  if (dlg.exec() != QDialog::Accepted) return;
 
   ui->m_searchEdit->setText(tr("[Advanced search]"));
   ui->m_searchEdit->setEnabled(false);
@@ -429,24 +431,22 @@ void GameDatabaseDialog::onAdvancedSearch() {
 }
 
 int GameDatabaseDialog::databaseIndexFromGame(int game) const {
-  if (m_selectedDatabases.isEmpty())
-    return -1;
+  if (m_selectedDatabases.isEmpty()) return -1;
 
   game = m_pgnGameEntryModel->sourceIndex(game);
 
-  QMap<int, PgnDatabase *>::const_iterator it;
+  QMap<int, PgnDatabase*>::const_iterator it;
   for (it = m_selectedDatabases.constBegin();
        it != m_selectedDatabases.constEnd(); ++it) {
     game -= it.value()->entries().count();
-    if (game < 0)
-      return it.key();
+    if (game < 0) return it.key();
   }
 
   return -1;
 }
 
-void GameDatabaseDialog::exportPgn(const QString &fileName) {
-  QFile *file = new QFile(fileName);
+void GameDatabaseDialog::exportPgn(const QString& fileName) {
+  QFile* file = new QFile(fileName);
   if (!file->open(QIODevice::WriteOnly | QIODevice::Append)) {
     QMessageBox::critical(this, tr("File Error"),
                           tr("Error while saving file %1\n%2")
@@ -455,7 +455,7 @@ void GameDatabaseDialog::exportPgn(const QString &fileName) {
     return;
   }
 
-  PgnExportTask *task =
+  PgnExportTask* task =
       new PgnExportTask(new PgnGameIterator(this), file, this);
   task->start();
 }
@@ -465,17 +465,15 @@ void GameDatabaseDialog::createOpeningBook() {
   int depth = QInputDialog::getInt(this, tr("Opening depth"),
                                    tr("Maximum opening depth (plies):"), 20, 1,
                                    1024, 1, &ok);
-  if (!ok)
-    return;
+  if (!ok) return;
 
   const QString fileName =
       QFileDialog::getSaveFileName(this, tr("Create Opening Book"), QString(),
                                    tr("Polyglot Book File (*.bin)"));
 
-  if (fileName.isEmpty())
-    return;
+  if (fileName.isEmpty()) return;
 
-  QFile *file = new QFile(fileName);
+  QFile* file = new QFile(fileName);
   if (!file->open(QIODevice::WriteOnly)) {
     QMessageBox::critical(this, tr("File Error"),
                           tr("Error while saving file %1\n%2")
@@ -484,33 +482,31 @@ void GameDatabaseDialog::createOpeningBook() {
     return;
   }
 
-  BookExportTask *task =
+  BookExportTask* task =
       new BookExportTask(new PgnGameIterator(this), file, depth, this);
   task->start();
 }
 
 void GameDatabaseDialog::copyGame() {
-  if (m_game.isNull())
-    return;
+  if (m_game.isNull()) return;
 
   QString str;
   QTextStream s(&str);
   s << m_game;
 
-  QClipboard *cb = SylvanApplication::clipboard();
+  QClipboard* cb = SylvanApplication::clipboard();
   cb->setText(s.readAll());
   ui->m_copyGameBtn->setText(tr("Copied"));
 }
 
 void GameDatabaseDialog::copyFen() {
-  if (m_game.isNull() || m_gameViewer->board() == nullptr)
-    return;
+  if (m_game.isNull() || m_gameViewer->board() == nullptr) return;
 
   QString str;
   QTextStream s(&str);
   s << m_gameViewer->board()->fenString();
 
-  QClipboard *cb = SylvanApplication::clipboard();
+  QClipboard* cb = SylvanApplication::clipboard();
   cb->setText(s.readAll());
   ui->m_copyFenBtn->setText(tr("Copied"));
 }

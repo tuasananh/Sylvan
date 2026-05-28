@@ -28,19 +28,19 @@ class Tournament;
 class TournamentResultsDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /* Creates a new TournamentResultsDialog. */
-  TournamentResultsDialog(QWidget *parent = nullptr);
+  TournamentResultsDialog(QWidget* parent = nullptr);
   virtual ~TournamentResultsDialog();
 
   /*! Sets \a tournament as the current tournament. */
-  void setTournament(Tournament *tournament);
+  void setTournament(Tournament* tournament);
 
-public slots:
+ public slots:
   void update();
 
-private:
-  QPlainTextEdit *m_resultsEdit;
+ private:
+  QPlainTextEdit* m_resultsEdit;
 };
 
-#endif // TOURNAMENTRESULTSDIALOG_H
+#endif  // TOURNAMENTRESULTSDIALOG_H

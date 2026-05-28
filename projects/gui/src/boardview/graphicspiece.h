@@ -20,9 +20,9 @@
 #ifndef GRAPHICSPIECE_H
 #define GRAPHICSPIECE_H
 
-#include <QGraphicsObject>
-
 #include <board/piece.h>
+
+#include <QGraphicsObject>
 
 class QSvgRenderer;
 
@@ -40,7 +40,7 @@ class QSvgRenderer;
 class GraphicsPiece : public QGraphicsObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The type value returned by type(). */
   enum { Type = UserType + 4 };
 
@@ -52,15 +52,15 @@ public:
    * \a elementId is the XML ID of the piece picture which is
    * rendered by \a renderer.
    */
-  GraphicsPiece(const Chess::Piece &piece, qreal squareSize,
-                const QString &elementId, QSvgRenderer *renderer,
-                QGraphicsItem *parent = nullptr);
+  GraphicsPiece(const Chess::Piece& piece, qreal squareSize,
+                const QString& elementId, QSvgRenderer* renderer,
+                QGraphicsItem* parent = nullptr);
 
   // Inherited from QGraphicsObject
   virtual int type() const;
   virtual QRectF boundingRect() const;
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = nullptr);
+  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = nullptr);
 
   /*! Returns the type of the chess piece. */
   Chess::Piece pieceType() const;
@@ -71,11 +71,11 @@ public:
    * A piece can have a container even if it doesn't have a parent
    * item.
    */
-  QGraphicsItem *container() const;
+  QGraphicsItem* container() const;
   /*! Sets the container to \a item. */
-  void setContainer(QGraphicsItem *item);
+  void setContainer(QGraphicsItem* item);
 
-public slots:
+ public slots:
   /*!
    * Restores the parent item (container).
    *
@@ -86,12 +86,12 @@ public slots:
    */
   void restoreParent();
 
-private:
+ private:
   Chess::Piece m_piece;
   QRectF m_rect;
   QString m_elementId;
-  QSvgRenderer *m_renderer;
-  QGraphicsItem *m_container;
+  QSvgRenderer* m_renderer;
+  QGraphicsItem* m_container;
 };
 
-#endif // GRAPHICSPIECE_H
+#endif  // GRAPHICSPIECE_H

@@ -19,8 +19,8 @@
 
 #include "pgndatabasemodel.h"
 
-PgnDatabaseModel::PgnDatabaseModel(GameDatabaseManager *gameDatabaseManager,
-                                   QObject *parent)
+PgnDatabaseModel::PgnDatabaseModel(GameDatabaseManager* gameDatabaseManager,
+                                   QObject* parent)
     : QAbstractItemModel(parent), m_gameDatabaseManager(gameDatabaseManager) {
   Q_ASSERT(m_gameDatabaseManager);
 
@@ -48,46 +48,42 @@ void PgnDatabaseModel::onDatabasesReset() {
 }
 
 QModelIndex PgnDatabaseModel::index(int row, int column,
-                                    const QModelIndex &parent) const {
-  if (!hasIndex(row, column, parent))
-    return QModelIndex();
+                                    const QModelIndex& parent) const {
+  if (!hasIndex(row, column, parent)) return QModelIndex();
 
   return createIndex(row, column);
 }
 
-QModelIndex PgnDatabaseModel::parent(const QModelIndex &index) const {
+QModelIndex PgnDatabaseModel::parent(const QModelIndex& index) const {
   Q_UNUSED(index);
 
   return QModelIndex();
 }
 
-int PgnDatabaseModel::rowCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnDatabaseModel::rowCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return m_gameDatabaseManager->databases().count();
 }
 
-int PgnDatabaseModel::columnCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnDatabaseModel::columnCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return 1;
 }
 
-QVariant PgnDatabaseModel::data(const QModelIndex &index, int role) const {
-  if (!index.isValid())
-    return QVariant();
+QVariant PgnDatabaseModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) return QVariant();
 
-  const PgnDatabase *db = m_gameDatabaseManager->databases().at(index.row());
+  const PgnDatabase* db = m_gameDatabaseManager->databases().at(index.row());
 
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
-    case 0:
-      return db->displayName();
+      case 0:
+        return db->displayName();
 
-    default:
-      return QVariant();
+      default:
+        return QVariant();
     }
   } else if (role == Qt::ToolTipRole && index.column() == 0)
     return db->fileName();
@@ -99,19 +95,18 @@ QVariant PgnDatabaseModel::headerData(int section, Qt::Orientation orientation,
                                       int role) const {
   if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
     switch (section) {
-    case 0:
-      return tr("Database");
-    default:
-      return QVariant();
+      case 0:
+        return tr("Database");
+      default:
+        return QVariant();
     }
   }
 
   return QVariant();
 }
 
-Qt::ItemFlags PgnDatabaseModel::flags(const QModelIndex &index) const {
-  if (!index.isValid())
-    return Qt::ItemFlags(Qt::NoItemFlags);
+Qt::ItemFlags PgnDatabaseModel::flags(const QModelIndex& index) const {
+  if (!index.isValid()) return Qt::ItemFlags(Qt::NoItemFlags);
 
   Qt::ItemFlags defaultFlags =
       Qt::ItemFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -123,16 +118,15 @@ Qt::ItemFlags PgnDatabaseModel::flags(const QModelIndex &index) const {
   return defaultFlags;
 }
 
-bool PgnDatabaseModel::setData(const QModelIndex &index, const QVariant &data,
+bool PgnDatabaseModel::setData(const QModelIndex& index, const QVariant& data,
                                int role) {
   Q_UNUSED(role);
 
-  if (!index.isValid())
-    return false;
+  if (!index.isValid()) return false;
 
   // only database's name should be editable
   if (index.column() == 0) {
-    PgnDatabase *db = m_gameDatabaseManager->databases().at(index.row());
+    PgnDatabase* db = m_gameDatabaseManager->databases().at(index.row());
     db->setDisplayName(data.toString());
     m_gameDatabaseManager->setModified(true);
 

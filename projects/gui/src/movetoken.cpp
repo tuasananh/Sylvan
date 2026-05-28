@@ -19,12 +19,12 @@
 
 #include "movetoken.h"
 
-MoveToken::MoveToken(int ply, const QString &text)
+MoveToken::MoveToken(int ply, const QString& text)
     : PgnToken(), m_ply(ply), m_text(text) {}
 
 QString MoveToken::toString() const { return m_text; }
 
-void MoveToken::vInsert(QTextCursor &cursor) {
+void MoveToken::vInsert(QTextCursor& cursor) {
   QString html = QString("<a class=\"move\" href=\"move://%1@\">%2</a> ")
                      .arg(m_ply)
                      .arg(m_text);

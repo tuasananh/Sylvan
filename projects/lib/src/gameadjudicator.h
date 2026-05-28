@@ -34,7 +34,7 @@ class MoveEvaluation;
  * the probability of a specific result is high enough.
  */
 class LIB_EXPORT GameAdjudicator {
-public:
+ public:
   /*!
    * Creates a new game adjudicator.
    *
@@ -87,7 +87,7 @@ public:
    * result() can be called after this function to find out if
    * the game should be adjudicated.
    */
-  void addEval(const Chess::Board *board, const MoveEvaluation &eval);
+  void addEval(const Chess::Board* board, const MoveEvaluation& eval);
   /*! Sets draw move count to 0. */
   void resetDrawMoveCount();
   /*!
@@ -98,7 +98,7 @@ public:
    */
   Chess::Result result() const;
 
-private:
+ private:
   int m_drawMoveNum;
   int m_drawMoveCount;
   int m_drawScore;
@@ -113,4 +113,4 @@ private:
   Chess::Result m_result;
 };
 
-#endif // GAMEADJUDICATOR_H
+#endif  // GAMEADJUDICATOR_H

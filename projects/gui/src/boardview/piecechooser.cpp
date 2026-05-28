@@ -17,6 +17,8 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "piecechooser.h"
+
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
@@ -24,14 +26,12 @@
 #include <QPropertyAnimation>
 
 #include "graphicspiece.h"
-#include "piecechooser.h"
 
-PieceChooser::PieceChooser(const QList<GraphicsPiece *> &pieces,
-                           qreal squareSize, QGraphicsItem *parent)
+PieceChooser::PieceChooser(const QList<GraphicsPiece*>& pieces,
+                           qreal squareSize, QGraphicsItem* parent)
     : QGraphicsObject(parent), m_squareSize(squareSize), m_anim(nullptr) {
   for (auto piece : pieces)
-    if (piece != nullptr)
-      m_pieces[piece->pieceType().side()] << piece;
+    if (piece != nullptr) m_pieces[piece->pieceType().side()] << piece;
 
   int columns = qMax(m_pieces[0].size(), m_pieces[1].size());
   int rows = (!m_pieces[0].isEmpty() && !m_pieces[1].isEmpty()) ? 2 : 1;
@@ -48,9 +48,9 @@ int PieceChooser::type() const { return Type; }
 
 QRectF PieceChooser::boundingRect() const { return m_rect; }
 
-void PieceChooser::paint(QPainter *painter,
-                         const QStyleOptionGraphicsItem *option,
-                         QWidget *widget) {
+void PieceChooser::paint(QPainter* painter,
+                         const QStyleOptionGraphicsItem* option,
+                         QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
@@ -69,18 +69,17 @@ void PieceChooser::cancelChoice() {
 }
 
 void PieceChooser::reveal() {
-  QParallelAnimationGroup *group = new QParallelAnimationGroup(this);
+  QParallelAnimationGroup* group = new QParallelAnimationGroup(this);
 
   qreal y = m_rect.top() + m_squareSize / 2;
   for (int i = 0; i < 2; i++) {
-    if (m_pieces[i].isEmpty())
-      continue;
+    if (m_pieces[i].isEmpty()) continue;
 
     for (int j = 0; j < m_pieces[i].size(); j++) {
-      GraphicsPiece *piece = m_pieces[i].at(j);
+      GraphicsPiece* piece = m_pieces[i].at(j);
       piece->setParentItem(this);
 
-      QPropertyAnimation *posAnim = new QPropertyAnimation(piece, "pos");
+      QPropertyAnimation* posAnim = new QPropertyAnimation(piece, "pos");
       qreal x = m_rect.left() + m_squareSize * (0.5 + j);
       posAnim->setStartValue(QPointF(0, 0));
       posAnim->setEndValue(QPointF(x, y));
@@ -88,7 +87,7 @@ void PieceChooser::reveal() {
       posAnim->setDuration(300);
       group->addAnimation(posAnim);
 
-      QPropertyAnimation *opAnim = new QPropertyAnimation(piece, "opacity");
+      QPropertyAnimation* opAnim = new QPropertyAnimation(piece, "opacity");
       opAnim->setStartValue(0.0);
       opAnim->setEndValue(1.0);
       opAnim->setEasingCurve(QEasingCurve::InOutQuad);
@@ -98,7 +97,7 @@ void PieceChooser::reveal() {
     y += m_squareSize;
   }
 
-  QPropertyAnimation *anim = new QPropertyAnimation(this, "opacity");
+  QPropertyAnimation* anim = new QPropertyAnimation(this, "opacity");
   anim->setStartValue(0.0);
   anim->setEndValue(0.6);
   anim->setEasingCurve(QEasingCurve::InOutQuad);
@@ -121,9 +120,8 @@ void PieceChooser::destroy() {
   m_anim->start();
 }
 
-void PieceChooser::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-  if (event->button() != Qt::LeftButton)
-    return;
+void PieceChooser::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+  if (event->button() != Qt::LeftButton) return;
 
   event->setAccepted(true);
   QPointF pos(mapFromScene(event->scenePos()));
@@ -133,8 +131,8 @@ void PieceChooser::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     return;
   }
 
-  QGraphicsItem *item = scene()->itemAt(event->scenePos(), QTransform());
-  GraphicsPiece *piece = qgraphicsitem_cast<GraphicsPiece *>(item);
+  QGraphicsItem* item = scene()->itemAt(event->scenePos(), QTransform());
+  GraphicsPiece* piece = qgraphicsitem_cast<GraphicsPiece*>(item);
   if (piece != nullptr && piece->parentItem() == this) {
     emit pieceChosen(piece->pieceType());
     destroy();

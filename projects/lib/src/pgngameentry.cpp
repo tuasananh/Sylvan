@@ -17,44 +17,40 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "pgngameentry.h"
+
+#include <pgnstream.h>
+
 #include <QDataStream>
 #include <QMap>
 #include <cctype>
 
-#include <pgnstream.h>
-
-#include "pgngameentry.h"
 #include "pgngamefilter.h"
 
 namespace {
 
-int s_stringContains(const char *s1, const char *s2, int size) {
+int s_stringContains(const char* s1, const char* s2, int size) {
   Q_ASSERT(s1 != nullptr);
   Q_ASSERT(s2 != nullptr);
   Q_ASSERT(size >= 0);
 
-  if (!*s2)
-    return 0;
-  if (size == 0)
-    return -1;
+  if (!*s2) return 0;
+  if (size == 0) return -1;
 
-  const char *s1_end = s1 + size;
+  const char* s1_end = s1 + size;
 
   while (s1 < s1_end) {
     if (toupper(*s1) == toupper(*s2)) {
-      const char *a = s1 + 1;
-      const char *b = s2 + 1;
+      const char* a = s1 + 1;
+      const char* b = s2 + 1;
 
       while (*b && a < s1_end) {
-        if (toupper(*a) != toupper(*b))
-          break;
+        if (toupper(*a) != toupper(*b)) break;
         a++;
         b++;
       }
-      if (!*b)
-        return b - s2;
-      if (a == s1_end)
-        return -1;
+      if (!*b) return b - s2;
+      if (a == s1_end) return -1;
     }
     s1++;
   }
@@ -62,38 +58,37 @@ int s_stringContains(const char *s1, const char *s2, int size) {
   return -1;
 }
 
-int s_stringToInt(const char *s, int size) {
+int s_stringToInt(const char* s, int size) {
   int num = 0;
   for (int i = 0; i < size; i++) {
-    if (!isdigit(s[i]))
-      return 0;
+    if (!isdigit(s[i])) return 0;
     num = num * 10 + (s[i] - '0');
   }
 
   return num;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-PgnStream &operator>>(PgnStream &in, PgnGameEntry &entry) {
+PgnStream& operator>>(PgnStream& in, PgnGameEntry& entry) {
   entry.read(in);
   return in;
 }
 
-QDataStream &operator>>(QDataStream &in, PgnGameEntry &entry) {
+QDataStream& operator>>(QDataStream& in, PgnGameEntry& entry) {
   entry.read(in);
   return in;
 }
 
-QDataStream &operator<<(QDataStream &out, const PgnGameEntry &entry) {
+QDataStream& operator<<(QDataStream& out, const PgnGameEntry& entry) {
   entry.write(out);
   return out;
 }
 
 PgnGameEntry::PgnGameEntry() : m_pos(0), m_lineNumber(1) {}
 
-bool PgnGameEntry::match(const PgnGameFilter &filter) const {
-  const char *data = m_data.constData();
+bool PgnGameEntry::match(const PgnGameFilter& filter) const {
+  const char* data = m_data.constData();
 
   if (filter.type() == PgnGameFilter::FixedString)
     return s_stringContains(data, filter.pattern(), m_data.size()) != -1;
@@ -103,125 +98,115 @@ bool PgnGameEntry::match(const PgnGameFilter &filter) const {
   int i = 0;
   for (int type = 0; type < 8; type++) {
     int size = data[i++];
-    const char *str = data + i;
+    const char* str = data + i;
 
     switch (type) {
-    case EventTag:
-      if (s_stringContains(str, filter.event(), size) == -1)
-        return false;
-      break;
-    case SiteTag:
-      if (s_stringContains(str, filter.site(), size) == -1)
-        return false;
-      break;
-    case DateTag:
-      if (!filter.minDate().isNull() || !filter.maxDate().isNull()) {
-        if (size < 10)
-          return false;
-
-        int year = s_stringToInt(str, 4);
-        if (year == 0)
-          return false;
-        int month = s_stringToInt(str + 5, 2);
-        if (month == 0)
-          month = 1;
-        int day = s_stringToInt(str + 8, 2);
-        if (day == 0)
-          day = 1;
-
-        QDate date(year, month, day);
-
-        if ((!filter.minDate().isNull() && date < filter.minDate()) ||
-            (!filter.maxDate().isNull() && date > filter.maxDate()))
-          return false;
-      }
-      break;
-    case RoundTag:
-      if (filter.minRound() != 0 || filter.maxRound() != 0) {
-        int round = s_stringToInt(str, size);
-
-        if (round == 0 ||
-            (filter.minRound() != 0 && round < filter.minRound()) ||
-            (filter.maxRound() != 0 && round > filter.maxRound()))
-          return false;
-      }
-      break;
-    case RedTag: {
-      int len1 = -1;
-      int len2 = -1;
-
-      if (filter.playerSide() != Chess::Side::Black)
-        len1 = s_stringContains(str, filter.player(), size);
-      if (filter.playerSide() != Chess::Side::Red)
-        len2 = s_stringContains(str, filter.opponent(), size);
-
-      if (len1 == -1 && len2 == -1)
-        return false;
-      redPlayer = (len1 >= len2) ? 1 : 2;
-    } break;
-    case BlackTag: {
-      int len1 = -1;
-      int len2 = -1;
-
-      if (filter.playerSide() != Chess::Side::Red && redPlayer != 1)
-        len1 = s_stringContains(str, filter.player(), size);
-      if (filter.playerSide() != Chess::Side::Black && redPlayer != 2)
-        len2 = s_stringContains(str, filter.opponent(), size);
-
-      if (len1 == -1 && len2 == -1)
-        return false;
-    } break;
-    case ResultTag: {
-      if (filter.result() == PgnGameFilter::AnyResult)
+      case EventTag:
+        if (s_stringContains(str, filter.event(), size) == -1) return false;
         break;
+      case SiteTag:
+        if (s_stringContains(str, filter.site(), size) == -1) return false;
+        break;
+      case DateTag:
+        if (!filter.minDate().isNull() || !filter.maxDate().isNull()) {
+          if (size < 10) return false;
 
-      Chess::Result result(QString::fromLatin1(str, size));
-      int winner = 0;
+          int year = s_stringToInt(str, 4);
+          if (year == 0) return false;
+          int month = s_stringToInt(str + 5, 2);
+          if (month == 0) month = 1;
+          int day = s_stringToInt(str + 8, 2);
+          if (day == 0) day = 1;
 
-      if (!result.winner().isNull()) {
-        if (redPlayer == 1)
-          winner = result.winner() + 1;
-        else {
-          if (result.winner() == Chess::Side::Red)
-            winner = 2;
-          else
-            winner = 1;
+          QDate date(year, month, day);
+
+          if ((!filter.minDate().isNull() && date < filter.minDate()) ||
+              (!filter.maxDate().isNull() && date > filter.maxDate()))
+            return false;
         }
-      }
+        break;
+      case RoundTag:
+        if (filter.minRound() != 0 || filter.maxRound() != 0) {
+          int round = s_stringToInt(str, size);
 
-      bool ok;
-      switch (filter.result()) {
-      case PgnGameFilter::EitherPlayerWins:
-        ok = !result.winner().isNull();
+          if (round == 0 ||
+              (filter.minRound() != 0 && round < filter.minRound()) ||
+              (filter.maxRound() != 0 && round > filter.maxRound()))
+            return false;
+        }
         break;
-      case PgnGameFilter::RedWins:
-        ok = result.winner() == Chess::Side::Red;
-        break;
-      case PgnGameFilter::BlackWins:
-        ok = result.winner() == Chess::Side::Black;
-        break;
-      case PgnGameFilter::FirstPlayerWins:
-        ok = winner == 1;
-        break;
-      case PgnGameFilter::FirstPlayerLoses:
-        ok = winner == 2;
-        break;
-      case PgnGameFilter::Draw:
-        ok = result.isDraw();
-        break;
-      case PgnGameFilter::Unfinished:
-        ok = result.isNone();
-        break;
+      case RedTag: {
+        int len1 = -1;
+        int len2 = -1;
+
+        if (filter.playerSide() != Chess::Side::Black)
+          len1 = s_stringContains(str, filter.player(), size);
+        if (filter.playerSide() != Chess::Side::Red)
+          len2 = s_stringContains(str, filter.opponent(), size);
+
+        if (len1 == -1 && len2 == -1) return false;
+        redPlayer = (len1 >= len2) ? 1 : 2;
+      } break;
+      case BlackTag: {
+        int len1 = -1;
+        int len2 = -1;
+
+        if (filter.playerSide() != Chess::Side::Red && redPlayer != 1)
+          len1 = s_stringContains(str, filter.player(), size);
+        if (filter.playerSide() != Chess::Side::Black && redPlayer != 2)
+          len2 = s_stringContains(str, filter.opponent(), size);
+
+        if (len1 == -1 && len2 == -1) return false;
+      } break;
+      case ResultTag: {
+        if (filter.result() == PgnGameFilter::AnyResult) break;
+
+        Chess::Result result(QString::fromLatin1(str, size));
+        int winner = 0;
+
+        if (!result.winner().isNull()) {
+          if (redPlayer == 1)
+            winner = result.winner() + 1;
+          else {
+            if (result.winner() == Chess::Side::Red)
+              winner = 2;
+            else
+              winner = 1;
+          }
+        }
+
+        bool ok;
+        switch (filter.result()) {
+          case PgnGameFilter::EitherPlayerWins:
+            ok = !result.winner().isNull();
+            break;
+          case PgnGameFilter::RedWins:
+            ok = result.winner() == Chess::Side::Red;
+            break;
+          case PgnGameFilter::BlackWins:
+            ok = result.winner() == Chess::Side::Black;
+            break;
+          case PgnGameFilter::FirstPlayerWins:
+            ok = winner == 1;
+            break;
+          case PgnGameFilter::FirstPlayerLoses:
+            ok = winner == 2;
+            break;
+          case PgnGameFilter::Draw:
+            ok = result.isDraw();
+            break;
+          case PgnGameFilter::Unfinished:
+            ok = result.isNone();
+            break;
+          default:
+            ok = true;
+            break;
+        }
+
+        if (ok == filter.isResultInverted()) return false;
+      } break;
       default:
-        ok = true;
         break;
-      }
-
-      if (ok == filter.isResultInverted())
-        return false;
-    } break;
-    default:
-      break;
     }
     i += size;
   }
@@ -229,7 +214,7 @@ bool PgnGameEntry::match(const PgnGameFilter &filter) const {
   return true;
 }
 
-void PgnGameEntry::addTag(const QByteArray &tagValue) {
+void PgnGameEntry::addTag(const QByteArray& tagValue) {
   int size = qMin(127, tagValue.size());
 
   m_data.append(char(size));
@@ -242,9 +227,8 @@ void PgnGameEntry::clear() {
   m_data.clear();
 }
 
-bool PgnGameEntry::read(PgnStream &in) {
-  if (!in.nextGame())
-    return false;
+bool PgnGameEntry::read(PgnStream& in) {
+  if (!in.nextGame()) return false;
 
   m_pos = in.pos();
   m_lineNumber = in.lineNumber();
@@ -303,7 +287,7 @@ bool PgnGameEntry::read(PgnStream &in) {
   return true;
 }
 
-bool PgnGameEntry::read(QDataStream &in) {
+bool PgnGameEntry::read(QDataStream& in) {
   // modifying this function can cause backward compatibility issues
   // in other programs.
 
@@ -314,7 +298,7 @@ bool PgnGameEntry::read(QDataStream &in) {
   return in.status() == QDataStream::Ok;
 }
 
-void PgnGameEntry::write(QDataStream &out) const {
+void PgnGameEntry::write(QDataStream& out) const {
   // modifying this function can cause backward compatibility issues
   // in other programs.
 
@@ -329,11 +313,9 @@ qint64 PgnGameEntry::lineNumber() const { return m_lineNumber; }
 
 QString PgnGameEntry::tagValue(TagType type) const {
   int i = 0;
-  for (int j = 0; j < type; j++)
-    i += m_data[i] + 1;
+  for (int j = 0; j < type; j++) i += m_data[i] + 1;
 
   int size = m_data[i];
-  if (size == 0)
-    return QString();
+  if (size == 0) return QString();
   return m_data.mid(i + 1, size);
 }

@@ -37,16 +37,16 @@ namespace Chess {
  * \sa PolyglotBook
  */
 class LIB_EXPORT StandardBoard : public WesternBoard {
-public:
+ public:
   /*! Creates a new StandardBoard object. */
   StandardBoard();
 
   // Inherited from WesternBoard
-  virtual Board *copy() const;
+  virtual Board* copy() const;
   virtual QString variant() const;
   virtual QString defaultFenString() const;
-  virtual Result tablebaseResult(unsigned int *dtm = nullptr) const;
+  virtual Result tablebaseResult(unsigned int* dtm = nullptr) const;
 };
 
-} // namespace Chess
-#endif // STANDARDBOARD_H
+}  // namespace Chess
+#endif  // STANDARDBOARD_H

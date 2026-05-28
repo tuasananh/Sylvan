@@ -41,7 +41,7 @@ namespace Chess {
  * \sa GenericMove
  */
 class Move {
-public:
+ public:
   /*! Creates an empty Move (null move). */
   Move();
   /*!
@@ -61,11 +61,11 @@ public:
   /*! Returns true if this is a null move. */
   bool isNull() const;
   /*! Returns true if \a other is equal to this move. */
-  bool operator==(const Move &other) const;
+  bool operator==(const Move& other) const;
   /*! Returns true if \a other is different from this move. */
-  bool operator!=(const Move &other) const;
+  bool operator!=(const Move& other) const;
 
-private:
+ private:
   quint32 m_data;
 };
 
@@ -79,11 +79,11 @@ inline Move::Move(int sourceSquare, int targetSquare)
 
 inline bool Move::isNull() const { return (m_data == 0); }
 
-inline bool Move::operator==(const Move &other) const {
+inline bool Move::operator==(const Move& other) const {
   return (m_data == other.m_data);
 }
 
-inline bool Move::operator!=(const Move &other) const {
+inline bool Move::operator!=(const Move& other) const {
   return (m_data != other.m_data);
 }
 
@@ -91,8 +91,8 @@ inline int Move::sourceSquare() const { return m_data & 0xff; }
 
 inline int Move::targetSquare() const { return (m_data >> 8) & 0xff; }
 
-} // namespace Chess
+}  // namespace Chess
 
 Q_DECLARE_METATYPE(Chess::Move)
 
-#endif // MOVE_H
+#endif  // MOVE_H

@@ -18,8 +18,9 @@
 #ifndef UCCIENGINE_H
 #define UCCIENGINE_H
 
-#include "chessengine.h"
 #include <QVarLengthArray>
+
+#include "chessengine.h"
 
 /*!
  * \brief A chess engine which uses the UCCI chess interface.
@@ -29,19 +30,19 @@
 class LIB_EXPORT UcciEngine : public ChessEngine {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new UcciEngine. */
-  UcciEngine(QObject *parent = nullptr);
+  UcciEngine(QObject* parent = nullptr);
 
   // Inherited from ChessEngine
-  virtual void endGame(const Chess::Result &result);
-  virtual void makeMove(const Chess::Move &move);
-  virtual void makeBookMove(const Chess::Move &move);
+  virtual void endGame(const Chess::Result& result);
+  virtual void makeMove(const Chess::Move& move);
+  virtual void makeBookMove(const Chess::Move& move);
   virtual QString protocol() const;
   virtual void startPondering();
   virtual void clearPonderState();
 
-protected:
+ protected:
   // Inherited from ChessEngine
   virtual bool sendPing();
   virtual void sendStop();
@@ -49,28 +50,28 @@ protected:
   virtual void startProtocol();
   virtual void startGame();
   virtual void startThinking();
-  virtual void parseLine(const QString &line);
-  virtual void sendOption(const QString &name, const QVariant &value);
+  virtual void parseLine(const QString& line);
+  virtual void sendOption(const QString& name, const QVariant& value);
   virtual bool isPondering() const;
 
-private:
+ private:
   enum PonderState { NotPondering, Pondering, PonderHit };
 
-  static QStringRef parseUcciTokens(const QStringRef &first,
-                                    const QString *types, int typeCount,
-                                    QVarLengthArray<QStringRef> &tokens,
-                                    int &type);
-  void parseInfo(const QVarLengthArray<QStringRef> &tokens, int type,
-                 MoveEvaluation *eval);
-  void parseInfo(const QStringRef &line);
-  EngineOption *parseOption(const QStringRef &line);
-  void addVariantsFromOption(const EngineOption *option);
-  void setVariant(const QString &variant);
+  static QStringRef parseUcciTokens(const QStringRef& first,
+                                    const QString* types, int typeCount,
+                                    QVarLengthArray<QStringRef>& tokens,
+                                    int& type);
+  void parseInfo(const QVarLengthArray<QStringRef>& tokens, int type,
+                 MoveEvaluation* eval);
+  void parseInfo(const QStringRef& line);
+  EngineOption* parseOption(const QStringRef& line);
+  void addVariantsFromOption(const EngineOption* option);
+  void setVariant(const QString& variant);
   QString positionString(bool position);
   void sendPosition();
-  void setPonderMove(const QString &moveString);
-  QString directPv(const QVarLengthArray<QStringRef> &tokens);
-  QString sanPv(const QVarLengthArray<QStringRef> &tokens);
+  void setPonderMove(const QString& moveString);
+  QString directPv(const QVarLengthArray<QStringRef>& tokens);
+  QString sanPv(const QVarLengthArray<QStringRef>& tokens);
 
   QString m_variantOption;
   QString m_startFen;
@@ -92,4 +93,4 @@ private:
   QStringList m_comboVariants;
 };
 
-#endif // UCCIENGINE_H
+#endif  // UCCIENGINE_H

@@ -27,27 +27,27 @@ class EngineOption;
 class EngineOptionModel : public QAbstractItemModel {
   Q_OBJECT
 
-public:
-  EngineOptionModel(QObject *parent = nullptr);
-  EngineOptionModel(QList<EngineOption *> options, QObject *parent = nullptr);
+ public:
+  EngineOptionModel(QObject* parent = nullptr);
+  EngineOptionModel(QList<EngineOption*> options, QObject* parent = nullptr);
 
-  void setOptions(const QList<EngineOption *> &options);
+  void setOptions(const QList<EngineOption*>& options);
 
   // Inherited from QAbstractItemModel
   virtual QModelIndex index(int row, int column,
-                            const QModelIndex &parent = QModelIndex()) const;
-  virtual QModelIndex parent(const QModelIndex &index) const;
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual QVariant data(const QModelIndex &index, int role) const;
+                            const QModelIndex& parent = QModelIndex()) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex& index, int role) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-  virtual bool setData(const QModelIndex &index, const QVariant &value,
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value,
                        int role = Qt::EditRole);
 
-private:
-  QList<EngineOption *> m_options;
+ private:
+  QList<EngineOption*> m_options;
 };
 
-#endif // ENGINE_OPTION_MODEL_H
+#endif  // ENGINE_OPTION_MODEL_H

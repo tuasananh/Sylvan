@@ -33,7 +33,7 @@ class QTextDocument;
 class PgnHighlighter : public QSyntaxHighlighter {
   Q_OBJECT
 
-public:
+ public:
   enum Construct {
     Tag,
     String,
@@ -43,18 +43,18 @@ public:
     LastConstrcut = Comment
   };
 
-  PgnHighlighter(QTextDocument *document);
+  PgnHighlighter(QTextDocument* document);
 
-  void setFormatFor(Construct construct, const QTextCharFormat &format);
+  void setFormatFor(Construct construct, const QTextCharFormat& format);
   QTextCharFormat formatFor(Construct construct) const;
 
-protected:
+ protected:
   enum State { NormalState = -1, InTag, InString, InMoveNumber, InComment };
 
-  void highlightBlock(const QString &text);
+  void highlightBlock(const QString& text);
 
-private:
+ private:
   QTextCharFormat m_formats[LastConstrcut + 1];
 };
 
-#endif // PGN_HIGHLIGHTER_H
+#endif  // PGN_HIGHLIGHTER_H

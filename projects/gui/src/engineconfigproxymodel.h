@@ -33,23 +33,23 @@
 class EngineConfigurationProxyModel : public QSortFilterProxyModel {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new EngineConfigurationProxyModel. */
-  explicit EngineConfigurationProxyModel(QObject *parent = nullptr);
+  explicit EngineConfigurationProxyModel(QObject* parent = nullptr);
 
   /*!
    * Sets the chess variant used to filter the contents
    * of the source model to \a variant.
    */
-  void setFilterVariant(const QString &variant);
+  void setFilterVariant(const QString& variant);
 
-protected:
+ protected:
   // Reimplemented from QSortFilterProxyModel
   virtual bool filterAcceptsRow(int sourceRow,
-                                const QModelIndex &sourceParent) const;
+                                const QModelIndex& sourceParent) const;
 
-private:
+ private:
   QString m_filterVariant;
 };
 
-#endif // ENGINECONFIGPROXYMODEL_H
+#endif  // ENGINECONFIGPROXYMODEL_H

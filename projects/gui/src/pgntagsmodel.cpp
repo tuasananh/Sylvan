@@ -19,54 +19,50 @@
 
 #include "pgntagsmodel.h"
 
-PgnTagsModel::PgnTagsModel(QObject *parent) : QAbstractItemModel(parent) {}
+PgnTagsModel::PgnTagsModel(QObject* parent) : QAbstractItemModel(parent) {}
 
-void PgnTagsModel::setTags(const QList<QPair<QString, QString>> &tags) {
+void PgnTagsModel::setTags(const QList<QPair<QString, QString>>& tags) {
   beginResetModel();
   m_tags = tags;
   endResetModel();
 }
 
 QModelIndex PgnTagsModel::index(int row, int column,
-                                const QModelIndex &parent) const {
-  if (!hasIndex(row, column, parent))
-    return QModelIndex();
+                                const QModelIndex& parent) const {
+  if (!hasIndex(row, column, parent)) return QModelIndex();
 
   return createIndex(row, column);
 }
 
-QModelIndex PgnTagsModel::parent(const QModelIndex &index) const {
+QModelIndex PgnTagsModel::parent(const QModelIndex& index) const {
   Q_UNUSED(index);
 
   return QModelIndex();
 }
 
-int PgnTagsModel::rowCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnTagsModel::rowCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return m_tags.size();
 }
 
-int PgnTagsModel::columnCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnTagsModel::columnCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return 2;
 }
 
-QVariant PgnTagsModel::data(const QModelIndex &index, int role) const {
-  if (!index.isValid())
-    return QVariant();
+QVariant PgnTagsModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) return QVariant();
 
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
-    case 0:
-      return m_tags.at(index.row()).first;
-    case 1:
-      return m_tags.at(index.row()).second;
-    default:
-      return QVariant();
+      case 0:
+        return m_tags.at(index.row()).first;
+      case 1:
+        return m_tags.at(index.row()).second;
+      default:
+        return QVariant();
     }
   }
 
@@ -77,19 +73,19 @@ QVariant PgnTagsModel::headerData(int section, Qt::Orientation orientation,
                                   int role) const {
   if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
     switch (section) {
-    case 0:
-      return tr("Name");
-    case 1:
-      return tr("Value");
-    default:
-      return QVariant();
+      case 0:
+        return tr("Name");
+      case 1:
+        return tr("Value");
+      default:
+        return QVariant();
     }
   }
 
   return QVariant();
 }
 
-void PgnTagsModel::setTag(const QString &name, const QString &value) {
+void PgnTagsModel::setTag(const QString& name, const QString& value) {
   for (int i = 0; i < m_tags.size(); i++) {
     if (m_tags.at(i).first == name) {
       if (value.isEmpty()) {
@@ -106,8 +102,7 @@ void PgnTagsModel::setTag(const QString &name, const QString &value) {
     }
   }
 
-  if (value.isEmpty())
-    return;
+  if (value.isEmpty()) return;
 
   int pos = m_tags.size();
   beginInsertRows(QModelIndex(), pos, pos);

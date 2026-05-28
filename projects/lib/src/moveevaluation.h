@@ -34,7 +34,7 @@
  * From human players we can only get the move time.
  */
 class LIB_EXPORT MoveEvaluation {
-public:
+ public:
   /*! Mate score reference */
   constexpr static int MATE_SCORE = 1000000;
 
@@ -45,9 +45,9 @@ public:
   MoveEvaluation();
 
   /*! Returns true if \a other is the same as this eval. */
-  bool operator==(const MoveEvaluation &other) const;
+  bool operator==(const MoveEvaluation& other) const;
   /*! Returns true if \a other is different from this eval. */
-  bool operator!=(const MoveEvaluation &other) const;
+  bool operator!=(const MoveEvaluation& other) const;
 
   /*! Returns true if the evaluation is empty. */
   bool isEmpty() const;
@@ -171,18 +171,18 @@ public:
   void setPonderhitRate(int rate);
 
   /*! Sets the current ponder move to \a san. */
-  void setPonderMove(const QString &san);
+  void setPonderMove(const QString& san);
 
   /*! Sets the principal variation to \a pv. */
-  void setPv(const QString &pv);
+  void setPv(const QString& pv);
 
   /*! Sets the principal variation number to \a number. */
   void setPvNumber(int number);
 
   /*! Merges non-empty parameters of \a other into this eval. */
-  void merge(const MoveEvaluation &other);
+  void merge(const MoveEvaluation& other);
 
-private:
+ private:
   bool m_isBookEval;
   bool m_isTrusted;
   int m_depth;
@@ -201,4 +201,4 @@ private:
 
 Q_DECLARE_METATYPE(MoveEvaluation)
 
-#endif // MOVEEVALUATION_H
+#endif  // MOVEEVALUATION_H

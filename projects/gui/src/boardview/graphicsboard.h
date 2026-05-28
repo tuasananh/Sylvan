@@ -20,11 +20,12 @@
 #ifndef GRAPHICSBOARD_H
 #define GRAPHICSBOARD_H
 
+#include <board/piece.h>
+#include <board/square.h>
+
 #include <QColor>
 #include <QGraphicsItem>
 #include <QVector>
-#include <board/piece.h>
-#include <board/square.h>
 
 class GraphicsPiece;
 class QPropertyAnimation;
@@ -37,7 +38,7 @@ class QPropertyAnimation;
  * board, ie. it is the pieces' parent item and container.
  */
 class GraphicsBoard : public QGraphicsItem {
-public:
+ public:
   /*! The type value returned by type(). */
   enum { Type = UserType + 1 };
 
@@ -49,15 +50,15 @@ public:
    * \a squareSize.
    */
   explicit GraphicsBoard(int files, int ranks, qreal squareSize,
-                         QGraphicsItem *parent = nullptr);
+                         QGraphicsItem* parent = nullptr);
   /*! Destroys the GraphicsBoard object. */
   virtual ~GraphicsBoard();
 
   // Inherited from QGraphicsItem
   virtual int type() const;
   virtual QRectF boundingRect() const;
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = nullptr);
+  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = nullptr);
 
   /*!
    * Returns the chess square at \a point.
@@ -65,35 +66,35 @@ public:
    * \a point is in item coordinates.
    * Returns a null square if \a point is not on the board.
    */
-  Chess::Square squareAt(const QPointF &point) const;
+  Chess::Square squareAt(const QPointF& point) const;
   /*!
    * Returns the position of \a square.
    *
    * The returned position is in item coordinates.
    * Returns a null point if \a square is not on the board.
    */
-  QPointF squarePos(const Chess::Square &square) const;
+  QPointF squarePos(const Chess::Square& square) const;
   /*!
    * Returns the type of piece at \a square.
    *
    * Returns a null piece if \a square is not on the board or
    * if there's no piece placed on it.
    */
-  Chess::Piece pieceTypeAt(const Chess::Square &square) const;
+  Chess::Piece pieceTypeAt(const Chess::Square& square) const;
   /*!
    * Returns the GraphicsPiece object at \a square.
    *
    * Returns 0 if \a square is not on the board or if there's
    * no piece placed on it.
    */
-  GraphicsPiece *pieceAt(const Chess::Square &square) const;
+  GraphicsPiece* pieceAt(const Chess::Square& square) const;
   /*!
    * Removes the GraphicsPiece object at \a square and returns it.
    *
    * Returns 0 if \a square is not on the board or if there's
    * no piece placed on it.
    */
-  GraphicsPiece *takePieceAt(const Chess::Square &square);
+  GraphicsPiece* takePieceAt(const Chess::Square& square);
 
   /*! Deletes all pieces and removes them from the scene. */
   void clearSquares();
@@ -103,13 +104,13 @@ public:
    * If \a square already contains a piece, it is deleted.
    * If \a piece is 0, the square becomes empty.
    */
-  void setSquare(const Chess::Square &square, GraphicsPiece *piece);
+  void setSquare(const Chess::Square& square, GraphicsPiece* piece);
   /*!
    * Moves the piece from \a source to \a target.
    *
    * If \a target already contains a piece, it is deleted.
    */
-  void movePiece(const Chess::Square &source, const Chess::Square &target);
+  void movePiece(const Chess::Square& source, const Chess::Square& target);
 
   /*! Clears all highlights. */
   void clearHighlights();
@@ -119,7 +120,7 @@ public:
    * This function clears all previous highlights and marks the
    * squares in \a squares as possible target squares of a chess move.
    */
-  void setHighlights(const QList<Chess::Square> &squares);
+  void setHighlights(const QList<Chess::Square>& squares);
 
   /*!
    * Returns true if the board is flipped;
@@ -130,8 +131,8 @@ public:
   /*! Sets board flipping to \a flipped. */
   void setFlipped(bool flipped);
 
-private:
-  int squareIndex(const Chess::Square &square) const;
+ private:
+  int squareIndex(const Chess::Square& square) const;
 
   int m_files;
   int m_ranks;
@@ -141,9 +142,9 @@ private:
   QColor m_lightColor;
   QColor m_darkColor;
   QColor m_textColor;
-  QVector<GraphicsPiece *> m_squares;
-  QPropertyAnimation *m_highlightAnim;
+  QVector<GraphicsPiece*> m_squares;
+  QPropertyAnimation* m_highlightAnim;
   bool m_flipped;
 };
 
-#endif // GRAPHICSBOARD_H
+#endif  // GRAPHICSBOARD_H

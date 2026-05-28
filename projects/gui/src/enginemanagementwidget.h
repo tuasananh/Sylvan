@@ -20,9 +20,9 @@
 #ifndef ENGINEMANAGEMENTWIDGET_H
 #define ENGINEMANAGEMENTWIDGET_H
 
-#include <QWidget>
-
 #include <engineconfiguration.h>
+
+#include <QWidget>
 
 class EngineManager;
 class QSortFilterProxyModel;
@@ -39,9 +39,9 @@ class EngineManagementWidget;
 class EngineManagementWidget : public QWidget {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new engine management widget. */
-  EngineManagementWidget(QWidget *parent = nullptr);
+  EngineManagementWidget(QWidget* parent = nullptr);
   /*! Destroys the widget. */
   virtual ~EngineManagementWidget();
 
@@ -54,22 +54,22 @@ public:
   /*! Saves the engine configuration to engines.json. */
   void saveConfig();
 
-private slots:
+ private slots:
   void updateUi();
-  void updateSearch(const QString &terms);
+  void updateSearch(const QString& terms);
   void addEngine();
   void configureEngine();
-  void configureEngine(const QModelIndex &index);
+  void configureEngine(const QModelIndex& index);
   void removeEngine();
   void browseDefaultLocation();
 
-private:
+ private:
   void updateEngineCount();
 
-  EngineManager *m_engineManager;
+  EngineManager* m_engineManager;
   bool m_hasChanged;
-  QSortFilterProxyModel *m_filteredModel;
-  Ui::EngineManagementWidget *ui;
+  QSortFilterProxyModel* m_filteredModel;
+  Ui::EngineManagementWidget* ui;
 };
 
-#endif // ENGINEMANAGEMENTWIDGET_H
+#endif  // ENGINEMANAGEMENTWIDGET_H

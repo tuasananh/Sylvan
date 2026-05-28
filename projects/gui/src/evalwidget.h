@@ -20,9 +20,10 @@
 #ifndef EVALWIDGET_H
 #define EVALWIDGET_H
 
+#include <moveevaluation.h>
+
 #include <QPointer>
 #include <QWidget>
-#include <moveevaluation.h>
 
 class QTableWidget;
 class ChessPlayer;
@@ -33,21 +34,21 @@ class ChessPlayer;
 class EvalWidget : public QWidget {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new EvalWidget object. */
-  explicit EvalWidget(QWidget *parent = nullptr);
+  explicit EvalWidget(QWidget* parent = nullptr);
 
   /*!
    * Connects the widget to \a player and disconnects from
    * the previous player (if any).
    */
-  void setPlayer(ChessPlayer *player);
+  void setPlayer(ChessPlayer* player);
 
-private slots:
+ private slots:
   void clear();
-  void onEval(const MoveEvaluation &eval);
+  void onEval(const MoveEvaluation& eval);
 
-private:
+ private:
   enum StatHeaders {
     NpsHeader,
     HashHeader,
@@ -57,10 +58,10 @@ private:
   };
 
   QPointer<ChessPlayer> m_player;
-  QTableWidget *m_statsTable;
-  QTableWidget *m_pvTable;
+  QTableWidget* m_statsTable;
+  QTableWidget* m_pvTable;
   int m_depth;
   QString m_pv;
 };
 
-#endif // EVALWIDGET_H
+#endif  // EVALWIDGET_H

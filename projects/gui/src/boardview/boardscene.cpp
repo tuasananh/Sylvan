@@ -17,7 +17,9 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
+#include "boardscene.h"
+
+#include <board/board.h>
 
 #include <QGraphicsPolygonItem>
 #include <QGraphicsSceneMouseEvent>
@@ -27,10 +29,8 @@
 #include <QSequentialAnimationGroup>
 #include <QSettings>
 #include <QSvgRenderer>
+#include <algorithm>
 
-#include <board/board.h>
-
-#include "boardscene.h"
 #include "graphicsboard.h"
 #include "graphicspiece.h"
 #include "graphicspiecereserve.h"
@@ -40,20 +40,24 @@ namespace {
 
 const qreal s_squareSize = 50;
 
-} // anonymous namespace
+}  // anonymous namespace
 
-BoardScene::BoardScene(QObject *parent)
-    : QGraphicsScene(parent), m_board(nullptr), m_direction(Forward),
+BoardScene::BoardScene(QObject* parent)
+    : QGraphicsScene(parent),
+      m_board(nullptr),
+      m_direction(Forward),
       m_squares(nullptr),
       // m_reserve(nullptr),
-      m_chooser(nullptr), m_anim(nullptr),
+      m_chooser(nullptr),
+      m_anim(nullptr),
       // m_renderer(new QSvgRenderer(QString(":/default.svg"), this)),
       // QString pic = QCoreApplication::applicationDirPath() +
       // "/image/default.svg";
       m_renderer(new QSvgRenderer(
           (QCoreApplication::applicationDirPath() + "/image/default.svg"),
           this)),
-      m_highlightPiece(nullptr), m_moveArrows(nullptr) {
+      m_highlightPiece(nullptr),
+      m_moveArrows(nullptr) {
   // default-rbok.svg
 }
 
@@ -62,12 +66,11 @@ BoardScene::~BoardScene() {
   delete m_board;
 }
 
-Chess::Board *BoardScene::board() const { return m_board; }
+Chess::Board* BoardScene::board() const { return m_board; }
 
-void BoardScene::setBoard(Chess::Board *board) {
+void BoardScene::setBoard(Chess::Board* board) {
   stopAnimation();
-  if (m_board != board)
-    delete m_board;
+  if (m_board != board) delete m_board;
 
   clear();
   m_history.clear();
@@ -135,17 +138,16 @@ void BoardScene::populate() {
   for (int x = 0; x < m_board->width(); x++) {
     for (int y = 0; y < m_board->height(); y++) {
       Chess::Square sq(x, y);
-      GraphicsPiece *piece(createPiece(m_board->pieceAt(sq))); // 放上棋子
+      GraphicsPiece* piece(createPiece(m_board->pieceAt(sq)));  // 放上棋子
 
-      if (piece != nullptr)
-        m_squares->setSquare(sq, piece);
+      if (piece != nullptr) m_squares->setSquare(sq, piece);
     }
   }
 
   updateMoves();
 }
 
-void BoardScene::setFenString(const QString &fenString) {
+void BoardScene::setFenString(const QString& fenString) {
   Q_ASSERT(m_board != nullptr);
 
   bool ok = m_board->setFenString(fenString);
@@ -155,7 +157,7 @@ void BoardScene::setFenString(const QString &fenString) {
   populate();
 }
 
-void BoardScene::makeMove(const Chess::Move &move) {
+void BoardScene::makeMove(const Chess::Move& move) {
   stopAnimation();
   delete m_moveArrows;
   m_moveArrows = new QGraphicsItemGroup(m_squares);
@@ -170,7 +172,7 @@ void BoardScene::makeMove(const Chess::Move &move) {
   applyTransition(transition, Forward);
 }
 
-void BoardScene::makeMove(const Chess::GenericMove &move) {
+void BoardScene::makeMove(const Chess::GenericMove& move) {
   makeMove(m_board->moveFromGenericMove(move));
 }
 
@@ -184,11 +186,9 @@ void BoardScene::undoMove() {
 }
 
 void BoardScene::cancelUserMove() {
-  GraphicsPiece *piece =
-      qgraphicsitem_cast<GraphicsPiece *>(mouseGrabberItem());
+  GraphicsPiece* piece = qgraphicsitem_cast<GraphicsPiece*>(mouseGrabberItem());
   if (piece == nullptr) {
-    if (!m_chooser.isNull())
-      m_chooser->cancelChoice();
+    if (!m_chooser.isNull()) m_chooser->cancelChoice();
     return;
   }
 
@@ -203,15 +203,14 @@ void BoardScene::flip() {
   stopAnimation();
   m_squares->setFlipped(!m_squares->isFlipped());
 
-  QParallelAnimationGroup *group = new QParallelAnimationGroup;
+  QParallelAnimationGroup* group = new QParallelAnimationGroup;
   m_anim = group;
 
   for (int y = 0; y < m_board->height(); y++) {
     for (int x = 0; x < m_board->width(); x++) {
       auto sq = Chess::Square(x, y);
       auto pc = m_squares->pieceAt(sq);
-      if (!pc)
-        continue;
+      if (!pc) continue;
       group->addAnimation(pieceAnimation(pc, squarePos(sq)));
     }
   }
@@ -224,11 +223,11 @@ void BoardScene::flip() {
   group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void BoardScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-  GraphicsPiece *piece = pieceAt(event->scenePos());
+void BoardScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+  GraphicsPiece* piece = pieceAt(event->scenePos());
   if (piece == m_highlightPiece || m_anim != nullptr || m_chooser != nullptr)
     return QGraphicsScene::mouseMoveEvent(
-        event); // clazy:exclude=returning-void-expression
+        event);  // clazy:exclude=returning-void-expression
 
   if (m_targets.contains(piece) &&
       QSettings().value("ui/highlight_legal_moves", true).toBool()) {
@@ -242,7 +241,7 @@ void BoardScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   QGraphicsScene::mouseMoveEvent(event);
 }
 
-void BoardScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void BoardScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
   stopAnimation();
 
   if (m_chooser != nullptr) {
@@ -252,9 +251,8 @@ void BoardScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     return;
   }
 
-  GraphicsPiece *piece = pieceAt(event->scenePos());
-  if (piece == nullptr || event->button() != Qt::LeftButton)
-    return;
+  GraphicsPiece* piece = pieceAt(event->scenePos());
+  if (piece == nullptr || event->button() != Qt::LeftButton) return;
 
   if (m_targets.contains(piece)) {
     piece->setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -267,9 +265,8 @@ void BoardScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     piece->setFlag(QGraphicsItem::ItemIsMovable, false);
 }
 
-void BoardScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-  GraphicsPiece *piece =
-      qgraphicsitem_cast<GraphicsPiece *>(mouseGrabberItem());
+void BoardScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+  GraphicsPiece* piece = qgraphicsitem_cast<GraphicsPiece*>(mouseGrabberItem());
   if (piece != nullptr && event->button() == Qt::LeftButton) {
     QPointF targetPos(m_squares->mapFromScene(event->scenePos()));
     tryMove(piece, targetPos);
@@ -287,7 +284,7 @@ void BoardScene::onTransitionFinished() {
   // }
 
   const auto moves = m_transition.moves();
-  for (const auto &move : moves) {
+  for (const auto& move : moves) {
     if (m_direction == Forward)
       m_squares->movePiece(move.source, move.target);
     else
@@ -302,7 +299,7 @@ void BoardScene::onTransitionFinished() {
   // }
 
   const auto squares = m_transition.squares();
-  for (const auto &square : squares) {
+  for (const auto& square : squares) {
     Chess::Piece type = m_board->pieceAt(square);
     if (type != m_squares->pieceTypeAt(square))
       m_squares->setSquare(square, createPiece(type));
@@ -336,8 +333,8 @@ void BoardScene::onTransitionFinished() {
 //	if (!promotion.isValid() && !m_moves.contains(m_promotionMove))
 //	{
 //		GraphicsPiece* piece =
-//m_squares->pieceAt(m_promotionMove.sourceSquare()); 		m_anim =
-//pieceAnimation(piece, m_sourcePos);
+// m_squares->pieceAt(m_promotionMove.sourceSquare()); 		m_anim =
+// pieceAnimation(piece, m_sourcePos);
 //		m_anim->start(QAbstractAnimation::DeleteWhenStopped);
 //	}
 //	else
@@ -347,7 +344,7 @@ void BoardScene::onTransitionFinished() {
 //	}
 // }
 
-void BoardScene::onGameFinished(ChessGame *game, Chess::Result result) {
+void BoardScene::onGameFinished(ChessGame* game, Chess::Result result) {
   Q_UNUSED(game);
 
   stopAnimation();
@@ -386,39 +383,37 @@ void BoardScene::onGameFinished(ChessGame *game, Chess::Result result) {
   group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-QPointF BoardScene::squarePos(const Chess::Square &square) const {
+QPointF BoardScene::squarePos(const Chess::Square& square) const {
   return m_squares->mapToScene(m_squares->squarePos(square));
 }
 
-GraphicsPiece *BoardScene::pieceAt(const QPointF &pos) const {
+GraphicsPiece* BoardScene::pieceAt(const QPointF& pos) const {
   const auto items = this->items(pos);
   for (auto item : items) {
-    GraphicsPiece *piece = qgraphicsitem_cast<GraphicsPiece *>(item);
-    if (piece != nullptr)
-      return piece;
+    GraphicsPiece* piece = qgraphicsitem_cast<GraphicsPiece*>(item);
+    if (piece != nullptr) return piece;
   }
 
   return nullptr;
 }
 
-GraphicsPiece *BoardScene::createPiece(const Chess::Piece &piece) {
+GraphicsPiece* BoardScene::createPiece(const Chess::Piece& piece) {
   Q_ASSERT(m_board != nullptr);
   Q_ASSERT(m_renderer != nullptr);
   Q_ASSERT(m_squares != nullptr);
 
-  if (!piece.isValid())
-    return nullptr;
+  if (!piece.isValid()) return nullptr;
 
   return new GraphicsPiece(piece, s_squareSize, m_board->representation(piece),
                            m_renderer);
 }
 
-QPropertyAnimation *BoardScene::pieceAnimation(GraphicsPiece *piece,
-                                               const QPointF &endPoint) const {
+QPropertyAnimation* BoardScene::pieceAnimation(GraphicsPiece* piece,
+                                               const QPointF& endPoint) const {
   Q_ASSERT(piece != nullptr);
 
   QPointF startPoint(piece->scenePos());
-  QPropertyAnimation *anim = new QPropertyAnimation(piece, "pos");
+  QPropertyAnimation* anim = new QPropertyAnimation(piece, "pos");
   connect(anim, SIGNAL(finished()), piece, SLOT(restoreParent()));
 
   anim->setStartValue(startPoint);
@@ -437,7 +432,7 @@ void BoardScene::stopAnimation() {
     m_anim->setCurrentTime(m_anim->totalDuration());
 }
 
-void BoardScene::tryMove(GraphicsPiece *piece, const QPointF &targetPos) {
+void BoardScene::tryMove(GraphicsPiece* piece, const QPointF& targetPos) {
   Chess::Square target(m_squares->squareAt(targetPos));
 
   // Illegal move
@@ -452,7 +447,7 @@ void BoardScene::tryMove(GraphicsPiece *piece, const QPointF &targetPos) {
 
     // QList<Chess::Piece> promotions;
     const auto moves = m_moves;
-    for (const auto &move : moves) {
+    for (const auto& move : moves) {
       if (move.sourceSquare() != source || move.targetSquare() != target)
         continue;
 
@@ -464,7 +459,7 @@ void BoardScene::tryMove(GraphicsPiece *piece, const QPointF &targetPos) {
     }
     // Q_ASSERT(!promotions.isEmpty());
 
-    Chess::GenericMove move(source, target); // , 0);
+    Chess::GenericMove move(source, target);  // , 0);
     // if (promotions.size() > 1)
     //{
     //	m_promotionMove = move;
@@ -488,11 +483,10 @@ void BoardScene::tryMove(GraphicsPiece *piece, const QPointF &targetPos) {
   m_squares->clearHighlights();
 }
 
-void BoardScene::selectPiece(const QList<Chess::Piece> &types,
-                             const char *member) {
-  QList<GraphicsPiece *> list;
-  for (const auto &type : types)
-    list << createPiece(type);
+void BoardScene::selectPiece(const QList<Chess::Piece>& types,
+                             const char* member) {
+  QList<GraphicsPiece*> list;
+  for (const auto& type : types) list << createPiece(type);
 
   m_chooser = new PieceChooser(list, s_squareSize);
   connect(m_chooser, SIGNAL(pieceChosen(Chess::Piece)), this, member);
@@ -500,8 +494,8 @@ void BoardScene::selectPiece(const QList<Chess::Piece> &types,
   m_chooser->reveal();
 }
 
-void BoardScene::addMoveArrow(const QPointF &sourcePos,
-                              const QPointF &targetPos) {
+void BoardScene::addMoveArrow(const QPointF& sourcePos,
+                              const QPointF& targetPos) {
   Q_ASSERT(m_moveArrows != nullptr);
 
   QLineF l1(sourcePos, targetPos);
@@ -514,7 +508,7 @@ void BoardScene::addMoveArrow(const QPointF &sourcePos,
   QPolygonF polygon;
   polygon << l2.p1() << l1.p2() << l2.p2();
 
-  QGraphicsPolygonItem *item = new QGraphicsPolygonItem(polygon);
+  QGraphicsPolygonItem* item = new QGraphicsPolygonItem(polygon);
   item->setPen(QPen(QBrush(Qt::yellow), 2));
   item->setBrush(Qt::yellow);
   item->setOpacity(0.6);
@@ -522,12 +516,12 @@ void BoardScene::addMoveArrow(const QPointF &sourcePos,
   m_moveArrows->addToGroup(item);
 }
 
-void BoardScene::applyTransition(const Chess::BoardTransition &transition,
+void BoardScene::applyTransition(const Chess::BoardTransition& transition,
                                  MoveDirection direction) {
   m_transition = transition;
   m_direction = direction;
 
-  QParallelAnimationGroup *group = new QParallelAnimationGroup;
+  QParallelAnimationGroup* group = new QParallelAnimationGroup;
   connect(group, SIGNAL(finished()), this, SLOT(onTransitionFinished()));
   m_anim = group;
 
@@ -538,12 +532,12 @@ void BoardScene::applyTransition(const Chess::BoardTransition &transition,
   //	//{
   //	//	GraphicsPiece* piece = m_squares->pieceAt(drop.target);
   //	//	group->addAnimation(pieceAnimation(piece,
-  //m_reserve->scenePos()));
+  // m_reserve->scenePos()));
   //	//}
   // }
 
   const auto moves = transition.moves();
-  for (const auto &move : moves) {
+  for (const auto& move : moves) {
     Chess::Square source = move.source;
     Chess::Square target = move.target;
 
@@ -552,7 +546,7 @@ void BoardScene::applyTransition(const Chess::BoardTransition &transition,
     else
       addMoveArrow(m_squares->squarePos(source), m_squares->squarePos(target));
 
-    GraphicsPiece *piece = m_squares->pieceAt(source);
+    GraphicsPiece* piece = m_squares->pieceAt(source);
     if (piece == nullptr) {
       piece = createPiece(m_board->pieceAt(target));
       m_squares->setSquare(source, piece);
@@ -577,14 +571,13 @@ void BoardScene::applyTransition(const Chess::BoardTransition &transition,
 void BoardScene::updateMoves() {
   m_targets.clear();
   m_moves.clear();
-  if (!m_board->result().isNone())
-    return;
+  if (!m_board->result().isNone()) return;
 
   const auto moves = m_board->legalMoves();
-  for (const auto &move : moves) {
+  for (const auto& move : moves) {
     Chess::GenericMove gmove(m_board->genericMove(move));
     m_moves << gmove;
-    GraphicsPiece *piece = nullptr;
+    GraphicsPiece* piece = nullptr;
 
     if (gmove.sourceSquare().isValid())
       piece = m_squares->pieceAt(gmove.sourceSquare());
@@ -596,7 +589,6 @@ void BoardScene::updateMoves() {
     Q_ASSERT(piece != nullptr);
 
     Chess::Square target(gmove.targetSquare());
-    if (!m_targets.contains(piece, target))
-      m_targets.insert(piece, target);
+    if (!m_targets.contains(piece, target)) m_targets.insert(piece, target);
   }
 }

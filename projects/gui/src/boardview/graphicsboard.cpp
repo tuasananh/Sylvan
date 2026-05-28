@@ -15,6 +15,9 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "graphicsboard.h"
+
+#include <board/square.h>
 #include <math.h>
 
 #include <QApplication>
@@ -23,37 +26,39 @@
 #include <QPalette>
 #include <QPropertyAnimation>
 
-#include <board/square.h>
-
-#include "graphicsboard.h"
 #include "graphicspiece.h"
 
 namespace {
 
 class TargetHighlights : public QGraphicsObject {
-public:
-  TargetHighlights(QGraphicsItem *parentItem = nullptr)
+ public:
+  TargetHighlights(QGraphicsItem* parentItem = nullptr)
       : QGraphicsObject(parentItem) {
     setFlag(ItemHasNoContents);
   }
   virtual QRectF boundingRect() const { return QRectF(); }
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget) {
+  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget) {
     Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
   }
 };
 
-} // anonymous namespace
+}  // anonymous namespace
 
 GraphicsBoard::GraphicsBoard(int files, int ranks, qreal squareSize,
-                             QGraphicsItem *parent)
-    : QGraphicsItem(parent), m_files(files), m_ranks(ranks),
-      m_squareSize(squareSize), m_coordSize(squareSize / 2.0),
+                             QGraphicsItem* parent)
+    : QGraphicsItem(parent),
+      m_files(files),
+      m_ranks(ranks),
+      m_squareSize(squareSize),
+      m_coordSize(squareSize / 2.0),
       m_lightColor(QColor(0xff, 0xce, 0x9e)),
-      m_darkColor(QColor(0x20, 0x20, 0x20)), m_squares(files * ranks),
-      m_highlightAnim(nullptr), m_flipped(false) {
+      m_darkColor(QColor(0x20, 0x20, 0x20)),
+      m_squares(files * ranks),
+      m_highlightAnim(nullptr),
+      m_flipped(false) {
   Q_ASSERT(files > 0);
   Q_ASSERT(ranks > 0);
 
@@ -74,9 +79,9 @@ QRectF GraphicsBoard::boundingRect() const {
   return m_rect.marginsAdded(margins);
 }
 
-void GraphicsBoard::paint(QPainter *painter,
-                          const QStyleOptionGraphicsItem *option,
-                          QWidget *widget) {
+void GraphicsBoard::paint(QPainter* painter,
+                          const QStyleOptionGraphicsItem* option,
+                          QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
@@ -99,7 +104,7 @@ void GraphicsBoard::paint(QPainter *painter,
   painter->drawLine(x - off, m_squareSize * 9 + y + off,
                     m_squareSize * 8 + x + off, m_squareSize * 9 + y + off);
 
-  qreal xWidth = m_squareSize / 30; //
+  qreal xWidth = m_squareSize / 30;  //
   pen.setWidth(xWidth);
   painter->setPen(pen);
 
@@ -225,21 +230,18 @@ void GraphicsBoard::paint(QPainter *painter,
   }
 }
 
-Chess::Square GraphicsBoard::squareAt(const QPointF &point) const {
-  if (!m_rect.contains(point))
-    return Chess::Square();
+Chess::Square GraphicsBoard::squareAt(const QPointF& point) const {
+  if (!m_rect.contains(point)) return Chess::Square();
 
   int col = (point.x() + m_rect.width() / 2) / m_squareSize;
   int row = (point.y() + m_rect.height() / 2) / m_squareSize;
 
-  if (m_flipped)
-    return Chess::Square(m_files - col - 1, row);
+  if (m_flipped) return Chess::Square(m_files - col - 1, row);
   return Chess::Square(col, m_ranks - row - 1);
 }
 
-QPointF GraphicsBoard::squarePos(const Chess::Square &square) const {
-  if (!square.isValid())
-    return QPointF();
+QPointF GraphicsBoard::squarePos(const Chess::Square& square) const {
+  if (!square.isValid()) return QPointF();
 
   qreal x = m_rect.left() + m_squareSize / 2;
   qreal y = m_rect.top() + m_squareSize / 2;
@@ -255,30 +257,26 @@ QPointF GraphicsBoard::squarePos(const Chess::Square &square) const {
   return QPointF(x, y);
 }
 
-Chess::Piece GraphicsBoard::pieceTypeAt(const Chess::Square &square) const {
-  GraphicsPiece *piece = pieceAt(square);
-  if (piece == nullptr)
-    return Chess::Piece();
+Chess::Piece GraphicsBoard::pieceTypeAt(const Chess::Square& square) const {
+  GraphicsPiece* piece = pieceAt(square);
+  if (piece == nullptr) return Chess::Piece();
   return piece->pieceType();
 }
 
-GraphicsPiece *GraphicsBoard::pieceAt(const Chess::Square &square) const {
-  if (!square.isValid())
-    return nullptr;
+GraphicsPiece* GraphicsBoard::pieceAt(const Chess::Square& square) const {
+  if (!square.isValid()) return nullptr;
 
-  GraphicsPiece *piece = m_squares.at(squareIndex(square));
+  GraphicsPiece* piece = m_squares.at(squareIndex(square));
   Q_ASSERT(piece == nullptr || piece->container() == this);
   return piece;
 }
 
-GraphicsPiece *GraphicsBoard::takePieceAt(const Chess::Square &square) {
+GraphicsPiece* GraphicsBoard::takePieceAt(const Chess::Square& square) {
   int index = squareIndex(square);
-  if (index == -1)
-    return nullptr;
+  if (index == -1) return nullptr;
 
-  GraphicsPiece *piece = m_squares.at(index);
-  if (piece == nullptr)
-    return nullptr;
+  GraphicsPiece* piece = m_squares.at(index);
+  if (piece == nullptr) return nullptr;
 
   m_squares[index] = nullptr;
   piece->setParentItem(nullptr);
@@ -292,8 +290,8 @@ void GraphicsBoard::clearSquares() {
   m_squares.clear();
 }
 
-void GraphicsBoard::setSquare(const Chess::Square &square,
-                              GraphicsPiece *piece) {
+void GraphicsBoard::setSquare(const Chess::Square& square,
+                              GraphicsPiece* piece) {
   Q_ASSERT(square.isValid());
 
   int index = squareIndex(square);
@@ -309,18 +307,17 @@ void GraphicsBoard::setSquare(const Chess::Square &square,
   }
 }
 
-void GraphicsBoard::movePiece(const Chess::Square &source,
-                              const Chess::Square &target) {
-  GraphicsPiece *piece = pieceAt(source);
+void GraphicsBoard::movePiece(const Chess::Square& source,
+                              const Chess::Square& target) {
+  GraphicsPiece* piece = pieceAt(source);
   Q_ASSERT(piece != nullptr);
 
   m_squares[squareIndex(source)] = nullptr;
   setSquare(target, piece);
 }
 
-int GraphicsBoard::squareIndex(const Chess::Square &square) const {
-  if (!square.isValid())
-    return -1;
+int GraphicsBoard::squareIndex(const Chess::Square& square) const {
+  if (!square.isValid()) return -1;
 
   return square.rank() * m_files + square.file();
 }
@@ -333,12 +330,11 @@ void GraphicsBoard::clearHighlights() {
   }
 }
 
-void GraphicsBoard::setHighlights(const QList<Chess::Square> &squares) {
+void GraphicsBoard::setHighlights(const QList<Chess::Square>& squares) {
   clearHighlights();
-  if (squares.isEmpty())
-    return;
+  if (squares.isEmpty()) return;
 
-  TargetHighlights *targets = new TargetHighlights(this);
+  TargetHighlights* targets = new TargetHighlights(this);
 
   QRectF rect;
   rect.setSize(QSizeF(m_squareSize / 3, m_squareSize / 3));
@@ -346,8 +342,8 @@ void GraphicsBoard::setHighlights(const QList<Chess::Square> &squares) {
   QPen pen(Qt::white, m_squareSize / 20);
   QBrush brush(Qt::black);
 
-  for (const auto &sq : squares) {
-    QGraphicsEllipseItem *dot = new QGraphicsEllipseItem(rect, targets);
+  for (const auto& sq : squares) {
+    QGraphicsEllipseItem* dot = new QGraphicsEllipseItem(rect, targets);
 
     dot->setCacheMode(DeviceCoordinateCache);
     dot->setPen(pen);
@@ -368,8 +364,7 @@ void GraphicsBoard::setHighlights(const QList<Chess::Square> &squares) {
 bool GraphicsBoard::isFlipped() const { return m_flipped; }
 
 void GraphicsBoard::setFlipped(bool flipped) {
-  if (flipped == m_flipped)
-    return;
+  if (flipped == m_flipped) return;
 
   clearHighlights();
   m_flipped = flipped;

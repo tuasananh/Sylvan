@@ -18,6 +18,7 @@
 */
 
 #include "tournamentpair.h"
+
 #include <algorithm>
 
 TournamentPair::TournamentPair(int firstPlayer, int secondPlayer)
@@ -28,9 +29,8 @@ TournamentPair::TournamentPair(int firstPlayer, int secondPlayer)
   m_second.score = 0;
 }
 
-bool TournamentPair::hasSamePlayers(const TournamentPair *other) const {
-  if (!other)
-    return false;
+bool TournamentPair::hasSamePlayers(const TournamentPair* other) const {
+  if (!other) return false;
 
   if (other->firstPlayer() == firstPlayer() &&
       other->secondPlayer() == secondPlayer())
@@ -52,10 +52,8 @@ int TournamentPair::firstPlayer() const { return m_first.index; }
 int TournamentPair::secondPlayer() const { return m_second.index; }
 
 int TournamentPair::leader() const {
-  if (m_first.index == -1)
-    return secondPlayer();
-  if (m_second.index == -1)
-    return firstPlayer();
+  if (m_first.index == -1) return secondPlayer();
+  if (m_second.index == -1) return firstPlayer();
 
   if (m_first.score > m_second.score)
     return firstPlayer();

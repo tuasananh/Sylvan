@@ -18,8 +18,10 @@
 */
 
 #include "westernzobrist.h"
-#include "piece.h"
+
 #include <QMutexLocker>
+
+#include "piece.h"
 
 namespace Chess {
 
@@ -1234,21 +1236,20 @@ const quint64 ZobristTable[14][256] = {
     0x90cd28b0a49941bc, 0x4bed3658846db60d, 0xa2aabe2ded518020,
     0xede9c05c8179f062, 0x7e3e3c3949ed0d33};
 
-WesternZobrist::WesternZobrist(const quint64 *keys)
+WesternZobrist::WesternZobrist(const quint64* keys)
     : Zobrist(keys), m_pieceIndex(0) {}
 
 void WesternZobrist::initialize(int squareCount, int pieceTypeCount) {
   QMutexLocker locker(&m_mutex);
 
-  if (isInitialized())
-    return;
+  if (isInitialized()) return;
 
   Zobrist::initialize(squareCount, pieceTypeCount);
 }
 
 quint64 WesternZobrist::side() const { return ZobristPlayer; }
 
-quint64 WesternZobrist::piece(const Piece &piece, int square) const {
+quint64 WesternZobrist::piece(const Piece& piece, int square) const {
   Q_ASSERT(piece.isValid());
   Q_ASSERT(piece.type() >= 0 && piece.type() < pieceTypeCount());
   Q_ASSERT(square >= 0 && square < squareCount());
@@ -1267,4 +1268,4 @@ quint64 WesternZobrist::piece(const Piece &piece, int square) const {
   return ZobristTable[T15[p15]][s256];
 }
 
-} // namespace Chess
+}  // namespace Chess

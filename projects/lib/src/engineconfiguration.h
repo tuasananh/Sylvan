@@ -32,15 +32,15 @@ class EngineOption;
  * \sa EngineConfigurationModel
  */
 class LIB_EXPORT EngineConfiguration {
-public:
+ public:
   /*!
    * The modes that determine whether the engine
    * will be restarted between games.
    */
   enum RestartMode {
-    RestartAuto, //!< The engine decides whether to restart
-    RestartOn,   //!< The engine is always restarted between games
-    RestartOff   //!< The engine is never restarted between games
+    RestartAuto,  //!< The engine decides whether to restart
+    RestartOn,    //!< The engine is always restarted between games
+    RestartOff    //!< The engine is never restarted between games
   };
 
   /*! Creates an empty chess engine configuration. */
@@ -49,14 +49,14 @@ public:
    * Creates a new chess engine configuration with specified name,
    * command and protocol settings.
    */
-  EngineConfiguration(const QString &name, const QString &command,
-                      const QString &protocol);
+  EngineConfiguration(const QString& name, const QString& command,
+                      const QString& protocol);
   /*! Creates a new chess engine configuration from a QVariant. */
-  EngineConfiguration(const QVariant &variant);
+  EngineConfiguration(const QVariant& variant);
   /*! Creates a new chess engine configuration from \a other. */
-  EngineConfiguration(const EngineConfiguration &other);
+  EngineConfiguration(const EngineConfiguration& other);
   /*! Move assignment operator. */
-  EngineConfiguration &operator=(EngineConfiguration &&other);
+  EngineConfiguration& operator=(EngineConfiguration&& other);
 
   /*! Destroys the engine configuration. */
   ~EngineConfiguration();
@@ -74,32 +74,32 @@ public:
    *
    * \sa name()
    */
-  void setName(const QString &name);
+  void setName(const QString& name);
   /*!
    * Sets the command which is used to launch the engine.
    *
    * \sa command()
    */
-  void setCommand(const QString &command);
+  void setCommand(const QString& command);
   /*!
    * Sets the working directory the engine uses.
    *
    * \sa workingDirectory()
    */
-  void setWorkingDirectory(const QString &workingDir);
+  void setWorkingDirectory(const QString& workingDir);
   /*!
    * Sets the filename where the engine's standard error output
    * is written.
    *
    * \sa stderrFile()
    */
-  void setStderrFile(const QString &fileName);
+  void setStderrFile(const QString& fileName);
   /*!
    * Sets the communication protocol the engine uses.
    *
    * \sa protocol()
    */
-  void setProtocol(const QString &protocol);
+  void setProtocol(const QString& protocol);
 
   /*!
    * Returns the engine's name.
@@ -136,16 +136,16 @@ public:
   /*! Returns the command line arguments sent to the engine. */
   QStringList arguments() const;
   /*! Sets the command line arguments sent to the engine. */
-  void setArguments(const QStringList &arguments);
+  void setArguments(const QStringList& arguments);
   /*! Adds new command line argument. */
-  void addArgument(const QString &argument);
+  void addArgument(const QString& argument);
 
   /*! Returns the initialization strings sent to the engine. */
   QStringList initStrings() const;
   /*! Sets the initialization strings sent to the engine. */
-  void setInitStrings(const QStringList &initStrings);
+  void setInitStrings(const QStringList& initStrings);
   /*! Adds new initialization string. */
-  void addInitString(const QString &initString);
+  void addInitString(const QString& initString);
 
   /*!
    * Returns a list of the chess variants the engine can play.
@@ -157,23 +157,23 @@ public:
    * Returns true if the engine can play \a variant;
    * otherwise returns false.
    */
-  bool supportsVariant(const QString &variant) const;
+  bool supportsVariant(const QString& variant) const;
   /*! Sets the list of supported variants to \a variants. */
-  void setSupportedVariants(const QStringList &variants);
+  void setSupportedVariants(const QStringList& variants);
 
   /*! Returns the options sent to the engine. */
-  QList<EngineOption *> options() const;
+  QList<EngineOption*> options() const;
   /*! Sets the options sent to the engine. */
-  void setOptions(const QList<EngineOption *> &options);
+  void setOptions(const QList<EngineOption*>& options);
   /*! Adds new option. */
-  void addOption(EngineOption *option);
+  void addOption(EngineOption* option);
   /*!
    * Sets option \a name's value to \a value.
    *
    * If an option with the name \a name doesn't exist, a new
    * EngineTextOption object is added to the configuration.
    */
-  void setOption(const QString &name, const QVariant &value);
+  void setOption(const QString& name, const QVariant& value);
 
   /*! Returns true if evaluation is from red's point of view. */
   bool redEvalPov() const;
@@ -208,9 +208,9 @@ public:
    * Assigns \a other to this engine configuration and returns
    * a reference to this object.
    */
-  EngineConfiguration &operator=(const EngineConfiguration &other);
+  EngineConfiguration& operator=(const EngineConfiguration& other);
 
-private:
+ private:
   QString m_name;
   QString m_command;
   QString m_workingDirectory;
@@ -219,11 +219,11 @@ private:
   QStringList m_arguments;
   QStringList m_initStrings;
   QStringList m_variants;
-  QList<EngineOption *> m_options;
+  QList<EngineOption*> m_options;
   bool m_redEvalPov;
   bool m_pondering;
   bool m_validateClaims;
   RestartMode m_restartMode;
 };
 
-#endif // ENGINE_CONFIGURATION_H
+#endif  // ENGINE_CONFIGURATION_H

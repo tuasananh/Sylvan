@@ -17,21 +17,21 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QLoggingCategory>
-#include <QMetaType>
-#include <QStringList>
-#include <QTextStream>
-#include <QTranslator>
-
 #include <board/genericmove.h>
 #include <board/move.h>
 #include <board/result.h>
 #include <board/side.h>
 #include <moveevaluation.h>
 
+#include <QLoggingCategory>
+#include <QMetaType>
+#include <QStringList>
+#include <QTextStream>
+#include <QTranslator>
+
 #include "sylvanapp.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // Register types for signal / slot connections
   qRegisterMetaType<Chess::GenericMove>("Chess::GenericMove");
   qRegisterMetaType<Chess::Move>("Chess::Move");

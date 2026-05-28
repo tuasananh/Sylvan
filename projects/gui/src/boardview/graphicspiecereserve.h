@@ -20,10 +20,10 @@
 #ifndef GRAPHICSPIECERESERVE_H
 #define GRAPHICSPIECERESERVE_H
 
+#include <board/piece.h>
+
 #include <QGraphicsItem>
 #include <QMultiMap>
-
-#include <board/piece.h>
 
 class GraphicsPiece;
 
@@ -35,7 +35,7 @@ class GraphicsPiece;
  * a kind of separate chessboard for the piece reserve.
  */
 class GraphicsPieceReserve : public QGraphicsItem {
-public:
+ public:
   /*! The type value returned by type(). */
   enum { Type = UserType + 3 };
 
@@ -47,38 +47,38 @@ public:
    * needed.
    */
   explicit GraphicsPieceReserve(qreal squareSize,
-                                QGraphicsItem *parent = nullptr);
+                                QGraphicsItem* parent = nullptr);
 
   // Inherited from QGraphicsItem
   virtual int type() const;
   virtual QRectF boundingRect() const;
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = nullptr);
+  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = nullptr);
 
   /*! Returns the number of pieces of type \a piece. */
-  int pieceCount(const Chess::Piece &piece) const;
+  int pieceCount(const Chess::Piece& piece) const;
   /*!
    * Returns a GraphicsPiece object of type \a piece.
    * Returns 0 if no pieces of type \a piece exist.
    */
-  GraphicsPiece *piece(const Chess::Piece &piece) const;
+  GraphicsPiece* piece(const Chess::Piece& piece) const;
   /*!
    * Removes a GraphicsPiece of type \a piece and returns it.
    * Returns 0 if no pieces of type \a exist.
    */
-  GraphicsPiece *takePiece(const Chess::Piece &piece);
+  GraphicsPiece* takePiece(const Chess::Piece& piece);
   /*!
    * Adds \a piece to the reserve.
    * This object becomes the parent item and container of \a piece.
    */
-  void addPiece(GraphicsPiece *piece);
+  void addPiece(GraphicsPiece* piece);
 
-private:
+ private:
   QPointF piecePos(Chess::Side side, int index) const;
   QRectF textRect(Chess::Side side, int index) const;
-  QRectF textRect(const Chess::Piece &piece) const;
+  QRectF textRect(const Chess::Piece& piece) const;
   void updateTiles();
-  typedef QMultiMap<Chess::Piece, GraphicsPiece *> PieceMap;
+  typedef QMultiMap<Chess::Piece, GraphicsPiece*> PieceMap;
 
   qreal m_tileWidth;
   qreal m_tileHeight;
@@ -88,4 +88,4 @@ private:
   QList<Chess::Piece> m_tiles[2];
 };
 
-#endif // GRAPHICSPIECERESERVE_H
+#endif  // GRAPHICSPIECERESERVE_H

@@ -20,10 +20,10 @@
 #ifndef GAMESETTINGSWIDGET_H
 #define GAMESETTINGSWIDGET_H
 
-#include <QWidget>
-
 #include <gameadjudicator.h>
 #include <timecontrol.h>
+
+#include <QWidget>
 
 namespace Ui {
 class GameSettingsWidget;
@@ -38,43 +38,43 @@ class OpeningBook;
 class GameSettingsWidget : public QWidget {
   Q_OBJECT
 
-public:
-  explicit GameSettingsWidget(QWidget *parent = nullptr);
+ public:
+  explicit GameSettingsWidget(QWidget* parent = nullptr);
   virtual ~GameSettingsWidget();
 
   QString chessVariant() const;
   TimeControl timeControl() const;
   bool pondering() const;
   GameAdjudicator adjudicator() const;
-  OpeningSuite *openingSuite() const;
+  OpeningSuite* openingSuite() const;
   int openingSuiteDepth() const;
-  OpeningBook *openingBook() const;
+  OpeningBook* openingBook() const;
   int bookDepth() const;
   bool isValid() const;
 
-  void applyEngineConfiguration(EngineConfiguration *config);
+  void applyEngineConfiguration(EngineConfiguration* config);
   void enableSettingsUpdates();
 
-public slots:
+ public slots:
   void onHumanCountChanged(int count);
 
-signals:
-  void variantChanged(const QString &variant);
+ signals:
+  void variantChanged(const QString& variant);
   void timeControlChanged();
   void statusChanged(bool ok);
 
-private slots:
-  void validateFen(const QString &fen);
+ private slots:
+  void validateFen(const QString& fen);
   void showTimeControlDialog();
 
-private:
+ private:
   void readSettings();
 
-  Ui::GameSettingsWidget *ui;
+  Ui::GameSettingsWidget* ui;
   TimeControl m_timeControl;
-  Chess::Board *m_board;
+  Chess::Board* m_board;
   QPalette m_defaultPalette;
   bool m_isValid;
 };
 
-#endif // GAMESETTINGSWIDGET_H
+#endif  // GAMESETTINGSWIDGET_H

@@ -23,18 +23,19 @@
     OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <QtTest/QtTest>
 #include <jsonparser.h>
 #include <jsonserializer.h>
+
+#include <QtTest/QtTest>
 
 class tst_JsonSerializer : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void test_data() const;
   void test() const;
 
-private:
+ private:
   QVariant sample1() const;
   QVariant sample2() const;
 };
@@ -45,8 +46,9 @@ QVariant tst_JsonSerializer::sample1() const {
   list << "GML" << "XML";
 
   QVariantMap glossDef;
-  glossDef["para"] = "A meta-markup language, used to create markup "
-                     "languages such as DocBook.";
+  glossDef["para"] =
+      "A meta-markup language, used to create markup "
+      "languages such as DocBook.";
   glossDef["GlossSeeAlso"] = list;
 
   QVariantMap glossEntry;

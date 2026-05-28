@@ -18,6 +18,7 @@
 */
 
 #include "polyglotbook.h"
+
 #include <QDataStream>
 
 namespace {
@@ -31,11 +32,11 @@ Chess::GenericMove moveFromBits(quint16 pgMove) {
   return Chess::GenericMove(source, target);
 }
 
-quint16 moveToBits(const Chess::GenericMove &move) {
+quint16 moveToBits(const Chess::GenericMove& move) {
   using Chess::Square;
 
-  const Square &src = move.sourceSquare();
-  const Square &trg = move.targetSquare();
+  const Square& src = move.sourceSquare();
+  const Square& trg = move.targetSquare();
 
   quint16 target = trg.file() | (trg.rank() << 3);
   quint16 source = (src.file() << 6) | (src.rank() << 9);
@@ -43,17 +44,17 @@ quint16 moveToBits(const Chess::GenericMove &move) {
   // if (move.promotion() > 0)
   //	promotion = (move.promotion() - 1) << 12;
   //
-  return target | source; // | promotion;
+  return target | source;  // | promotion;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 PolyglotBook::PolyglotBook(BookMoveMode mode) : OpeningBook(mode) {}
 
 int PolyglotBook::entrySize() const { return 16; }
 
-OpeningBook::Entry PolyglotBook::readEntry(QDataStream &in,
-                                           quint64 *key) const {
+OpeningBook::Entry PolyglotBook::readEntry(QDataStream& in,
+                                           quint64* key) const {
   quint16 pgMove;
   quint16 weight;
   quint32 learn;
@@ -65,12 +66,12 @@ OpeningBook::Entry PolyglotBook::readEntry(QDataStream &in,
   return {moveFromBits(pgMove), weight};
 }
 
-void PolyglotBook::writeEntry(const Map::const_iterator &it,
-                              QDataStream &out) const {
+void PolyglotBook::writeEntry(const Map::const_iterator& it,
+                              QDataStream& out) const {
   quint32 learn = 0;
   quint64 key = it.key();
   quint16 pgMove = moveToBits(it.value().move);
-  quint16 weight = 0; //  it.value().weight;
+  quint16 weight = 0;  //  it.value().weight;
 
   // Store the data. Again, big-endian is used by default.
   out << key << pgMove << weight << learn;

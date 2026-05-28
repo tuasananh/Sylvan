@@ -10,10 +10,10 @@
 QMutex DatabaseManager::s_databaseMutex;
 QMap<QString, QMap<QString, QSqlDatabase>> DatabaseManager::s_instances;
 
-QSqlDatabase DatabaseManager::database(const QString &connectionName,
+QSqlDatabase DatabaseManager::database(const QString& connectionName,
                                        const QString dbName) {
   QMutexLocker locker(&s_databaseMutex);
-  QThread *thread = QThread::currentThread();
+  QThread* thread = QThread::currentThread();
 
   if (!thread->objectName().isEmpty()) {
     QString objectname =
@@ -29,8 +29,7 @@ QSqlDatabase DatabaseManager::database(const QString &connectionName,
         qDebug() << "Function Name: " << Q_FUNC_INFO
                  << " found SQL connection instances Thread: " << thread
                  << " Name: " << connectionName;
-        if (connection.isValid())
-          return it_conn.value();
+        if (connection.isValid()) return it_conn.value();
       }
     }
   }

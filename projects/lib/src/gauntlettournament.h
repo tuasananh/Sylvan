@@ -31,24 +31,24 @@
 class LIB_EXPORT GauntletTournament : public Tournament {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new Gauntlet tournament. */
-  explicit GauntletTournament(GameManager *gameManager,
-                              QObject *parent = nullptr);
+  explicit GauntletTournament(GameManager* gameManager,
+                              QObject* parent = nullptr);
   // Inherited from Tournament
   virtual QString type() const;
 
-protected:
+ protected:
   // Inherited from Tournament
-  virtual void onGameAboutToStart(ChessGame *game, const PlayerBuilder *red,
-                                  const PlayerBuilder *black);
+  virtual void onGameAboutToStart(ChessGame* game, const PlayerBuilder* red,
+                                  const PlayerBuilder* black);
   virtual void initializePairing();
   virtual int gamesPerCycle() const;
-  virtual TournamentPair *nextPair(int gameNumber);
+  virtual TournamentPair* nextPair(int gameNumber);
   virtual bool hasGauntletRatingsOrder() const;
 
-private:
+ private:
   int m_opponent;
 };
 
-#endif // GAUNTLETTOURNAMENT_H
+#endif  // GAUNTLETTOURNAMENT_H

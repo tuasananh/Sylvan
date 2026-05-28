@@ -24,9 +24,9 @@
 
 #ifdef Q_OS_WIN32
 #include "engineprocess_win.h"
-#else // not Q_OS_WIN32
+#else  // not Q_OS_WIN32
 #include <QProcess>
 #define EngineProcess QProcess
-#endif // not Q_OS_WIN32
+#endif  // not Q_OS_WIN32
 
-#endif // ENGINEPROCESS_H
+#endif  // ENGINEPROCESS_H

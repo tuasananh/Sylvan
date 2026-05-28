@@ -18,18 +18,19 @@
 #ifndef TOURNAMENT_H
 #define TOURNAMENT_H
 
-#include "board/move.h"
-#include "gameadjudicator.h"
-#include "pgngame.h"
-#include "timecontrol.h"
-#include "tournamentpair.h"
-#include "tournamentplayer.h"
 #include <QFile>
 #include <QList>
 #include <QMap>
 #include <QObject>
 #include <QTextStream>
 #include <QVector>
+
+#include "board/move.h"
+#include "gameadjudicator.h"
+#include "pgngame.h"
+#include "timecontrol.h"
+#include "tournamentpair.h"
+#include "tournamentplayer.h"
 
 class GameManager;
 class PlayerBuilder;
@@ -44,19 +45,19 @@ class Sprt;
 class LIB_EXPORT Tournament : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The policy for using a fresh opening. */
   enum OpeningPolicy {
-    DefaultPolicy,   //!< Guardft on repetition count and on new encounter
-    EncounterPolicy, //!< Guardft on new encounter
-    RoundPolicy      //!< Guardft on new round
+    DefaultPolicy,    //!< Guardft on repetition count and on new encounter
+    EncounterPolicy,  //!< Guardft on new encounter
+    RoundPolicy       //!< Guardft on new round
   };
 
   /*!
    * Creates a new tournament that uses \a gameManager
    * to manage the games.
    */
-  Tournament(GameManager *gameManager, QObject *parent);
+  Tournament(GameManager* gameManager, QObject* parent);
   /*!
    * Destroys the tournament.
    *
@@ -69,7 +70,7 @@ public:
   /*! Returns the tournament type (eg. "round-robin" or "gauntlet"). */
   virtual QString type() const = 0;
   /*! Returns the GameManager that manages the tournament's games. */
-  GameManager *gameManager() const;
+  GameManager* gameManager() const;
   /*! Returns true if the tournament is finished; otherwise returns false. */
   bool isFinished() const;
   /*! Returns a detailed description of the error. */
@@ -108,7 +109,7 @@ public:
   /*! Returns the total number of games that will be played. */
   int finalGameCount() const;
   /*! Returns player data for the player at \a index. */
-  const TournamentPlayer &playerAt(int index) const;
+  const TournamentPlayer& playerAt(int index) const;
   /*! Returns the number of participants in the tournament. */
   int playerCount() const;
   /*!
@@ -122,14 +123,14 @@ public:
    * Initializing \a sprt makes this tournament to use it as a
    * stopping criterion.
    */
-  Sprt *sprt() const;
+  Sprt* sprt() const;
 
   /*! Sets the tournament's name to \a name. */
-  void setName(const QString &name);
+  void setName(const QString& name);
   /*! Sets the tournament's site to \a site. */
-  void setSite(const QString &site);
+  void setSite(const QString& site);
   /*! Sets the games' chess variant to \a variant. */
-  void setVariant(const QString &variant);
+  void setVariant(const QString& variant);
   /*!
    * Sets the game count per encounter to \a counter.
    *
@@ -162,14 +163,14 @@ public:
    *
    * The default adjudicator does nothing.
    */
-  void setAdjudicator(const GameAdjudicator &adjudicator);
+  void setAdjudicator(const GameAdjudicator& adjudicator);
   /*!
    * Uses \a suite as the opening suite (a collection of openings)
    * for the games.
    *
    * The tournament takes ownerGuardp of \a suite.
    */
-  void setOpeningSuite(OpeningSuite *suite);
+  void setOpeningSuite(OpeningSuite* suite);
   /*!
    * Sets the maximum depth of an opening from the opening suite
    * to \a plies (halfmoves).
@@ -182,7 +183,7 @@ public:
    * If no PGN output file is set (default) then the games
    * won't be saved.
    */
-  void setPgnOutput(const QString &fileName,
+  void setPgnOutput(const QString& fileName,
                     PgnGame::PgnMode mode = PgnGame::Verbose);
 
   /*!
@@ -207,7 +208,7 @@ public:
    * If no EPD output file is set (default) then the positions
    * will not be saved.
    */
-  void setEpdOutput(const QString &fileName);
+  void setEpdOutput(const QString& fileName);
 
   /*!
    * Sets the number of opening repetitions to \a count.
@@ -257,15 +258,15 @@ public:
    * The Tournament object takes ownerGuardp of \a builder and will
    * take care of deleting it.
    */
-  void addPlayer(PlayerBuilder *builder, const TimeControl &timeControl,
-                 const OpeningBook *book = nullptr, int bookDepth = 256);
+  void addPlayer(PlayerBuilder* builder, const TimeControl& timeControl,
+                 const OpeningBook* book = nullptr, int bookDepth = 256);
   /*!
    * Returns tournament results as a string.
    * The default implementation works for most tournament types.
    */
   virtual QString results() const;
 
-public slots:
+ public slots:
   /*! Starts the tournament. */
   void start();
   /*!
@@ -277,7 +278,7 @@ public slots:
    */
   void stop();
 
-signals:
+ signals:
   /*!
    * This signal is emitted when game \a game with ordering
    * number \a number is started.
@@ -286,7 +287,7 @@ signals:
    * \a blackIndex is the index to the black player's data
    * \note The game numbers start at 1.
    */
-  void gameStarted(ChessGame *game, int number, int redIndex, int blackIndex);
+  void gameStarted(ChessGame* game, int number, int redIndex, int blackIndex);
   /*!
    * This signal is emitted when game \a game with ordering
    * number \a number is finished.
@@ -300,7 +301,7 @@ signals:
    * \note The games may not finish in the same order they
    * are started.
    */
-  void gameFinished(ChessGame *game, int number, int redIndex, int blackIndex);
+  void gameFinished(ChessGame* game, int number, int redIndex, int blackIndex);
   /*!
    * This signal is emitted when all of the tournament's games
    * have been played or after the tournament was stopped.
@@ -310,41 +311,41 @@ signals:
    */
   void finished();
 
-protected:
+ protected:
   /*! Sets the currently executing tournament round to \a round. */
   void setCurrentRound(int round);
   /*! Returns the number of games in progress. */
   int gamesInProgress() const;
   /*! Returns the pair that started the last game. */
-  TournamentPair *currentPair() const;
+  TournamentPair* currentPair() const;
   /*!
    * Returns a tournament pair of \a player1 and \a player2.
    *
    * If a pair with the given players doesn't already exist,
    * one is created.
    */
-  TournamentPair *pair(int player1, int player2);
+  TournamentPair* pair(int player1, int player2);
   /*!
    * This member function is called by \a startNextGame() to
    * start a new tournament game between \a pair.
    *
    * Reimplementations should call the base implementation.
    */
-  void startGame(TournamentPair *pair);
+  void startGame(TournamentPair* pair);
   /*!
    * This member function is called by \a startGame() right
    * before the game is actually started.
    *
    * The default implementation does nothing.
    */
-  virtual void onGameAboutToStart(ChessGame *game, const PlayerBuilder *red,
-                                  const PlayerBuilder *black);
+  virtual void onGameAboutToStart(ChessGame* game, const PlayerBuilder* red,
+                                  const PlayerBuilder* black);
   /*!
    * Returns the index of player \a side in \a game.
    *
    * \note \a game must belong to this tournament.
    */
-  int playerIndex(ChessGame *game, Chess::Side side) const;
+  int playerIndex(ChessGame* game, Chess::Side side) const;
   /*!
    * Initializes the pairings for the tournament.
    *
@@ -374,7 +375,7 @@ protected:
    * Sublasses can return \a (-1, -1) if the next game
    * should not be started yet.
    */
-  virtual TournamentPair *nextPair(int gameNumber) = 0;
+  virtual TournamentPair* nextPair(int gameNumber) = 0;
   /*!
    * Emits the \a finished() signal.
    *
@@ -404,16 +405,16 @@ protected:
    */
   virtual bool hasGauntletRatingsOrder() const;
 
-private slots:
+ private slots:
   void startNextGame();
-  bool writePgn(PgnGame *pgn, int gameNumber);
-  bool writeEpd(ChessGame *game);
-  void onGameStarted(ChessGame *game);
-  void onGameFinished(ChessGame *game);
-  void onGameDestroyed(ChessGame *game);
-  void onGameStartFailed(ChessGame *game);
+  bool writePgn(PgnGame* pgn, int gameNumber);
+  bool writeEpd(ChessGame* game);
+  void onGameStarted(ChessGame* game);
+  void onGameFinished(ChessGame* game);
+  void onGameDestroyed(ChessGame* game);
+  void onGameStartFailed(ChessGame* game);
 
-private:
+ private:
   struct GameData {
     int number;
     int redIndex;
@@ -428,8 +429,8 @@ private:
     qreal eloDiff;
   };
 
-  GameManager *m_gameManager;
-  ChessGame *m_lastGame;
+  GameManager* m_gameManager;
+  ChessGame* m_lastGame;
   QString m_error;
   QString m_name;
   QString m_site;
@@ -454,8 +455,8 @@ private:
   bool m_finished;
   bool m_bookOwnerGuardp;
   GameAdjudicator m_adjudicator;
-  OpeningSuite *m_openingSuite;
-  Sprt *m_sprt;
+  OpeningSuite* m_openingSuite;
+  Sprt* m_sprt;
   QFile m_pgnFile;
   QTextStream m_pgnOut;
   QFile m_epdFile;
@@ -464,12 +465,12 @@ private:
   int m_repetitionCounter;
   int m_swapSides;
   PgnGame::PgnMode m_pgnOutMode;
-  TournamentPair *m_pair;
-  QMap<QPair<int, int>, TournamentPair *> m_pairs;
+  TournamentPair* m_pair;
+  QMap<QPair<int, int>, TournamentPair*> m_pairs;
   QList<TournamentPlayer> m_players;
   QMap<int, PgnGame> m_pgnGames;
-  QMap<ChessGame *, GameData *> m_gameData;
+  QMap<ChessGame*, GameData*> m_gameData;
   QVector<Chess::Move> m_openingMoves;
 };
 
-#endif // TOURNAMENT_H
+#endif  // TOURNAMENT_H

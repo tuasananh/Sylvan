@@ -37,7 +37,7 @@ class QSettings;
 class LIB_EXPORT TimeControl {
   Q_DECLARE_TR_FUNCTIONS(TimeControl)
 
-public:
+ public:
   /*! Creates a new time control with invalid default settings. */
   TimeControl();
 
@@ -65,7 +65,7 @@ public:
    * Example 4 (infinite thinking time):
    *   TimeControl("inf");
    */
-  TimeControl(const QString &str);
+  TimeControl(const QString& str);
 
   /*!
    * Returns true if \a other is the same as this time control.
@@ -73,7 +73,7 @@ public:
    * The state of a game (eg. time left, used time, the expiry flag)
    * and the expiry margin are ignored.
    */
-  bool operator==(const TimeControl &other) const;
+  bool operator==(const TimeControl& other) const;
 
   /*! Returns true if the time control is valid. */
   bool isValid() const;
@@ -198,12 +198,12 @@ public:
   int activeTimeLeft() const;
 
   /*! Reads time control settings from \a settings. */
-  void readSettings(QSettings *settings);
+  void readSettings(QSettings* settings);
 
   /*! Writes this time control to \a settings. */
-  void writeSettings(QSettings *settings);
+  void writeSettings(QSettings* settings);
 
-private:
+ private:
   int m_movesPerTc;
   int m_timePerTc;
   int m_timePerMove;
@@ -219,4 +219,4 @@ private:
   QElapsedTimer m_time;
 };
 
-#endif // TIMECONTROL_H
+#endif  // TIMECONTROL_H

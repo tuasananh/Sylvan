@@ -17,17 +17,18 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "settingsdlg.h"
+
+#include <gamemanager.h>
+
 #include <QFileDialog>
 #include <QSettings>
 #include <QShowEvent>
 
-#include <gamemanager.h>
-
-#include "settingsdlg.h"
 #include "sylvanapp.h"
 #include "ui_settingsdlg.h"
 
-SettingsDialog::SettingsDialog(QWidget *parent)
+SettingsDialog::SettingsDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::SettingsDialog) {
   ui->setupUi(this);
 
@@ -66,27 +67,27 @@ SettingsDialog::SettingsDialog(QWidget *parent)
           });
 
   connect(ui->m_siteEdit, &QLineEdit::textChanged,
-          [=](const QString &site) { QSettings().setValue("pgn/site", site); });
+          [=](const QString& site) { QSettings().setValue("pgn/site", site); });
 
   connect(ui->m_defaultPgnOutFileEdit, &QLineEdit::textChanged,
-          [=](const QString &defaultPgnFile) {
+          [=](const QString& defaultPgnFile) {
             QSettings().setValue("games/default_pgn_output_file",
                                  defaultPgnFile);
           });
 
   connect(ui->m_tbPathEdit, &QLineEdit::textChanged,
-          [=](const QString &tbPath) {
+          [=](const QString& tbPath) {
             QSettings().setValue("ui/tb_path", tbPath);
           });
 
   connect(ui->m_tournamentDefaultPgnOutFileEdit, &QLineEdit::textChanged,
-          [=](const QString &tourFile) {
+          [=](const QString& tourFile) {
             QSettings().setValue("tournament/default_pgn_output_file",
                                  tourFile);
           });
 
   connect(ui->m_tournamentDefaultEpdOutFileEdit, &QLineEdit::textChanged,
-          [=](const QString &tourEpdFile) {
+          [=](const QString& tourEpdFile) {
             QSettings().setValue("tournament/default_epd_output_file",
                                  tourEpdFile);
           });
@@ -107,7 +108,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
 SettingsDialog::~SettingsDialog() { delete ui; }
 
-void SettingsDialog::closeEvent(QCloseEvent *event) {
+void SettingsDialog::closeEvent(QCloseEvent* event) {
   if (ui->m_engineManagementWidget->hasConfigChanged())
     ui->m_engineManagementWidget->saveConfig();
 
@@ -122,7 +123,7 @@ void SettingsDialog::browseTbPath() {
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setAcceptMode(QFileDialog::AcceptOpen);
 
-  connect(dlg, &QFileDialog::fileSelected, [=](const QString &dir) {
+  connect(dlg, &QFileDialog::fileSelected, [=](const QString& dir) {
     ui->m_tbPathEdit->setText(dir);
     QSettings().setValue("ui/tb_path", dir);
   });

@@ -29,29 +29,29 @@ class QLabel;
 class ChessClock : public QWidget {
   Q_OBJECT
 
-public:
-  ChessClock(QWidget *parent = nullptr);
+ public:
+  ChessClock(QWidget* parent = nullptr);
 
-public slots:
-  void setPlayerName(const QString &name);
+ public slots:
+  void setPlayerName(const QString& name);
   void setInfiniteTime(bool infinite);
   void setTime(int totalTime);
   void start(int totalTime);
   void stop();
 
-protected:
-  virtual void timerEvent(QTimerEvent *event);
+ protected:
+  virtual void timerEvent(QTimerEvent* event);
 
-private:
+ private:
   void stopTimer();
 
   int m_totalTime;
   int m_timerId;
   bool m_infiniteTime;
   QTime m_time;
-  QLabel *m_nameLabel;
-  QLabel *m_timeLabel;
+  QLabel* m_nameLabel;
+  QLabel* m_timeLabel;
   QPalette m_defaultPalette;
 };
 
-#endif // CHESSCLOCK
+#endif  // CHESSCLOCK

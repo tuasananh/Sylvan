@@ -27,9 +27,8 @@ bool PgnToken::isEmpty() const { return toString().isEmpty(); }
 
 int PgnToken::length() const { return m_end - m_begin; }
 
-void PgnToken::insert(QTextCursor &cursor) {
-  if (isEmpty())
-    return;
+void PgnToken::insert(QTextCursor& cursor) {
+  if (isEmpty()) return;
 
   if (!cursor.hasSelection())
     m_begin = cursor.position();
@@ -40,24 +39,22 @@ void PgnToken::insert(QTextCursor &cursor) {
   m_end = cursor.position();
 }
 
-void PgnToken::select(QTextCursor &cursor) {
-  if (m_begin == -1 || m_end == -1)
-    return;
+void PgnToken::select(QTextCursor& cursor) {
+  if (m_begin == -1 || m_end == -1) return;
 
   cursor.setPosition(m_begin);
   cursor.setPosition(m_end, QTextCursor::KeepAnchor);
 }
 
 void PgnToken::move(int diff) {
-  if (m_begin == -1 || m_end == -1)
-    return;
+  if (m_begin == -1 || m_end == -1) return;
 
   m_begin += diff;
   m_end += diff;
 }
 
-void PgnToken::mergeCharFormat(QTextCursor &cursor,
-                               const QTextCharFormat &format) {
+void PgnToken::mergeCharFormat(QTextCursor& cursor,
+                               const QTextCharFormat& format) {
   cursor.setPosition(m_begin);
   cursor.setPosition(m_end - 1, QTextCursor::KeepAnchor);
   cursor.mergeCharFormat(format);

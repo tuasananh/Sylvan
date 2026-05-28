@@ -17,16 +17,19 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QSvgRenderer>
-
 #include "graphicspiece.h"
 
-GraphicsPiece::GraphicsPiece(const Chess::Piece &piece, qreal squareSize,
-                             const QString &elementId, QSvgRenderer *renderer,
-                             QGraphicsItem *parent)
-    : QGraphicsObject(parent), m_piece(piece),
+#include <QSvgRenderer>
+
+GraphicsPiece::GraphicsPiece(const Chess::Piece& piece, qreal squareSize,
+                             const QString& elementId, QSvgRenderer* renderer,
+                             QGraphicsItem* parent)
+    : QGraphicsObject(parent),
+      m_piece(piece),
       m_rect(-squareSize / 2, -squareSize / 2, squareSize, squareSize),
-      m_elementId(elementId), m_renderer(renderer), m_container(nullptr) {
+      m_elementId(elementId),
+      m_renderer(renderer),
+      m_container(nullptr) {
   setAcceptedMouseButtons(Qt::LeftButton);
   setCacheMode(DeviceCoordinateCache);
 }
@@ -35,15 +38,15 @@ int GraphicsPiece::type() const { return Type; }
 
 QRectF GraphicsPiece::boundingRect() const { return m_rect; }
 
-void GraphicsPiece::paint(QPainter *painter,
-                          const QStyleOptionGraphicsItem *option,
-                          QWidget *widget) {
+void GraphicsPiece::paint(QPainter* painter,
+                          const QStyleOptionGraphicsItem* option,
+                          QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
   QRectF bounds(m_renderer->boundsOnElement(m_elementId));
   qreal ar = bounds.width() / bounds.height();
-  qreal width = m_rect.width() * 0.95; // was 0.8 棋子相对格子的比例
+  qreal width = m_rect.width() * 0.95;  // was 0.8 棋子相对格子的比例
 
   if (ar > 1.0) {
     bounds.setWidth(width);
@@ -59,9 +62,9 @@ void GraphicsPiece::paint(QPainter *painter,
 
 Chess::Piece GraphicsPiece::pieceType() const { return m_piece; }
 
-QGraphicsItem *GraphicsPiece::container() const { return m_container; }
+QGraphicsItem* GraphicsPiece::container() const { return m_container; }
 
-void GraphicsPiece::setContainer(QGraphicsItem *item) { m_container = item; }
+void GraphicsPiece::setContainer(QGraphicsItem* item) { m_container = item; }
 
 void GraphicsPiece::restoreParent() {
   if (parentItem() == nullptr && m_container != nullptr) {

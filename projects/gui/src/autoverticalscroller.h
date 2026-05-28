@@ -35,16 +35,16 @@ class QAbstractItemView;
 class AutoVerticalScroller : QObject {
   Q_OBJECT
 
-public:
-  AutoVerticalScroller(QAbstractItemView *view, QObject *parent = nullptr);
+ public:
+  AutoVerticalScroller(QAbstractItemView* view, QObject* parent = nullptr);
 
-private:
-  QAbstractItemView *m_view;
+ private:
+  QAbstractItemView* m_view;
   bool m_scrollToBottom;
 
-private slots:
+ private slots:
   void onRowsAboutToBeInserted();
   void onRowsInserted();
 };
 
-#endif // AUTO_VERTICAL_SCROLLER_H
+#endif  // AUTO_VERTICAL_SCROLLER_H

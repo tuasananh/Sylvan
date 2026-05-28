@@ -21,7 +21,7 @@
 
 namespace Chess {
 
-Side::Side(const QString &symbol) {
+Side::Side(const QString& symbol) {
   if (symbol == "w")
     m_type = Red;
   else if (symbol == "b")
@@ -48,4 +48,4 @@ QString Side::toString() const {
   return QString();
 }
 
-} // namespace Chess
+}  // namespace Chess

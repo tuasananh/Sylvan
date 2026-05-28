@@ -41,7 +41,7 @@ class GameThread;
 class LIB_EXPORT GameManager : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The mode for starting games. */
   enum StartMode {
     /*! The game is started immediately. */
@@ -68,7 +68,7 @@ public:
   };
 
   /*! Creates a new game manager. */
-  GameManager(QObject *parent = nullptr);
+  GameManager(QObject* parent = nullptr);
 
   /*!
    * Returns the list of active games.
@@ -78,7 +78,7 @@ public:
    * because the game could still be used for analysis, etc.
    * The game loses its active status only when it's deleted.
    */
-  QList<ChessGame *> activeGames() const;
+  QList<ChessGame*> activeGames() const;
 
   /*!
    * Returns the maximum allowed number of concurrent games.
@@ -138,12 +138,12 @@ public:
    * \note If there are still free game slots after starting this
    * game, the ready() signal is emitted immediately.
    */
-  void newGame(ChessGame *game, const PlayerBuilder *red,
-               const PlayerBuilder *black,
+  void newGame(ChessGame* game, const PlayerBuilder* red,
+               const PlayerBuilder* black,
                StartMode startMode = StartImmediately,
                CleanupMode cleanupMode = DeletePlayers);
 
-public slots:
+ public slots:
   /*!
    * Removes all future games from the queue, waits for
    * ongoing games to end, and deletes all idle players.
@@ -151,16 +151,16 @@ public slots:
    */
   void finish();
 
-signals:
+ signals:
   /*! This signal is emitted when a new game starts. */
-  void gameStarted(ChessGame *game);
+  void gameStarted(ChessGame* game);
   /*!
    * This signal is emitted when a game is destroyed.
    *
    * Dereferencing the \a game pointer results in undefined
    * behavior, so this signal should only be used for cleanup.
    */
-  void gameDestroyed(ChessGame *game);
+  void gameDestroyed(ChessGame* game);
   /*!
    * This signal is emitted after a game has started
    * or after a game has ended, if there are free
@@ -178,24 +178,24 @@ signals:
    */
   void finished();
   /*! This signal redirects the ChessPlayer::debugMessage() signal. */
-  void debugMessage(const QString &data);
+  void debugMessage(const QString& data);
 
-private slots:
+ private slots:
   void onThreadReady();
   void onThreadQuit();
   void onGameInitialized(bool success);
 
-private:
+ private:
   struct GameEntry {
-    ChessGame *game;
-    const PlayerBuilder *red;
-    const PlayerBuilder *black;
+    ChessGame* game;
+    const PlayerBuilder* red;
+    const PlayerBuilder* black;
     StartMode startMode;
     CleanupMode cleanupMode;
   };
 
-  GameThread *getThread(const PlayerBuilder *red, const PlayerBuilder *black);
-  void startGame(const GameEntry &entry);
+  GameThread* getThread(const PlayerBuilder* red, const PlayerBuilder* black);
+  void startGame(const GameEntry& entry);
   void startQueuedGame();
   void cleanup();
 
@@ -203,9 +203,9 @@ private:
   int m_concurrency;
   int m_activeQueuedGameCount;
   QList<QPointer<GameThread>> m_threads;
-  QList<GameThread *> m_activeThreads;
+  QList<GameThread*> m_activeThreads;
   QList<GameEntry> m_gameEntries;
-  QList<ChessGame *> m_activeGames;
+  QList<ChessGame*> m_activeGames;
 };
 
-#endif // GAMEMANAGER_H
+#endif  // GAMEMANAGER_H

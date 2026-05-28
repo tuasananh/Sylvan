@@ -18,6 +18,7 @@
 */
 
 #include "mersenne.h"
+
 #include <QMutex>
 
 namespace {
@@ -30,12 +31,11 @@ void generateNumbers() {
     quint32 y = (s_mt[i] & 0x1) + (s_mt[(i + 1) % 624] & 0x7fffffff);
     s_mt[i] = s_mt[(i + 397) % 624] ^ (y >> 1);
 
-    if (y % 2)
-      s_mt[i] ^= 0x9908b0df;
+    if (y % 2) s_mt[i] ^= 0x9908b0df;
   }
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 void Mersenne::initialize(quint32 seed) {
   s_mt[0] = seed;
@@ -49,8 +49,7 @@ quint32 Mersenne::random() {
   static QMutex mutex;
   mutex.lock();
 
-  if (s_index == 0)
-    generateNumbers();
+  if (s_index == 0) generateNumbers();
 
   quint32 y = s_mt[s_index];
   y ^= y >> 11;

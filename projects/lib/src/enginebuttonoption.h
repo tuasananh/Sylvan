@@ -23,14 +23,14 @@
 #include "engineoption.h"
 
 class LIB_EXPORT EngineButtonOption : public EngineOption {
-public:
-  EngineButtonOption(const QString &name);
+ public:
+  EngineButtonOption(const QString& name);
 
   // Inherited from EngineOption
-  virtual EngineOption *copy() const;
-  virtual bool isValid(const QVariant &value) const;
+  virtual EngineOption* copy() const;
+  virtual bool isValid(const QVariant& value) const;
   virtual bool isEditable() const;
   virtual QVariant toVariant() const;
 };
 
-#endif // ENGINEBUTTONOPTION_H
+#endif  // ENGINEBUTTONOPTION_H

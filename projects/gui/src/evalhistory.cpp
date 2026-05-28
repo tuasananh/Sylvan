@@ -17,23 +17,23 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QVBoxLayout>
-#include <QtGlobal>
-#include <qcustomplot.h>
+#include "evalhistory.h"
 
 #include <chessgame.h>
 #include <moveevaluation.h>
+#include <qcustomplot.h>
 
-#include "evalhistory.h"
+#include <QVBoxLayout>
+#include <QtGlobal>
 
-EvalHistory::EvalHistory(QWidget *parent)
+EvalHistory::EvalHistory(QWidget* parent)
     : QWidget(parent), m_plot(new QCustomPlot(this)), m_game(nullptr) {
   auto x = m_plot->xAxis;
   auto y = m_plot->yAxis;
   auto ticker = new QCPAxisTickerFixed;
 
   x->setLabel(tr("Step"));
-  x->setRange(1, 20); // 5->10
+  x->setRange(1, 20);  // 5->10
   x->setTicks(false);
   x->setSubTicks(false);
   x->setTicker(QSharedPointer<QCPAxisTicker>(ticker));
@@ -43,7 +43,7 @@ EvalHistory::EvalHistory(QWidget *parent)
   x->setBasePen(QApplication::palette().text().color());
 
   y->setLabel(tr("Score"));
-  y->setRange(-5, 5); // (-1, 1)->(-5, 5)
+  y->setRange(-5, 5);  // (-1, 1)->(-5, 5)
   x->setTicks(false);
   y->setSubTicks(false);
   y->setLabelColor(QApplication::palette().text().color());
@@ -53,16 +53,15 @@ EvalHistory::EvalHistory(QWidget *parent)
 
   m_plot->setBackground(QApplication::palette().window());
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->addWidget(m_plot);
   layout->setContentsMargins(0, 0, 0, 0);
   setLayout(layout);
   setMinimumHeight(120);
 }
 
-void EvalHistory::setGame(ChessGame *game) {
-  if (m_game)
-    m_game->disconnect(this);
+void EvalHistory::setGame(ChessGame* game) {
+  if (m_game) m_game->disconnect(this);
   m_game = game;
   m_plot->clearGraphs();
   if (!game) {
@@ -76,14 +75,13 @@ void EvalHistory::setGame(ChessGame *game) {
   setScores(game->scores());
 }
 
-void EvalHistory::setPgnGame(PgnGame *pgn) {
-  if (pgn == nullptr || pgn->isNull())
-    return;
+void EvalHistory::setPgnGame(PgnGame* pgn) {
+  if (pgn == nullptr || pgn->isNull()) return;
 
   setScores(pgn->extractScores());
 }
 
-void EvalHistory::setScores(const QMap<int, int> &scores) {
+void EvalHistory::setScores(const QMap<int, int>& scores) {
   m_plot->addGraph();
   m_plot->addGraph();
 
@@ -112,22 +110,19 @@ void EvalHistory::setScores(const QMap<int, int> &scores) {
 }
 
 void EvalHistory::addData(int ply, int score) {
-  if (score == MoveEvaluation::NULL_SCORE)
-    return;
+  if (score == MoveEvaluation::NULL_SCORE) return;
 
   int side = (ply % 2 == 0) ? 0 : 1;
   double x = double(ply + 2) / 2;
   double y = qBound(-15.0, double(score) / 100.0, 15.0);
 
-  if (side == 1)
-    y = -y;
+  if (side == 1) y = -y;
   if (y > 5.0)
     y = 5.0;
   else if (y < -5.0)
     y = -5.0;
 
-  if (ply < 2)
-    m_plot->graph(1 - side)->addData(1, -y);
+  if (ply < 2) m_plot->graph(1 - side)->addData(1, -y);
 
   m_plot->graph(side)->addData(x, y);
 }
@@ -135,9 +130,9 @@ void EvalHistory::addData(int ply, int score) {
 void EvalHistory::replot(int maxPly) {
   if (maxPly == -1) {
     auto ticker = new QCPAxisTickerFixed;
-    m_plot->xAxis->setRange(1, 20); // (1, 5)->(1, 10)
+    m_plot->xAxis->setRange(1, 20);  // (1, 5)->(1, 10)
     m_plot->xAxis->setTicker(QSharedPointer<QCPAxisTicker>(ticker));
-    m_plot->yAxis->setRange(-5, 5); // (-1, 1)->(-5, 5)
+    m_plot->yAxis->setRange(-5, 5);  // (-1, 1)->(-5, 5)
   } else {
     maxPly /= 2;
     maxPly += static_cast<int>(maxPly * 0.2);

@@ -18,13 +18,20 @@
 */
 
 #include "gameadjudicator.h"
+
 #include "board/board.h"
 #include "moveevaluation.h"
 
 GameAdjudicator::GameAdjudicator()
-    : m_drawMoveNum(0), m_drawMoveCount(0), m_drawScore(0), m_drawScoreCount(0),
-      m_resignMoveCount(0), m_resignScore(0), m_twoSided(false),
-      m_maxGameLength(0), m_tbEnabled(false) {
+    : m_drawMoveNum(0),
+      m_drawMoveCount(0),
+      m_drawScore(0),
+      m_drawScoreCount(0),
+      m_resignMoveCount(0),
+      m_resignScore(0),
+      m_twoSided(false),
+      m_maxGameLength(0),
+      m_tbEnabled(false) {
   m_resignScoreCount[0] = 0;
   m_resignScoreCount[1] = 0;
   m_winScoreCount[0] = 0;
@@ -64,15 +71,14 @@ void GameAdjudicator::setTablebaseAdjudication(bool enable) {
   m_tbEnabled = enable;
 }
 
-void GameAdjudicator::addEval(const Chess::Board *board,
-                              const MoveEvaluation &eval) {
+void GameAdjudicator::addEval(const Chess::Board* board,
+                              const MoveEvaluation& eval) {
   Chess::Side side = board->sideToMove().opposite();
 
   // Tablebase adjudication
   if (m_tbEnabled) {
     m_result = board->tablebaseResult();
-    if (!m_result.isNone())
-      return;
+    if (!m_result.isNone()) return;
   }
 
   // Moves forced by the user (eg. from opening book or played by user)
@@ -101,13 +107,13 @@ void GameAdjudicator::addEval(const Chess::Board *board,
 
   // Resign adjudication
   if (m_resignMoveCount > 0) {
-    int &count = m_resignScoreCount[side];
+    int& count = m_resignScoreCount[side];
     if (eval.score() <= m_resignScore)
       count++;
     else
       count = 0;
 
-    int &winCount = m_winScoreCount[side];
+    int& winCount = m_winScoreCount[side];
     if (eval.score() >= -m_resignScore)
       winCount++;
     else

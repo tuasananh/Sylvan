@@ -17,8 +17,7 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QAbstractItemView>
-#include <QSettings>
+#include "newgamedlg.h"
 
 #include <board/boardfactory.h>
 #include <chessgame.h>
@@ -27,10 +26,12 @@
 #include <humanbuilder.h>
 #include <openingsuite.h>
 
+#include <QAbstractItemView>
+#include <QSettings>
+
 #include "engineconfigproxymodel.h"
 #include "engineconfigurationdlg.h"
 #include "engineconfigurationmodel.h"
-#include "newgamedlg.h"
 #include "stringvalidator.h"
 #include "sylvanapp.h"
 #include "timecontroldlg.h"
@@ -40,8 +41,9 @@
 #include <modeltest.h>
 #endif
 
-NewGameDialog::NewGameDialog(EngineManager *engineManager, QWidget *parent)
-    : QDialog(parent), m_engineManager(engineManager),
+NewGameDialog::NewGameDialog(EngineManager* engineManager, QWidget* parent)
+    : QDialog(parent),
+      m_engineManager(engineManager),
       ui(new Ui::NewGameDialog) {
   Q_ASSERT(engineManager != nullptr);
   ui->setupUi(this);
@@ -62,7 +64,7 @@ NewGameDialog::NewGameDialog(EngineManager *engineManager, QWidget *parent)
   m_proxyModel->sort(0);
   m_proxyModel->setDynamicSortFilter(true);
 
-  StringValidator *engineValidator = new StringValidator(this);
+  StringValidator* engineValidator = new StringValidator(this);
   engineValidator->setModel(m_proxyModel);
 
   connect(ui->m_redEngineComboBox, SIGNAL(currentIndexChanged(int)), this,
@@ -95,7 +97,7 @@ NewGameDialog::NewGameDialog(EngineManager *engineManager, QWidget *parent)
 
 NewGameDialog::~NewGameDialog() { delete ui; }
 
-ChessGame *NewGameDialog::createGame() const {
+ChessGame* NewGameDialog::createGame() const {
   bool ok = true;
   const QString variant = ui->m_gameSettings->chessVariant();
   auto board = Chess::BoardFactory::create(variant);
@@ -120,8 +122,7 @@ ChessGame *NewGameDialog::createGame() const {
 
     for (int i = 0; i < 2; i++) {
       auto side = Chess::Side::Type(i);
-      if (playerType(side) == CPU)
-        game->setOpeningBook(book, side, depth);
+      if (playerType(side) == CPU) game->setOpeningBook(book, side, depth);
     }
   }
 
@@ -133,7 +134,7 @@ ChessGame *NewGameDialog::createGame() const {
   return game;
 }
 
-PlayerBuilder *NewGameDialog::createPlayerBuilder(Chess::Side side) const {
+PlayerBuilder* NewGameDialog::createPlayerBuilder(Chess::Side side) const {
   if (playerType(side) == CPU) {
     auto config = m_engineConfig[side];
     ui->m_gameSettings->applyEngineConfiguration(&config);
@@ -155,10 +156,8 @@ void NewGameDialog::setPlayerType(Chess::Side side, PlayerType type) {
   }
 
   int humanCount = 0;
-  if (playerType(Chess::Side::Red) == Human)
-    humanCount++;
-  if (playerType(Chess::Side::Black) == Human)
-    humanCount++;
+  if (playerType(Chess::Side::Red) == Human) humanCount++;
+  if (playerType(Chess::Side::Black) == Human) humanCount++;
   ui->m_gameSettings->onHumanCountChanged(humanCount);
 }
 
@@ -186,7 +185,7 @@ void NewGameDialog::configureEngine() {
     m_engineConfig[side] = dlg.engineConfiguration();
 }
 
-void NewGameDialog::onVariantChanged(const QString &variant) {
+void NewGameDialog::onVariantChanged(const QString& variant) {
   m_proxyModel->setFilterVariant(variant);
 
   bool empty = m_proxyModel->rowCount() == 0;

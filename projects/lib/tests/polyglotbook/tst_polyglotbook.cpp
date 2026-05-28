@@ -1,18 +1,19 @@
-#include <QMap>
-#include <QtTest/QtTest>
 #include <board/standardboard.h>
 #include <polyglotbook.h>
+
+#include <QMap>
+#include <QtTest/QtTest>
 
 class tst_PolyglotBook : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void initialValues();
   void startPos();
 
-private:
-  QMap<QString, quint16> entries(const OpeningBook *book,
-                                 Chess::Board *board) const;
+ private:
+  QMap<QString, quint16> entries(const OpeningBook* book,
+                                 Chess::Board* board) const;
 };
 
 void tst_PolyglotBook::initialValues() {
@@ -23,8 +24,8 @@ void tst_PolyglotBook::initialValues() {
   QVERIFY(book.entries(1234).isEmpty());
 }
 
-QMap<QString, quint16> tst_PolyglotBook::entries(const OpeningBook *book,
-                                                 Chess::Board *board) const {
+QMap<QString, quint16> tst_PolyglotBook::entries(const OpeningBook* book,
+                                                 Chess::Board* board) const {
   QMap<QString, quint16> ret;
 
   for (auto entry : book->entries(board->key())) {

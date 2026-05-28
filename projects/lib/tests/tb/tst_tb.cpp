@@ -1,12 +1,13 @@
-#include <QDir>
-#include <QtTest/QtTest>
 #include <board/standardboard.h>
 #include <board/syzygytablebase.h>
+
+#include <QDir>
+#include <QtTest/QtTest>
 
 class tst_Tb : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void initTestCase();
 
   void tbInitialized();
@@ -16,15 +17,14 @@ private slots:
 
   void cleanupTestCase();
 
-private:
+ private:
   Chess::StandardBoard m_board;
 };
 
 void tst_Tb::initTestCase() {
   const auto path = QLatin1String("tb_path");
   QDir dir(path);
-  if (!dir.exists())
-    QSKIP("Syzygy tablebases not available");
+  if (!dir.exists()) QSKIP("Syzygy tablebases not available");
 
   SyzygyTablebase::initialize(path);
 }
@@ -66,7 +66,7 @@ void tst_Tb::positions_data() const {
                          << "1/2-1/2" << 0;
   QTest::newRow("pos12") << "2K4N/8/8/8/7p/5k2/8/8 w - - 0 1"
                          << "0-1" << 4;
-  QTest::newRow("pos13") // TCEC9 superfinal game 17.
+  QTest::newRow("pos13")  // TCEC9 superfinal game 17.
       << "K5Q1/8/8/8/5bb1/6k1/8/8 b - - 0 72"
       << "1/2-1/2" << 124;
 }

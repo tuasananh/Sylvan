@@ -20,18 +20,19 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "genericmove.h"
-#include "move.h"
-#include "piece.h"
-#include "result.h"
-#include "square.h"
-#include "zobrist.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QSharedPointer>
 #include <QString>
 #include <QVarLengthArray>
 #include <QVector>
+
+#include "genericmove.h"
+#include "move.h"
+#include "piece.h"
+#include "result.h"
+#include "square.h"
+#include "zobrist.h"
 
 class QStringList;
 
@@ -58,11 +59,11 @@ class BoardTransition;
 class LIB_EXPORT Board {
   Q_DECLARE_TR_FUNCTIONS(Board)
 
-public:
+ public:
   /*! Notation for move strings. */
   enum MoveNotation {
     Standard,
-    LongAlgebraic //!< Long Algebraic/Coordinate notation.
+    LongAlgebraic  //!< Long Algebraic/Coordinate notation.
   };
   /*! Notation for FEN strings. */
   enum FenNotation {
@@ -82,11 +83,11 @@ public:
    * and comparing positions. The Board class takes ownerGuardp of
    * the zobrist object and takes care of deleting it.
    */
-  Board(Zobrist *zobrist);
+  Board(Zobrist* zobrist);
   /*! Destructs the Board object. */
   virtual ~Board();
   /*! Creates and returns a deep copy of this board. */
-  virtual Board *copy() const = 0;
+  virtual Board* copy() const = 0;
 
   /*! Returns the name of the chess variant. */
   virtual QString variant() const = 0;
@@ -118,11 +119,11 @@ public:
   void initialize();
 
   /*! Returns true if \a square is on the board. */
-  bool isValidSquare(const Square &square) const;
+  bool isValidSquare(const Square& square) const;
 
-  bool isInFort(const Square &square) const;
+  bool isInFort(const Square& square) const;
 
-  bool isPassed(const Square &square) const;
+  bool isPassed(const Square& square) const;
 
   /*!
    * Returns list of the pieces of \a side in current position.
@@ -146,7 +147,7 @@ public:
    *
    * Returns true if successful; otherwise returns false.
    */
-  bool setFenString(const QString &fen);
+  bool setFenString(const QString& fen);
   /*!
    * Sets the board position to the default starting position
    * of the chess variant.
@@ -163,7 +164,7 @@ public:
   /*! Returns the side that made/makes the first move. */
   Side startingSide() const;
   /*! Returns the piece at \a square. */
-  Piece pieceAt(const Square &square) const;
+  Piece pieceAt(const Square& square) const;
   /*! Returns the number of halfmoves (plies) played. */
   int plyCount() const;
   /*!
@@ -180,7 +181,7 @@ public:
   /*! Converts \a piece into a piece symbol. */
   QString pieceSymbol(Piece piece) const;
   /*! Converts \a pieceSymbol into a Piece object. */
-  Piece pieceFromSymbol(const QString &pieceSymbol) const;
+  Piece pieceFromSymbol(const QString& pieceSymbol) const;
   /*! Returns the internationalized name of \a pieceType. */
   QString pieceString(int pieceType) const;
   /*! Returns symbol for graphical representation of \a piece. */
@@ -194,7 +195,7 @@ public:
    * useful mainly for updating a graphical representation of
    * the board.
    */
-  void makeMove(const Move &move, BoardTransition *transition = nullptr);
+  void makeMove(const Move& move, BoardTransition* transition = nullptr);
   /*! Reverses the last move. */
   void undoMove();
 
@@ -204,7 +205,7 @@ public:
    * \note The board must be in a position where \a move can be made.
    * \sa moveFromString()
    */
-  QString moveString(const Move &move, MoveNotation notation);
+  QString moveString(const Move& move, MoveNotation notation);
   /*!
    * Converts a move string into a Move.
    *
@@ -213,31 +214,31 @@ public:
    * that's specified in MoveNotation.
    * \sa moveString()
    */
-  Move moveFromString(const QString &str);
+  Move moveFromString(const QString& str);
 
-  virtual Move moveFromStandardString(const QString &str) = 0;
+  virtual Move moveFromStandardString(const QString& str) = 0;
   /*!
    * Converts a GenericMove into a Move.
    *
    * \note The board must be in a position where \a move can be made.
    * \sa genericMove()
    */
-  Move moveFromGenericMove(const GenericMove &move) const;
+  Move moveFromGenericMove(const GenericMove& move) const;
   /*!
    * Converts a Move into a GenericMove.
    *
    * \note The board must be in a position where \a move can be made.
    * \sa moveFromGenericMove()
    */
-  GenericMove genericMove(const Move &move) const;
+  GenericMove genericMove(const Move& move) const;
 
   /*! Returns true if \a move is legal in the current position. */
-  bool isLegalMove(const Move &move);
+  bool isLegalMove(const Move& move);
   /*!
    * Returns true if \a move repeats a position that was
    * reached earlier in the game.
    */
-  bool isRepetition(const Move &move);
+  bool isRepetition(const Move& move);
   /*! Returns a vector of legal moves in the current position. */
   QVector<Move> legalMoves();
 
@@ -251,9 +252,9 @@ public:
    *
    * The default implementation always returns a null result.
    */
-  virtual Result tablebaseResult(unsigned int *dtm = nullptr) const;
+  virtual Result tablebaseResult(unsigned int* dtm = nullptr) const;
 
-protected:
+ protected:
   /*!
    * Initializes the variant.
    *
@@ -276,8 +277,8 @@ protected:
    * \param gsymbol Select the piece's graphical representation.
    *	  If not set the \a symbol will be used (default).
    */
-  void setPieceType(int type, const QString &name, const QString &symbol,
-                    const QString &gsymbol = QString());
+  void setPieceType(int type, const QString& name, const QString& symbol,
+                    const QString& gsymbol = QString());
 
   /*!
    * Makes \a move on the board.
@@ -290,7 +291,7 @@ protected:
    * etc. should be stored in \a transition. If \a transition is
    * 0 then it should be ignored.
    */
-  virtual void vMakeMove(const Move &move, BoardTransition *transition) = 0;
+  virtual void vMakeMove(const Move& move, BoardTransition* transition) = 0;
   /*!
    * Reverses \a move on the board.
    *
@@ -300,35 +301,35 @@ protected:
    * \note Unlike vMakeMove(), this function doesn't require
    * subclasses to update the zobrist position key.
    */
-  virtual void vUndoMove(const Move &move) = 0;
+  virtual void vUndoMove(const Move& move) = 0;
 
   /*! Converts a square index into a Square object. */
   Square chessSquare(int index) const;
   /*! Converts a string into a Square object. */
-  Square chessSquare(const QString &str) const;
+  Square chessSquare(const QString& str) const;
   /*! Converts a Square object into a square index. */
-  int squareIndex(const Square &square) const;
+  int squareIndex(const Square& square) const;
   /*! Converts a string into a square index. */
-  int squareIndex(const QString &str) const;
+  int squareIndex(const QString& str) const;
   /*! Converts a square index into a string. */
   QString squareString(int index) const;
   /*! Converts a Square object into a string. */
-  QString squareString(const Square &square) const;
+  QString squareString(const Square& square) const;
 
   /*!
    * Converts a Move object into a string in Long
    * Algebraic Notation (LAN)
    */
-  virtual QString lanMoveString(const Move &move);
+  virtual QString lanMoveString(const Move& move);
   /*!
    * Converts a Move object into a string in Standard
    * Algebraic Notation (SAN).
    *
    * \note Specs: http://en.wikipedia.org/wiki/Algebraic_chess_notation
    */
-  virtual QString standardMoveString(const Move &move) = 0;
+  virtual QString standardMoveString(const Move& move) = 0;
   /*! Converts a string in LAN format into a Move object. */
-  virtual Move moveFromEnglishString(const QString &str);
+  virtual Move moveFromEnglishString(const QString& str);
 
   /*!
    * Returns the latter part of the current position's FEN string.
@@ -345,7 +346,7 @@ protected:
    * to move and hand pieces are handled by the base class. This
    * function reads the rest of the string, if any.
    */
-  virtual bool vSetFenString(const QStringList &fen) = 0;
+  virtual bool vSetFenString(const QStringList& fen) = 0;
 
   /*!
    * Generates pseudo-legal moves for pieces of type \a pieceType.
@@ -354,7 +355,7 @@ protected:
    * for every piece type.
    * \sa legalMoves()
    */
-  void generateMoves(QVarLengthArray<Move> &moves,
+  void generateMoves(QVarLengthArray<Move>& moves,
                      int pieceType = Piece::NoPiece) const;
 
   /*!
@@ -364,7 +365,7 @@ protected:
    * \note It doesn't matter if \a square doesn't contain a piece of
    * \a pieceType, the move generator ignores it.
    */
-  virtual void generateMovesForPiece(QVarLengthArray<Move> &moves,
+  virtual void generateMovesForPiece(QVarLengthArray<Move>& moves,
                                      int pieceType, int square) const = 0;
   /*!
    * Generates hopping moves for a piece.
@@ -374,8 +375,8 @@ protected:
    * \note The generated \a moves include captures
    */
   void generateHoppingMoves(int sourceSquare,
-                            const QVarLengthArray<int> &offsets,
-                            QVarLengthArray<Move> &moves) const;
+                            const QVarLengthArray<int>& offsets,
+                            QVarLengthArray<Move>& moves) const;
   /*!
    * Generates sliding moves for a piece.
    *
@@ -383,8 +384,8 @@ protected:
    * \param offsets An array of offsets for the target square
    * \note The generated \a moves include captures
    */
-  void generateCheMoves(int sourceSquare, const QVarLengthArray<int> &offsets,
-                        QVarLengthArray<Move> &moves) const;
+  void generateCheMoves(int sourceSquare, const QVarLengthArray<int>& offsets,
+                        QVarLengthArray<Move>& moves) const;
   /*!
    * Returns true if the current position is a legal position.
    * If the position isn't legal it usually means that the last
@@ -402,7 +403,7 @@ protected:
    * The default implementation only checks if the position
    * after \a move is legal.
    */
-  virtual bool vIsLegalMove(const Move &move);
+  virtual bool vIsLegalMove(const Move& move);
 
   virtual bool inCheck(Side side) const = 0;
 
@@ -412,14 +413,14 @@ protected:
    * Returns the type of piece captured by \a move.
    * Returns Piece::NoPiece if \a move is not a capture.
    */
-  virtual int captureType(const Move &move) const;
+  virtual int captureType(const Move& move) const;
   /*! Updates the zobrist position key with \a key. */
   void xorKey(quint64 key);
   /*!
    * Returns true if a pseudo-legal move \a move exists.
    * \sa isLegalMove()
    */
-  bool moveExists(const Move &move) const;
+  bool moveExists(const Move& move) const;
   /*! Returns true if the side to move has any legal moves. */
   bool canMove();
   /*!
@@ -437,7 +438,7 @@ protected:
    */
   void setSquare(int square, Piece piece);
   /*! Returns the last move made in the game. */
-  const Move &lastMove() const;
+  const Move& lastMove() const;
   /*!
    * Returns the reserve piece type corresponding to \a pieceType.
    *
@@ -449,7 +450,7 @@ protected:
    */
   virtual int reserveType(int pieceType) const;
 
-private:
+ private:
   struct PieceData {
     QString name;
     QString symbol;
@@ -459,7 +460,7 @@ private:
     Move move;
     quint64 key;
   };
-  friend LIB_EXPORT QDebug operator<<(QDebug dbg, const Board *board);
+  friend LIB_EXPORT QDebug operator<<(QDebug dbg, const Board* board);
 
   bool m_initialized;
   int m_width;
@@ -468,14 +469,14 @@ private:
   Side m_startingSide;
   QString m_startingFen;
   quint64 m_key;
-  Zobrist *m_zobrist;
+  Zobrist* m_zobrist;
   QSharedPointer<Zobrist> m_sharedZobrist;
   QVarLengthArray<PieceData> m_pieceData;
   QVarLengthArray<Piece> m_squares;
   QVector<MoveData> m_moveHistory;
 };
 
-extern LIB_EXPORT QDebug operator<<(QDebug dbg, const Board *board);
+extern LIB_EXPORT QDebug operator<<(QDebug dbg, const Board* board);
 
 inline int Board::arraySize() const { return m_squares.size(); }
 
@@ -492,18 +493,16 @@ inline void Board::xorKey(quint64 key) { m_key ^= key; }
 inline Piece Board::pieceAt(int square) const { return m_squares[square]; }
 
 inline void Board::setSquare(int square, Piece piece) {
-  Piece &old = m_squares[square];
-  if (old.isValid())
-    xorKey(m_zobrist->piece(old, square));
-  if (piece.isValid())
-    xorKey(m_zobrist->piece(piece, square));
+  Piece& old = m_squares[square];
+  if (old.isValid()) xorKey(m_zobrist->piece(old, square));
+  if (piece.isValid()) xorKey(m_zobrist->piece(piece, square));
 
   old = piece;
 }
 
 inline int Board::plyCount() const { return m_moveHistory.size(); }
 
-inline const Move &Board::lastMove() const { return m_moveHistory.last().move; }
+inline const Move& Board::lastMove() const { return m_moveHistory.last().move; }
 
-} // namespace Chess
-#endif // BOARD_H
+}  // namespace Chess
+#endif  // BOARD_H

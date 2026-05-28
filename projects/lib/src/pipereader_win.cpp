@@ -18,11 +18,18 @@
 */
 
 #include "pipereader_win.h"
+
 #include <QMutexLocker>
 
-PipeReader::PipeReader(HANDLE pipe, QObject *parent)
-    : QThread(parent), m_pipe(pipe), m_bufEnd(m_buf + BufSize), m_start(m_buf),
-      m_end(m_buf), m_freeBytes(BufSize), m_usedBytes(0), m_lastNewLine(1) {
+PipeReader::PipeReader(HANDLE pipe, QObject* parent)
+    : QThread(parent),
+      m_pipe(pipe),
+      m_bufEnd(m_buf + BufSize),
+      m_start(m_buf),
+      m_end(m_buf),
+      m_freeBytes(BufSize),
+      m_usedBytes(0),
+      m_lastNewLine(1) {
   Q_ASSERT(m_pipe != INVALID_HANDLE_VALUE);
 }
 
@@ -35,10 +42,9 @@ bool PipeReader::canReadLine() const {
   return m_lastNewLine <= m_usedBytes.available();
 }
 
-qint64 PipeReader::readData(char *data, qint64 maxSize) {
+qint64 PipeReader::readData(char* data, qint64 maxSize) {
   int n = qMin(int(maxSize), m_usedBytes.available());
-  if (n <= 0)
-    return -1;
+  if (n <= 0) return -1;
   m_usedBytes.acquire(n);
 
   // Copy the first (possibly the only) block of data
@@ -47,8 +53,7 @@ qint64 PipeReader::readData(char *data, qint64 maxSize) {
   m_start += size1;
 
   Q_ASSERT(m_start <= m_bufEnd);
-  if (m_start == m_bufEnd)
-    m_start = m_buf;
+  if (m_start == m_bufEnd) m_start = m_buf;
 
   // Copy the second block of data from the beginning
   int size2 = n - size1;
@@ -57,8 +62,7 @@ qint64 PipeReader::readData(char *data, qint64 maxSize) {
     m_start += size2;
 
     Q_ASSERT(m_start <= m_bufEnd);
-    if (m_start == m_bufEnd)
-      m_start = m_buf;
+    if (m_start == m_bufEnd) m_start = m_buf;
   }
   Q_ASSERT(n == size1 + size2);
 
@@ -94,15 +98,13 @@ void PipeReader::run() {
       }
     }
 
-    if (m_end == m_bufEnd)
-      m_end = m_buf;
+    if (m_end == m_bufEnd) m_end = m_buf;
 
     m_freeBytes.release(maxSize - dwRead);
     m_usedBytes.release(dwRead);
 
     // To avoid signal spam, send the 'readyRead' signal only
     // if we have a whole line of new data
-    if (m_lastNewLine <= int(dwRead))
-      emit readyRead();
+    if (m_lastNewLine <= int(dwRead)) emit readyRead();
   }
 }

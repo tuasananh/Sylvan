@@ -20,10 +20,11 @@
 #ifndef ENGINEPROCESS_WIN_H
 #define ENGINEPROCESS_WIN_H
 
+#include <windows.h>
+
 #include <QIODevice>
 #include <QMutex>
 #include <QString>
-#include <windows.h>
 
 class PipeReader;
 
@@ -43,15 +44,15 @@ class PipeReader;
 class LIB_EXPORT EngineProcess : public QIODevice {
   Q_OBJECT
 
-public:
+ public:
   /*! The process' exit status. */
   enum ExitStatus {
-    NormalExit, //!< The process exited normally
-    CrashExit   //!< The process crashed
+    NormalExit,  //!< The process exited normally
+    CrashExit    //!< The process crashed
   };
 
   /*! Creates a new EngineProcess. */
-  explicit EngineProcess(QObject *parent = nullptr);
+  explicit EngineProcess(QObject* parent = nullptr);
   /*!
    * Destructs the EngineProcess and frees all resources.
    * If the process is still running, it is killed.
@@ -79,13 +80,13 @@ public:
    * Sets the working directory to dir.
    * EngineProcess will start the process in this directory.
    */
-  void setWorkingDirectory(const QString &dir);
+  void setWorkingDirectory(const QString& dir);
   /*!
    * Redirects the process' standard error to the file fileName.
    * The file will be appended to if mode is Append; otherwise
    * it will be truncated.
    */
-  void setStandardErrorFile(const QString &fileName, OpenMode mode = Truncate);
+  void setStandardErrorFile(const QString& fileName, OpenMode mode = Truncate);
 
   /*!
    * Starts the program \a program in a new process, passing the
@@ -98,10 +99,10 @@ public:
    * \note To check if the process started successfully, call
    * the waitForStarted() method.
    */
-  void start(const QString &program, const QStringList &arguments,
+  void start(const QString& program, const QStringList& arguments,
              OpenMode mode = ReadWrite);
   /*! Starts the program \a program with OpenMode \a mode. */
-  void start(const QString &program, OpenMode mode = ReadWrite);
+  void start(const QString& program, OpenMode mode = ReadWrite);
 
   /*!
    * Blocks until the process has finished and the finished()
@@ -121,11 +122,11 @@ public:
    */
   bool waitForStarted(int msecs = 30000);
 
-public slots:
+ public slots:
   /*! Kills the process, causing it to exit immediately. */
   void kill();
 
-signals:
+ signals:
   /*!
    * Emitted when the process finishes.
    * \param exitCode exit code of the process
@@ -133,27 +134,27 @@ signals:
    */
   void finished(int exitCode, ExitStatus exitStatus);
 
-protected:
+ protected:
   // Inherited from QIODevice
-  virtual qint64 readData(char *data, qint64 maxSize);
-  virtual qint64 writeData(const char *data, qint64 maxSize);
+  virtual qint64 readData(char* data, qint64 maxSize);
+  virtual qint64 writeData(const char* data, qint64 maxSize);
 
-private slots:
+ private slots:
   void onFinished();
 
-private:
+ private:
   static QString quote(QString str);
   static QString unquote(QString str);
-  static QString cmdLine(const QString &wdir, const QString &prog,
-                         const QStringList &args);
-  static HANDLE createFile(const QString &fileName, OpenMode mode);
+  static QString cmdLine(const QString& wdir, const QString& prog,
+                         const QStringList& args);
+  static HANDLE createFile(const QString& fileName, OpenMode mode);
   static HANDLE mainJob();
 
   static HANDLE s_job;
   static QMutex s_mutex;
 
   void cleanup();
-  void killHandle(HANDLE *handle);
+  void killHandle(HANDLE* handle);
 
   bool m_started;
   bool m_finished;
@@ -166,7 +167,7 @@ private:
   HANDLE m_inWrite;
   HANDLE m_outRead;
   HANDLE m_errRead;
-  PipeReader *m_reader;
+  PipeReader* m_reader;
 };
 
-#endif // ENGINEPROCESS_WIN_H
+#endif  // ENGINEPROCESS_WIN_H

@@ -17,18 +17,18 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "autoverticalscroller.h"
+
 #include <QAbstractItemView>
 #include <QScrollBar>
 
-#include "autoverticalscroller.h"
-
-AutoVerticalScroller::AutoVerticalScroller(QAbstractItemView *view,
-                                           QObject *parent)
+AutoVerticalScroller::AutoVerticalScroller(QAbstractItemView* view,
+                                           QObject* parent)
     : QObject(parent), m_view(view), m_scrollToBottom(false) {
   connect(m_view->model(),
-          SIGNAL(rowsAboutToBeInserted(const QModelIndex &, int, int)), this,
+          SIGNAL(rowsAboutToBeInserted(const QModelIndex&, int, int)), this,
           SLOT(onRowsAboutToBeInserted()));
-  connect(m_view->model(), SIGNAL(rowsInserted(const QModelIndex &, int, int)),
+  connect(m_view->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)),
           this, SLOT(onRowsInserted()));
 }
 
@@ -38,6 +38,5 @@ void AutoVerticalScroller::onRowsAboutToBeInserted() {
 }
 
 void AutoVerticalScroller::onRowsInserted() {
-  if (m_scrollToBottom)
-    m_view->scrollToBottom();
+  if (m_scrollToBottom) m_view->scrollToBottom();
 }

@@ -20,9 +20,10 @@
 #ifndef BOARDTRANSITION_H
 #define BOARDTRANSITION_H
 
+#include <QList>
+
 #include "piece.h"
 #include "square.h"
-#include <QList>
 
 namespace Chess {
 
@@ -39,11 +40,11 @@ namespace Chess {
  * \sa Board::makeMove()
  */
 class LIB_EXPORT BoardTransition {
-public:
+ public:
   /*! \brief Movement on the board. */
   struct Move {
-    Square source; //!< Source square
-    Square target; //!< Target square
+    Square source;  //!< Source square
+    Square target;  //!< Target square
   };
 
   /*! Creates a new empty BoardTransition object. */
@@ -65,19 +66,19 @@ public:
   QList<Square> squares() const;
 
   /*! Adds a new "move" from \a source to \a target. */
-  void addMove(const Square &source, const Square &target);
+  void addMove(const Square& source, const Square& target);
   /*!
    * Adds a new changed square.
    *
    * If \a square already exists in the transition, this
    * function does nothing.
    */
-  void addSquare(const Square &square);
+  void addSquare(const Square& square);
 
-private:
+ private:
   QList<Move> m_moves;
   QList<Square> m_squares;
 };
 
-} // namespace Chess
-#endif // BOARDTRANSITION_H
+}  // namespace Chess
+#endif  // BOARDTRANSITION_H

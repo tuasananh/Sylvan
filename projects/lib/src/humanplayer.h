@@ -36,17 +36,17 @@
 class LIB_EXPORT HumanPlayer : public ChessPlayer {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new human player. */
-  HumanPlayer(QObject *parent = nullptr);
+  HumanPlayer(QObject* parent = nullptr);
 
   // Inherted from ChessPlayer
-  virtual void endGame(const Chess::Result &result);
-  virtual void makeMove(const Chess::Move &move);
-  virtual bool supportsVariant(const QString &variant) const;
+  virtual void endGame(const Chess::Result& result);
+  virtual void makeMove(const Chess::Move& move);
+  virtual bool supportsVariant(const QString& variant) const;
   virtual bool isHuman() const;
 
-public slots:
+ public slots:
   /*!
    * Plays \a move as the human player's next move if
    * \a side is the player's side and the move is legal;
@@ -57,9 +57,9 @@ public slots:
    * it saves the move for later, emits the wokeUp() signal,
    * and plays the move when it gets its turn.
    */
-  void onHumanMove(const Chess::GenericMove &move, const Chess::Side &side);
+  void onHumanMove(const Chess::GenericMove& move, const Chess::Side& side);
 
-signals:
+ signals:
   /*!
    * This signal is emitted when the player receives a
    * user-made move in \a Observing state.
@@ -69,13 +69,13 @@ signals:
    */
   void wokeUp();
 
-protected:
+ protected:
   // Inherited from ChessPlayer
   virtual void startGame();
   virtual void startThinking();
 
-private:
+ private:
   Chess::GenericMove m_bufferMove;
 };
 
-#endif // HUMANPLAYER_H
+#endif  // HUMANPLAYER_H

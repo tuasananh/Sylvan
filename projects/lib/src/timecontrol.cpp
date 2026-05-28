@@ -17,18 +17,17 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "timecontrol.h"
+
 #include <QSettings>
 #include <QStringList>
-
-#include "timecontrol.h"
 
 namespace {
 
 QString s_timeString(int ms) {
   if (ms == 0 || ms % 60000 != 0)
     return TimeControl::tr("%1 sec").arg(double(ms) / 1000.0);
-  if (ms % 3600000 != 0)
-    return TimeControl::tr("%1 min").arg(ms / 60000);
+  if (ms % 3600000 != 0) return TimeControl::tr("%1 min").arg(ms / 60000);
   return TimeControl::tr("%1 h").arg(ms / 3600000);
 }
 
@@ -40,18 +39,34 @@ QString s_nodeString(qint64 nodes) {
   return TimeControl::tr("%1 M").arg(nodes / 1000000);
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 TimeControl::TimeControl()
-    : m_movesPerTc(0), m_timePerTc(0), m_timePerMove(0), m_increment(0),
-      m_timeLeft(0), m_movesLeft(0), m_plyLimit(0), m_nodeLimit(0),
-      m_lastMoveTime(0), m_expiryMargin(0), m_expired(false),
+    : m_movesPerTc(0),
+      m_timePerTc(0),
+      m_timePerMove(0),
+      m_increment(0),
+      m_timeLeft(0),
+      m_movesLeft(0),
+      m_plyLimit(0),
+      m_nodeLimit(0),
+      m_lastMoveTime(0),
+      m_expiryMargin(0),
+      m_expired(false),
       m_infinite(false) {}
 
-TimeControl::TimeControl(const QString &str)
-    : m_movesPerTc(0), m_timePerTc(0), m_timePerMove(0), m_increment(0),
-      m_timeLeft(0), m_movesLeft(0), m_plyLimit(0), m_nodeLimit(0),
-      m_lastMoveTime(0), m_expiryMargin(0), m_expired(false),
+TimeControl::TimeControl(const QString& str)
+    : m_movesPerTc(0),
+      m_timePerTc(0),
+      m_timePerMove(0),
+      m_increment(0),
+      m_timeLeft(0),
+      m_movesLeft(0),
+      m_plyLimit(0),
+      m_nodeLimit(0),
+      m_lastMoveTime(0),
+      m_expiryMargin(0),
+      m_expired(false),
       m_infinite(false) {
   if (str == "inf") {
     setInfinity(true);
@@ -63,8 +78,7 @@ TimeControl::TimeControl(const QString &str)
   // increment
   if (list.size() == 2) {
     int inc = (int)(list.at(1).toDouble() * 1000);
-    if (inc >= 0)
-      setTimeIncrement(inc);
+    if (inc >= 0) setTimeIncrement(inc);
   }
 
   list = list.at(0).split('/');
@@ -73,8 +87,7 @@ TimeControl::TimeControl(const QString &str)
   // moves per tc
   if (list.size() == 2) {
     int nmoves = list.at(0).toInt();
-    if (nmoves >= 0)
-      setMovesPerTc(nmoves);
+    if (nmoves >= 0) setMovesPerTc(nmoves);
     strTime = list.at(1);
   } else
     strTime = list.at(0);
@@ -87,11 +100,10 @@ TimeControl::TimeControl(const QString &str)
   else
     ms = (int)(list.at(0).toDouble() * 1000);
 
-  if (ms > 0)
-    setTimePerTc(ms);
+  if (ms > 0) setTimePerTc(ms);
 }
 
-bool TimeControl::operator==(const TimeControl &other) const {
+bool TimeControl::operator==(const TimeControl& other) const {
   if (m_movesPerTc == other.m_movesPerTc && m_timePerTc == other.m_timePerTc &&
       m_timePerMove == other.m_timePerMove &&
       m_increment == other.m_increment && m_plyLimit == other.m_plyLimit &&
@@ -109,18 +121,15 @@ bool TimeControl::isValid() const {
 }
 
 QString TimeControl::toString() const {
-  if (!isValid())
-    return QString();
+  if (!isValid()) return QString();
 
-  if (m_infinite)
-    return QString("inf");
+  if (m_infinite) return QString("inf");
 
   if (m_timePerMove != 0)
     return QString("%1 sec/move").arg((double)m_timePerMove / 1000);
 
   QString str;
-  if (m_movesPerTc > 0)
-    str += QString::number(m_movesPerTc) + "/";
+  if (m_movesPerTc > 0) str += QString::number(m_movesPerTc) + "/";
   str += QString::number((double)m_timePerTc / 1000);
 
   if (m_increment > 0)
@@ -129,8 +138,7 @@ QString TimeControl::toString() const {
 }
 
 QString TimeControl::toVerboseString() const {
-  if (!isValid())
-    return QString();
+  if (!isValid()) return QString();
 
   QString str;
 
@@ -145,12 +153,9 @@ QString TimeControl::toVerboseString() const {
 
   if (m_timePerTc != 0 && m_increment != 0)
     str += tr(", %1 increment").arg(s_timeString(m_increment));
-  if (m_nodeLimit != 0)
-    str += tr(", %1 nodes").arg(s_nodeString(m_nodeLimit));
-  if (m_plyLimit != 0)
-    str += tr(", %1 plies").arg(m_plyLimit);
-  if (m_expiryMargin != 0)
-    str += tr(", %1 ms margin").arg(m_expiryMargin);
+  if (m_nodeLimit != 0) str += tr(", %1 nodes").arg(s_nodeString(m_nodeLimit));
+  if (m_plyLimit != 0) str += tr(", %1 plies").arg(m_plyLimit);
+  if (m_expiryMargin != 0) str += tr(", %1 ms margin").arg(m_expiryMargin);
 
   return str;
 }
@@ -249,8 +254,7 @@ void TimeControl::update(bool applyIncrement) {
     setTimeLeft(m_timePerMove);
   else {
     int newTimeLeft = m_timeLeft - m_lastMoveTime;
-    if (applyIncrement)
-      newTimeLeft += m_increment;
+    if (applyIncrement) newTimeLeft += m_increment;
     setTimeLeft(newTimeLeft);
 
     if (m_movesPerTc > 0) {
@@ -270,12 +274,11 @@ int TimeControl::lastMoveTime() const { return m_lastMoveTime; }
 bool TimeControl::expired() const { return m_expired; }
 
 int TimeControl::activeTimeLeft() const {
-  if (m_time.isValid())
-    return m_timeLeft - m_time.elapsed();
+  if (m_time.isValid()) return m_timeLeft - m_time.elapsed();
   return m_timeLeft;
 }
 
-void TimeControl::readSettings(QSettings *settings) {
+void TimeControl::readSettings(QSettings* settings) {
   settings->beginGroup("time_control");
 
   m_movesPerTc = settings->value("moves_per_tc", m_movesPerTc).toInt();
@@ -290,7 +293,7 @@ void TimeControl::readSettings(QSettings *settings) {
   settings->endGroup();
 }
 
-void TimeControl::writeSettings(QSettings *settings) {
+void TimeControl::writeSettings(QSettings* settings) {
   settings->beginGroup("time_control");
 
   settings->setValue("moves_per_tc", m_movesPerTc);

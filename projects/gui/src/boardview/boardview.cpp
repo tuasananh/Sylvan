@@ -17,14 +17,15 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "boardview.h"
+
 #include <QPainter>
 #include <QResizeEvent>
 #include <QTimer>
 
-#include "boardview.h"
-
-BoardView::BoardView(QGraphicsScene *scene, QWidget *parent)
-    : QGraphicsView(scene, parent), m_initialized(false),
+BoardView::BoardView(QGraphicsScene* scene, QWidget* parent)
+    : QGraphicsView(scene, parent),
+      m_initialized(false),
       m_resizeTimer(new QTimer(this)) {
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -45,8 +46,7 @@ BoardView::BoardView(QGraphicsScene *scene, QWidget *parent)
 
 QSize BoardView::sizeHint() const {
   QSize size(sceneRect().size().toSize());
-  if (!size.isEmpty())
-    return size;
+  if (!size.isEmpty()) return size;
 
   return QSize(200, 200);
 }
@@ -61,7 +61,7 @@ int BoardView::heightForWidth(int width) const {
   return width;
 }
 
-void BoardView::paintEvent(QPaintEvent *event) {
+void BoardView::paintEvent(QPaintEvent* event) {
   if (!m_resizePixmap.isNull()) {
     QRect rect(viewport()->rect());
     qreal srcAr = qreal(m_resizePixmap.width()) / m_resizePixmap.height();
@@ -79,10 +79,9 @@ void BoardView::paintEvent(QPaintEvent *event) {
     QGraphicsView::paintEvent(event);
 }
 
-void BoardView::resizeEvent(QResizeEvent *event) {
+void BoardView::resizeEvent(QResizeEvent* event) {
   QGraphicsView::resizeEvent(event);
-  if (!m_initialized)
-    return;
+  if (!m_initialized) return;
 
   if (m_resizePixmap.isNull()) {
     m_resizePixmap = QPixmap(sceneRect().toRect().size());

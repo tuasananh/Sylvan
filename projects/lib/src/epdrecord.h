@@ -44,7 +44,7 @@ class QTextStream;
  * \sa OpeningSuite
  */
 class LIB_EXPORT EpdRecord {
-public:
+ public:
   /*! Creates a new empty EPD record. */
   EpdRecord();
 
@@ -52,12 +52,12 @@ public:
    * Reads and parses a record from \a stream.
    * Returns true if successful; otherwise returns false.
    */
-  bool parse(QTextStream &stream);
+  bool parse(QTextStream& stream);
   /*!
    * Returns true if the record contains an opcode that
    * matches \a opcode; otherwise returns false.
    */
-  bool hasOpcode(const QString &opcode) const;
+  bool hasOpcode(const QString& opcode) const;
   /*! Returns the record's FEN string. */
   QString fen() const;
   /*!
@@ -65,11 +65,11 @@ public:
    * An empty list is returned if the operation doesn't
    * have any operands.
    */
-  QStringList operands(const QString &opcode) const;
+  QStringList operands(const QString& opcode) const;
 
-private:
+ private:
   QString m_fen;
   QMap<QString, QStringList> m_operations;
 };
 
-#endif // EPDRECORD_H
+#endif  // EPDRECORD_H

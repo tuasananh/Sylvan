@@ -17,18 +17,23 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "movelist.h"
+
+#include <chessgame.h>
+
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QTextBrowser>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <chessgame.h>
 
-#include "movelist.h"
-
-MoveList::MoveList(QWidget *parent)
-    : QWidget(parent), m_game(nullptr), m_moveCount(0), m_startingSide(0),
-      m_selectedMove(-1), m_moveToBeSelected(-1),
+MoveList::MoveList(QWidget* parent)
+    : QWidget(parent),
+      m_game(nullptr),
+      m_moveCount(0),
+      m_startingSide(0),
+      m_selectedMove(-1),
+      m_moveToBeSelected(-1),
       m_selectionTimer(new QTimer(this)) {
   m_moveList = new QTextBrowser(this);
   m_moveList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -44,10 +49,10 @@ MoveList::MoveList(QWidget *parent)
   m_moveList->document()->setDefaultFont(font);
 #endif
 
-  connect(m_moveList, SIGNAL(anchorClicked(const QUrl &)), this,
-          SLOT(onLinkClicked(const QUrl &)));
+  connect(m_moveList, SIGNAL(anchorClicked(const QUrl&)), this,
+          SLOT(onLinkClicked(const QUrl&)));
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->addWidget(m_moveList);
   layout->setContentsMargins(0, 0, 0, 0);
   setLayout(layout);
@@ -65,7 +70,7 @@ MoveList::MoveList(QWidget *parent)
   m_moveList->installEventFilter(this);
 }
 
-void MoveList::insertMove(int ply, const QString &san, const QString &comment,
+void MoveList::insertMove(int ply, const QString& san, const QString& comment,
                           QTextCursor cursor) {
   Move move = {MoveNumberToken(ply, m_startingSide), MoveToken(ply, san),
                MoveCommentToken(ply, comment)};
@@ -83,13 +88,11 @@ void MoveList::insertMove(int ply, const QString &san, const QString &comment,
 
   m_moves.append(move);
 
-  if (editAsBlock)
-    cursor.endEditBlock();
+  if (editAsBlock) cursor.endEditBlock();
 }
 
-void MoveList::setGame(ChessGame *game, PgnGame *pgn) {
-  if (m_game != nullptr)
-    m_game->disconnect(this);
+void MoveList::setGame(ChessGame* game, PgnGame* pgn) {
+  if (m_game != nullptr) m_game->disconnect(this);
   m_game = game;
 
   if (pgn == nullptr) {
@@ -109,7 +112,7 @@ void MoveList::setGame(ChessGame *game, PgnGame *pgn) {
 
   m_startingSide = pgn->startingSide();
   m_moveCount = 0;
-  for (const PgnGame::MoveData &md : pgn->moves()) {
+  for (const PgnGame::MoveData& md : pgn->moves()) {
     insertMove(m_moveCount++, md.moveString, md.comment, cursor);
   }
   cursor.endEditBlock();
@@ -122,20 +125,19 @@ void MoveList::setGame(ChessGame *game, PgnGame *pgn) {
             this, SLOT(setMove(int, Chess::GenericMove, QString, QString)));
   }
 
-  QScrollBar *sb = m_moveList->verticalScrollBar();
+  QScrollBar* sb = m_moveList->verticalScrollBar();
   sb->setValue(sb->maximum());
 
   selectMove(m_moveCount - 1);
 }
 
-bool MoveList::eventFilter(QObject *obj, QEvent *event) {
+bool MoveList::eventFilter(QObject* obj, QEvent* event) {
   if (obj == m_moveList) {
     if (event->type() == QEvent::KeyPress) {
-      QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+      QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
       int index = m_moveToBeSelected;
       bool keyLeft = false;
-      if (index == -1)
-        index = m_selectedMove;
+      if (index == -1) index = m_selectedMove;
       if (keyEvent->key() == Qt::Key_Left) {
         keyLeft = true;
         index--;
@@ -144,8 +146,7 @@ bool MoveList::eventFilter(QObject *obj, QEvent *event) {
       else
         return true;
 
-      if (index != -1 && selectMove(index))
-        emit moveClicked(index, keyLeft);
+      if (index != -1 && selectMove(index)) emit moveClicked(index, keyLeft);
     }
     return false;
   }
@@ -153,11 +154,11 @@ bool MoveList::eventFilter(QObject *obj, QEvent *event) {
   return QWidget::eventFilter(obj, event);
 }
 
-void MoveList::onMoveMade(const Chess::GenericMove &move,
-                          const QString &sanString, const QString &comment) {
+void MoveList::onMoveMade(const Chess::GenericMove& move,
+                          const QString& sanString, const QString& comment) {
   Q_UNUSED(move);
 
-  QScrollBar *sb = m_moveList->verticalScrollBar();
+  QScrollBar* sb = m_moveList->verticalScrollBar();
   bool atEnd = sb->value() == sb->maximum();
 
   insertMove(m_moveCount++, sanString, comment);
@@ -168,23 +169,21 @@ void MoveList::onMoveMade(const Chess::GenericMove &move,
   if (m_moveToBeSelected == -1 && m_selectedMove == m_moveCount - 2)
     atLastMove = true;
 
-  if (atLastMove)
-    selectMove(m_moveCount - 1);
+  if (atLastMove) selectMove(m_moveCount - 1);
 
-  if (atEnd && atLastMove)
-    sb->setValue(sb->maximum());
+  if (atEnd && atLastMove) sb->setValue(sb->maximum());
 }
 
 // TODO: Handle changes to actual moves (eg. undo), not just comments
-void MoveList::setMove(int ply, const Chess::GenericMove &move,
-                       const QString &sanString, const QString &comment) {
+void MoveList::setMove(int ply, const Chess::GenericMove& move,
+                       const QString& sanString, const QString& comment) {
   Q_UNUSED(move);
   Q_UNUSED(sanString);
   Q_ASSERT(ply < m_moves.size());
 
   QTextCursor c(m_moveList->textCursor());
 
-  MoveCommentToken &commentToken(m_moves[ply].comment);
+  MoveCommentToken& commentToken(m_moves[ply].comment);
   int oldLength = commentToken.length();
   commentToken.setValue(comment);
   commentToken.select(c);
@@ -192,13 +191,12 @@ void MoveList::setMove(int ply, const Chess::GenericMove &move,
 
   int newLength = commentToken.length();
   int diff = newLength - oldLength;
-  if (diff == 0)
-    return;
+  if (diff == 0) return;
 
   for (int i = ply + 1; i < m_moves.size(); i++) {
     m_moves[i].number.move(diff);
     if (i == ply + 1) {
-      MoveNumberToken &nextNumber(m_moves[i].number);
+      MoveNumberToken& nextNumber(m_moves[i].number);
       oldLength = nextNumber.length();
       nextNumber.select(c);
       nextNumber.insert(c);
@@ -235,19 +233,16 @@ void MoveList::selectChosenMove() {
 }
 
 bool MoveList::selectMove(int moveNum) {
-  if (moveNum == -1)
-    moveNum = 0;
-  if (moveNum >= m_moveCount || m_moveCount <= 0)
-    return false;
-  if (moveNum == m_selectedMove)
-    return false;
+  if (moveNum == -1) moveNum = 0;
+  if (moveNum >= m_moveCount || m_moveCount <= 0) return false;
+  if (moveNum == m_selectedMove) return false;
 
   m_moveToBeSelected = moveNum;
   m_selectionTimer->start();
   return true;
 }
 
-void MoveList::onLinkClicked(const QUrl &url) {
+void MoveList::onLinkClicked(const QUrl& url) {
   bool ok;
   int ply = url.userName().toInt(&ok);
 
@@ -258,7 +253,7 @@ void MoveList::onLinkClicked(const QUrl &url) {
     return;
   }
 
-  const Move &move(m_moves.at(ply));
+  const Move& move(m_moves.at(ply));
   if (url.scheme() == "move") {
     emit moveClicked(ply, false);
   } else if (url.scheme() == "comment") {

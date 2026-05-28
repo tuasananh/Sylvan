@@ -20,9 +20,9 @@
 #ifndef GAMEDATABASESEARCHDIALOG_H
 #define GAMEDATABASESEARCHDIALOG_H
 
-#include <QDialog>
-
 #include <pgngamefilter.h>
+
+#include <QDialog>
 
 namespace Ui {
 class GameDatabaseSearchDialog;
@@ -36,20 +36,20 @@ class GameDatabaseSearchDialog;
 class GameDatabaseSearchDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs a new GameDatabaseSearchDialog. */
-  GameDatabaseSearchDialog(QWidget *parent = nullptr);
+  GameDatabaseSearchDialog(QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~GameDatabaseSearchDialog();
 
   /*! Returns the PGN filter. */
   PgnGameFilter filter() const;
 
-private slots:
+ private slots:
   void onResultChanged(int index);
 
-private:
-  Ui::GameDatabaseSearchDialog *ui;
+ private:
+  Ui::GameDatabaseSearchDialog* ui;
 };
 
-#endif // GAMEDATABASESEARCHDIALOG_H
+#endif  // GAMEDATABASESEARCHDIALOG_H

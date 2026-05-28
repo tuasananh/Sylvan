@@ -31,18 +31,18 @@ class GameWallWidget;
 class GameWall : public QWidget {
   Q_OBJECT
 
-public:
-  explicit GameWall(GameManager *manager, QWidget *parent = nullptr);
+ public:
+  explicit GameWall(GameManager* manager, QWidget* parent = nullptr);
 
-public slots:
-  void addGame(ChessGame *game);
-  void removeGame(ChessGame *game);
+ public slots:
+  void addGame(ChessGame* game);
+  void removeGame(ChessGame* game);
 
-private:
-  GameWallWidget *getFreeWidget();
+ private:
+  GameWallWidget* getFreeWidget();
 
-  QMap<ChessGame *, GameWallWidget *> m_games;
-  QList<GameWallWidget *> m_gamesToRemove;
+  QMap<ChessGame*, GameWallWidget*> m_games;
+  QList<GameWallWidget*> m_gamesToRemove;
 };
 
-#endif // GAMEWALL_H
+#endif  // GAMEWALL_H

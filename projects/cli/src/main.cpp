@@ -15,16 +15,6 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <csignal>
-
-#include <QDebug>
-#include <QFile>
-#include <QLoggingCategory>
-#include <QMetaType>
-#include <QStringList>
-#include <QTextStream>
-#include <QtGlobal>
-
 #include <board/boardfactory.h>
 #include <board/result.h>
 #include <enginebuilder.h>
@@ -38,13 +28,22 @@
 #include <tournament.h>
 #include <tournamentfactory.h>
 
+#include <QDebug>
+#include <QFile>
+#include <QLoggingCategory>
+#include <QMetaType>
+#include <QStringList>
+#include <QTextStream>
+#include <QtGlobal>
+#include <csignal>
+
 #include "enginematch.h"
 #include "matchparser.h"
 #include "sylvancoreapp.h"
 
 namespace {
 
-EngineMatch *s_match = nullptr;
+EngineMatch* s_match = nullptr;
 
 void sigintHandler(int param) {
   Q_UNUSED(param);
@@ -61,10 +60,10 @@ struct EngineData {
   int bookDepth;
 };
 
-bool readEngineConfig(const QString &name, EngineConfiguration &config) {
+bool readEngineConfig(const QString& name, EngineConfiguration& config) {
   const auto app = SylvanCoreApplication::instance();
   const auto engines = app->engineManager()->engines();
-  for (const auto &engine : engines) {
+  for (const auto& engine : engines) {
     if (engine.name() == name) {
       config = engine;
       return true;
@@ -73,12 +72,11 @@ bool readEngineConfig(const QString &name, EngineConfiguration &config) {
   return false;
 }
 
-bool parseEngine(const QStringList &args, EngineData &data) {
-  for (const auto &arg : args) {
+bool parseEngine(const QStringList& args, EngineData& data) {
+  for (const auto& arg : args) {
     QString name = arg.section('=', 0, 0);
     QString val = arg.section('=', 1);
-    if (name.isEmpty())
-      continue;
+    if (name.isEmpty()) continue;
 
     if (name == "conf") {
       if (!readEngineConfig(val, data.config)) {
@@ -196,7 +194,7 @@ bool parseEngine(const QStringList &args, EngineData &data) {
   return true;
 }
 
-EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
+EngineMatch* parseMatch(const QStringList& args, QObject* parent) {
   MatchParser parser(args);
   parser.addOption("-srand", QVariant::UInt, 1, 1);
   parser.addOption("-tournament", QVariant::String, 1, 1);
@@ -226,31 +224,29 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
   parser.addOption("-site", QVariant::String, 1, 1);
   parser.addOption("-wait", QVariant::Int, 1, 1);
   parser.addOption("-seeds", QVariant::UInt, 1, 1);
-  if (!parser.parse())
-    return nullptr;
+  if (!parser.parse()) return nullptr;
 
-  GameManager *manager = SylvanCoreApplication::instance()->gameManager();
+  GameManager* manager = SylvanCoreApplication::instance()->gameManager();
 
   QString ttype = parser.takeOption("-tournament").toString();
-  if (ttype.isEmpty())
-    ttype = "round-robin";
-  Tournament *tournament = TournamentFactory::create(ttype, manager, parent);
+  if (ttype.isEmpty()) ttype = "round-robin";
+  Tournament* tournament = TournamentFactory::create(ttype, manager, parent);
   if (tournament == nullptr) {
     qWarning("Invalid tournament type: %s", qUtf8Printable(ttype));
     return nullptr;
   }
 
-  EngineMatch *match = new EngineMatch(tournament, parent);
+  EngineMatch* match = new EngineMatch(tournament, parent);
 
   QList<EngineData> engines;
   QStringList eachOptions;
   GameAdjudicator adjudicator;
 
   const auto options = parser.options();
-  for (const auto &option : options) {
+  for (const auto& option : options) {
     bool ok = true;
-    const QString &name = option.name;
-    const QVariant &value = option.value;
+    const QString& name = option.name;
+    const QVariant& value = option.value;
     Q_ASSERT(!value.isNull());
 
     // Chess engine
@@ -258,8 +254,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
       EngineData engine;
       engine.bookDepth = 1000;
       ok = parseEngine(value.toStringList(), engine);
-      if (ok)
-        engines.append(engine);
+      if (ok) engines.append(engine);
     }
     // The engine options that apply to each engine
     else if (name == "-each")
@@ -267,12 +262,10 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
     // Chess variant (default: standard chess)
     else if (name == "-variant") {
       ok = Chess::BoardFactory::variants().contains(value.toString());
-      if (ok)
-        tournament->setVariant(value.toString());
+      if (ok) tournament->setVariant(value.toString());
     } else if (name == "-concurrency") {
       ok = value.toInt() > 0;
-      if (ok)
-        manager->setConcurrency(value.toInt());
+      if (ok) manager->setConcurrency(value.toInt());
     }
     // Threshold for draw adjudication
     else if (name == "-draw") {
@@ -286,8 +279,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
       int score = params["score"].toInt(&scoreOk);
 
       ok = (numOk && countOk && scoreOk);
-      if (ok)
-        adjudicator.setDrawThreshold(moveNumber, moveCount, score);
+      if (ok) adjudicator.setDrawThreshold(moveNumber, moveCount, score);
     }
     // Threshold for resign adjudication
     else if (name == "-resign") {
@@ -300,14 +292,12 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
       bool twoSided = params["twosided"] == "true";
 
       ok = (countOk && scoreOk);
-      if (ok)
-        adjudicator.setResignThreshold(moveCount, -score, twoSided);
+      if (ok) adjudicator.setResignThreshold(moveCount, -score, twoSided);
     }
     // Maximum game length before draw adjudication
     else if (name == "-maxmoves") {
       ok = value.toInt() >= 0;
-      if (ok)
-        adjudicator.setMaximumGameLength(value.toInt());
+      if (ok) adjudicator.setMaximumGameLength(value.toInt());
     }
     // Syzygy tablebase adjudication
     else if (name == "-tb") {
@@ -316,8 +306,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
 
       ok = false;
 
-      if (!ok)
-        qWarning("Could not load Syzygy tablebases");
+      if (!ok) qWarning("Could not load Syzygy tablebases");
     }
     // Syzygy tablebase pieces
     else if (name == "-tbpieces") {
@@ -332,15 +321,15 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
     // Number of games per encounter
     else if (name == "-games") {
       ok = value.toInt() > 0;
-      if (ok)
-        tournament->setGamesPerEncounter(value.toInt());
+      if (ok) tournament->setGamesPerEncounter(value.toInt());
     }
     // Multiplier for the number of tournament rounds
     else if (name == "-rounds") {
       if (!tournament->canSetRoundMultiplier()) {
-        qWarning("Tournament \"%s\" does not support "
-                 "user-defined round multipliers",
-                 qUtf8Printable(tournament->type()));
+        qWarning(
+            "Tournament \"%s\" does not support "
+            "user-defined round multipliers",
+            qUtf8Printable(tournament->type()));
         ok = false;
       } else {
         int rounds = value.toInt(&ok);
@@ -360,8 +349,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
       double beta = params["beta"].toDouble(sprtOk + 3);
 
       ok = (sprtOk[0] && sprtOk[1] && sprtOk[2] && sprtOk[3]);
-      if (ok)
-        tournament->sprt()->initialize(elo0, elo1, alpha, beta);
+      if (ok) tournament->sprt()->initialize(elo0, elo1, alpha, beta);
     }
     // Interval for rating list updates
     else if (name == "-ratinginterval")
@@ -421,7 +409,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
         tournament->setOpeningDepth(plies);
         tournament->setOpeningPolicy(policy);
 
-        OpeningSuite *suite =
+        OpeningSuite* suite =
             new OpeningSuite(params["file"], format, order, start - 1);
         if (order == OpeningSuite::RandomOrder)
           qInfo("Indexing opening suite...");
@@ -454,8 +442,7 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
             ok = false;
         }
       }
-      if (ok)
-        tournament->setPgnOutput(list.at(0), mode);
+      if (ok) tournament->setPgnOutput(list.at(0), mode);
     }
     // FEN/EPD output file to save positions
     else if (name == "-epdout") {
@@ -466,15 +453,15 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
     else if (name == "-repeat") {
       int rep = value.toInt(&ok);
 
-      if (option.value.type() == QVariant::Bool)
-        rep = 2; // default
+      if (option.value.type() == QVariant::Bool) rep = 2;  // default
       if (ok && rep >= 1) {
         tournament->setOpeningRepetitions(rep);
 
         if (tournament->gamesPerEncounter() % rep)
-          qWarning("%d opening repetitions vs"
-                   " %d games per encounter",
-                   rep, tournament->gamesPerEncounter());
+          qWarning(
+              "%d opening repetitions vs"
+              " %d games per encounter",
+              rep, tournament->gamesPerEncounter());
       } else
         ok = false;
     }
@@ -490,20 +477,17 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
     // Set the random seed manually
     else if (name == "-srand") {
       uint seed = value.toUInt(&ok);
-      if (ok)
-        Mersenne::initialize(seed);
+      if (ok) Mersenne::initialize(seed);
     }
     // Delay between games
     else if (name == "-wait") {
       ok = value.toInt() >= 0;
-      if (ok)
-        tournament->setStartDelay(value.toInt());
+      if (ok) tournament->setStartDelay(value.toInt());
     }
     // How many players should be seeded?
     else if (name == "-seeds") {
       uint seedCount = value.toUInt(&ok);
-      if (ok)
-        tournament->setSeedCount(seedCount);
+      if (ok) tournament->setSeedCount(seedCount);
     } else
       qFatal("Unknown argument: \"%s\"", qUtf8Printable(name));
 
@@ -533,13 +517,12 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
     QList<EngineData>::iterator it;
     for (it = engines.begin(); it != engines.end(); ++it) {
       ok = parseEngine(eachOptions, *it);
-      if (!ok)
-        break;
+      if (!ok) break;
     }
   }
 
-  const auto &constEngines = engines;
-  for (const auto &engine : constEngines) {
+  const auto& constEngines = engines;
+  for (const auto& engine : constEngines) {
     if (!engine.tc.isValid()) {
       ok = false;
       qWarning("Invalid or missing time control");
@@ -578,9 +561,9 @@ EngineMatch *parseMatch(const QStringList &args, QObject *parent) {
   return match;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // Register types for signal / slot connections
   qRegisterMetaType<Chess::Result>("Chess::Result");
 
@@ -590,12 +573,12 @@ int main(int argc, char *argv[]) {
   SylvanCoreApplication app(argc, argv);
 
   QStringList arguments = SylvanCoreApplication::arguments();
-  arguments.takeFirst(); // application name
+  arguments.takeFirst();  // application name
 
   // Use trivial command-line parsing for now
   QTextStream out(stdout);
-  const auto &constArguments = arguments;
-  for (const auto &arg : constArguments) {
+  const auto& constArguments = arguments;
+  for (const auto& arg : constArguments) {
     if (arg == "-v" || arg == "--version" || arg == "-version") {
       out << "sylvan-cli " << SYLVAN_CLI_VERSION << endl;
       out << "Using Qt version " << qVersion() << endl << endl;
@@ -609,8 +592,7 @@ int main(int argc, char *argv[]) {
       return 0;
     } else if (arg == "--engines" || arg == "-engines") {
       const auto engines = app.engineManager()->engines();
-      for (const auto &engine : engines)
-        out << engine.name() << endl;
+      for (const auto& engine : engines) out << engine.name() << endl;
 
       return 0;
     } else if (arg == "--help" || arg == "-help") {
@@ -622,8 +604,7 @@ int main(int argc, char *argv[]) {
   }
 
   s_match = parseMatch(arguments, &app);
-  if (s_match == nullptr)
-    return 1;
+  if (s_match == nullptr) return 1;
   QObject::connect(s_match, SIGNAL(finished()), &app, SLOT(quit()));
 
   s_match->start();

@@ -29,13 +29,13 @@
 class LIB_EXPORT Worker : public QObject, public QRunnable {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new Worker object with the given \a title.
    *
    * The title describes the purpose of this Worker so that it can be
    * identified.
    */
-  explicit Worker(const QString &title);
+  explicit Worker(const QString& title);
   /*! Destructs the Worker object. */
   virtual ~Worker();
   /*! Returns the time when the worker was started. */
@@ -46,7 +46,7 @@ public:
   // Inherited from QRunnable
   void run() override;
 
-signals:
+ signals:
   /*!
    * Emitted after the worker has been started but before
    * any tasks are performed.
@@ -67,7 +67,7 @@ signals:
    * In case of an error this signal can be used to give a textual
    * description of the error.
    * */
-  void statusChanged(const QString &statusMessage);
+  void statusChanged(const QString& statusMessage);
   /*! Emitted if the user requested to cancel the worker.
    *
    * This signal is emitted automatically just before the
@@ -87,7 +87,7 @@ signals:
    */
   void error(int error);
 
-public slots:
+ public slots:
   /*! Request cancellation of the worker.
    *
    * After this slot has been called the worker should try to
@@ -96,7 +96,7 @@ public slots:
    */
   void cancel();
 
-protected:
+ protected:
   /*! Perform the long running task.
    *
    * Periodically check for cancelRequested()
@@ -114,10 +114,10 @@ protected:
    * cancel() slot. */
   bool cancelRequested() const;
 
-private:
+ private:
   bool m_cancel;
   QString m_title;
   QTime m_startTime;
 };
 
-#endif // WORKER_H
+#endif  // WORKER_H

@@ -17,15 +17,18 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "graphicspiecereserve.h"
+
 #include <QPainter>
 
 #include "graphicspiece.h"
-#include "graphicspiecereserve.h"
 
 GraphicsPieceReserve::GraphicsPieceReserve(qreal squareSize,
-                                           QGraphicsItem *parent)
-    : QGraphicsItem(parent), m_tileWidth(squareSize * 1.5),
-      m_tileHeight(squareSize), m_rowCount(1) {
+                                           QGraphicsItem* parent)
+    : QGraphicsItem(parent),
+      m_tileWidth(squareSize * 1.5),
+      m_tileHeight(squareSize),
+      m_rowCount(1) {
   m_rect.setWidth(m_tileWidth * 2);
   m_rect.setHeight(m_tileHeight);
   m_rect.moveCenter(QPointF(0, 0));
@@ -37,9 +40,9 @@ int GraphicsPieceReserve::type() const { return Type; }
 
 QRectF GraphicsPieceReserve::boundingRect() const { return m_rect; }
 
-void GraphicsPieceReserve::paint(QPainter *painter,
-                                 const QStyleOptionGraphicsItem *option,
-                                 QWidget *widget) {
+void GraphicsPieceReserve::paint(QPainter* painter,
+                                 const QStyleOptionGraphicsItem* option,
+                                 QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
@@ -51,11 +54,10 @@ void GraphicsPieceReserve::paint(QPainter *painter,
   painter->drawLine(0, m_rect.top(), 0, m_rect.bottom());
 
   for (int i = 0; i < 2; i++) {
-    const QList<Chess::Piece> &list(m_tiles[i]);
+    const QList<Chess::Piece>& list(m_tiles[i]);
     for (int j = 0; j < list.size(); j++) {
       int count = m_pieces.count(list.at(j));
-      if (count < 1)
-        continue;
+      if (count < 1) continue;
 
       QRectF rect(textRect(Chess::Side::Type(i), j));
       painter->drawText(rect, QString::number(count),
@@ -64,26 +66,25 @@ void GraphicsPieceReserve::paint(QPainter *painter,
   }
 }
 
-int GraphicsPieceReserve::pieceCount(const Chess::Piece &piece) const {
+int GraphicsPieceReserve::pieceCount(const Chess::Piece& piece) const {
   return m_pieces.count(piece);
 }
 
-GraphicsPiece *GraphicsPieceReserve::piece(const Chess::Piece &piece) const {
+GraphicsPiece* GraphicsPieceReserve::piece(const Chess::Piece& piece) const {
   return m_pieces.value(piece);
 }
 
-GraphicsPiece *GraphicsPieceReserve::takePiece(const Chess::Piece &piece) {
-  GraphicsPiece *gpiece = m_pieces.take(piece);
+GraphicsPiece* GraphicsPieceReserve::takePiece(const Chess::Piece& piece) {
+  GraphicsPiece* gpiece = m_pieces.take(piece);
   Q_ASSERT(gpiece != nullptr);
 
   if (!m_pieces.contains(piece)) {
-    QList<Chess::Piece> &list = m_tiles[piece.side()];
+    QList<Chess::Piece>& list = m_tiles[piece.side()];
     int index = list.indexOf(piece);
 
     if (index == list.size() - 1) {
       list.removeLast();
-      while (!list.isEmpty() && list.last().isEmpty())
-        list.removeLast();
+      while (!list.isEmpty() && list.last().isEmpty()) list.removeLast();
       updateTiles();
     } else if (index != -1)
       list[index] = Chess::Piece();
@@ -95,11 +96,11 @@ GraphicsPiece *GraphicsPieceReserve::takePiece(const Chess::Piece &piece) {
   return gpiece;
 }
 
-void GraphicsPieceReserve::addPiece(GraphicsPiece *piece) {
+void GraphicsPieceReserve::addPiece(GraphicsPiece* piece) {
   Q_ASSERT(piece != nullptr);
 
   Chess::Piece type(piece->pieceType());
-  GraphicsPiece *old = m_pieces.value(type);
+  GraphicsPiece* old = m_pieces.value(type);
 
   m_pieces.insert(type, piece);
   piece->setContainer(this);
@@ -108,7 +109,7 @@ void GraphicsPieceReserve::addPiece(GraphicsPiece *piece) {
   if (old != nullptr)
     piece->setPos(old->pos());
   else {
-    QList<Chess::Piece> &list = m_tiles[type.side()];
+    QList<Chess::Piece>& list = m_tiles[type.side()];
     int index = list.indexOf(Chess::Piece());
     if (index == -1) {
       index = list.size();
@@ -151,10 +152,9 @@ QRectF GraphicsPieceReserve::textRect(Chess::Side side, int index) const {
   return rect;
 }
 
-QRectF GraphicsPieceReserve::textRect(const Chess::Piece &piece) const {
+QRectF GraphicsPieceReserve::textRect(const Chess::Piece& piece) const {
   int index = m_tiles[piece.side()].indexOf(piece);
-  if (index == -1)
-    return QRectF();
+  if (index == -1) return QRectF();
 
   return textRect(piece.side(), index);
 }

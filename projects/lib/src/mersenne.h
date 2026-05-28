@@ -31,7 +31,7 @@
  * are not deterministic per thread.
  */
 class LIB_EXPORT Mersenne {
-public:
+ public:
   /*! Initializes the PRNG with \a seed. */
   static void initialize(quint32 seed);
   /*!
@@ -41,8 +41,8 @@ public:
    */
   static quint32 random();
 
-private:
+ private:
   Mersenne();
 };
 
-#endif // MERSENNE_H
+#endif  // MERSENNE_H

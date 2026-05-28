@@ -17,7 +17,7 @@
 
 #include "worker.h"
 
-Worker::Worker(const QString &title)
+Worker::Worker(const QString& title)
     : QObject(nullptr), QRunnable(), m_cancel(false), m_title(title) {}
 
 Worker::~Worker() {}
@@ -35,8 +35,7 @@ void Worker::run() {
   emit started();
 
   work();
-  if (m_cancel)
-    emit cancelled();
+  if (m_cancel) emit cancelled();
 
   emit finished();
 }

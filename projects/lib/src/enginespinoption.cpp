@@ -19,19 +19,19 @@
 
 #include "enginespinoption.h"
 
-EngineSpinOption::EngineSpinOption(const QString &name, const QVariant &value,
-                                   const QVariant &defaultValue, int min,
-                                   int max, const QString &alias)
-    : EngineOption(name, QVariant::Int, value, defaultValue, alias), m_min(min),
+EngineSpinOption::EngineSpinOption(const QString& name, const QVariant& value,
+                                   const QVariant& defaultValue, int min,
+                                   int max, const QString& alias)
+    : EngineOption(name, QVariant::Int, value, defaultValue, alias),
+      m_min(min),
       m_max(max) {}
 
-EngineOption *EngineSpinOption::copy() const {
+EngineOption* EngineSpinOption::copy() const {
   return new EngineSpinOption(*this);
 }
 
-bool EngineSpinOption::isValid(const QVariant &value) const {
-  if (m_min > m_max)
-    return false;
+bool EngineSpinOption::isValid(const QVariant& value) const {
+  if (m_min > m_max) return false;
 
   bool ok = false;
   int tmp = value.toInt(&ok);

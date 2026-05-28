@@ -25,11 +25,11 @@ Square::Square() : m_file(-1), m_rank(-1) {}
 
 Square::Square(int file, int rank) : m_file(file), m_rank(rank) {}
 
-bool Square::operator==(const Square &other) const {
+bool Square::operator==(const Square& other) const {
   return (m_file == other.m_file) && (m_rank == other.m_rank);
 }
 
-bool Square::operator!=(const Square &other) const {
+bool Square::operator!=(const Square& other) const {
   return (m_file != other.m_file) || (m_rank != other.m_rank);
 }
 
@@ -43,4 +43,4 @@ void Square::setFile(int file) { m_file = file; }
 
 void Square::setRank(int rank) { m_rank = rank; }
 
-} // namespace Chess
+}  // namespace Chess

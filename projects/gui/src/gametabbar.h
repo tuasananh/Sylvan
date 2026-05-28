@@ -28,14 +28,14 @@
 class GameTabBar : public QTabBar {
   Q_OBJECT
 
-public:
-  GameTabBar(QWidget *parent = nullptr);
+ public:
+  GameTabBar(QWidget* parent = nullptr);
 
-public slots:
+ public slots:
   /*! Show the next tab in the tab bar. */
   void showNextTab();
   /*! Show the previous tab in the tab bar. */
   void showPreviousTab();
 };
 
-#endif // GAME_TAB_BAR_H
+#endif  // GAME_TAB_BAR_H

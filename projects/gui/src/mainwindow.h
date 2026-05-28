@@ -20,10 +20,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <board/side.h>
+
 #include <QMainWindow>
 #include <QPointer>
-
-#include <board/side.h>
 
 class QMenu;
 class QAction;
@@ -46,7 +46,7 @@ class Capture;
 namespace Chess {
 class Board;
 class Move;
-} // namespace Chess
+}  // namespace Chess
 
 /**
  * MainWindow
@@ -54,19 +54,19 @@ class Move;
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
-public:
-  explicit MainWindow(ChessGame *game);
+ public:
+  explicit MainWindow(ChessGame* game);
   virtual ~MainWindow();
   QString windowListTitle() const;
 
-public slots:
-  void addGame(ChessGame *game);
+ public slots:
+  void addGame(ChessGame* game);
 
-protected:
-  virtual void closeEvent(QCloseEvent *event);
+ protected:
+  virtual void closeEvent(QCloseEvent* event);
   void closeCurrentGame();
 
-private slots:
+ private slots:
   void newGame();
   void OpenPgnGame();
   void newTournament();
@@ -79,12 +79,12 @@ private slots:
   void onTabChanged(int index);
   void onTabCloseRequested(int index);
   void closeTab(int index);
-  void destroyGame(ChessGame *game);
+  void destroyGame(ChessGame* game);
   void onTournamentFinished();
   void onGameManagerFinished();
-  void onGameStartFailed(ChessGame *game);
-  void onGameFinished(ChessGame *game);
-  void editMoveComment(int ply, const QString &comment);
+  void onGameStartFailed(ChessGame* game);
+  void onGameFinished(ChessGame* game);
+  void editMoveComment(int ply, const QString& comment);
   void copyFen();
   void pasteFen();
   void copyPgn();
@@ -98,14 +98,14 @@ private slots:
   void onEngineAnalyze();
   void onLinkChessboard();
 
-private:
+ private:
   struct TabData {
-    explicit TabData(ChessGame *m_game, Tournament *m_tournament = nullptr);
+    explicit TabData(ChessGame* m_game, Tournament* m_tournament = nullptr);
 
-    ChessGame *m_id;
+    ChessGame* m_id;
     QPointer<ChessGame> m_game;
-    PgnGame *m_pgn;
-    Tournament *m_tournament;
+    PgnGame* m_pgn;
+    Tournament* m_tournament;
     bool m_finished;
   };
 
@@ -115,67 +115,67 @@ private:
   void createDockWindows();
   void readSettings();
   void writeSettings();
-  QString genericTitle(const TabData &gameData) const;
-  QString nameOnClock(const QString &name, Chess::Side side) const;
+  QString genericTitle(const TabData& gameData) const;
+  QString nameOnClock(const QString& name, Chess::Side side) const;
   void lockCurrentGame();
   void unlockCurrentGame();
-  bool saveGame(const QString &fileName);
+  bool saveGame(const QString& fileName);
   bool askToSave();
-  void setCurrentGame(const TabData &gameData);
+  void setCurrentGame(const TabData& gameData);
   void removeGame(int index);
-  int tabIndex(ChessGame *game) const;
-  int tabIndex(Tournament *tournament, bool freeTab = false) const;
+  int tabIndex(ChessGame* game) const;
+  int tabIndex(Tournament* tournament, bool freeTab = false) const;
   void addDefaultWindowMenu();
   void adjudicateGame(Chess::Side winner);
 
-  QMenu *m_gameMenu;
-  QMenu *m_tournamentMenu;
-  QMenu *m_toolsMenu;
-  QMenu *m_viewMenu;
-  QMenu *m_windowMenu;
-  QMenu *m_helpMenu;
+  QMenu* m_gameMenu;
+  QMenu* m_tournamentMenu;
+  QMenu* m_toolsMenu;
+  QMenu* m_viewMenu;
+  QMenu* m_windowMenu;
+  QMenu* m_helpMenu;
 
-  QToolBar *m_toolBar;
-  GameTabBar *m_tabBar;
-  GameViewer *m_gameViewer;
-  MoveList *m_moveList;
-  PgnTagsModel *m_tagsModel;
+  QToolBar* m_toolBar;
+  GameTabBar* m_tabBar;
+  GameViewer* m_gameViewer;
+  MoveList* m_moveList;
+  PgnTagsModel* m_tagsModel;
 
-  QAction *m_quitGameAct;
-  QAction *m_newGameAct;
-  QAction *m_openPgnAct;
-  QAction *m_adjudicateBlackWinAct;
-  QAction *m_adjudicateRedWinAct;
-  QAction *m_adjudicateDrawAct;
-  QAction *m_resignGameAct;
-  QAction *m_closeGameAct;
-  QAction *m_saveGameAct;
-  QAction *m_saveGameAsAct;
-  QAction *m_copyFenAct;
-  QAction *m_pasteFenAct;
-  QAction *m_copyPgnAct;
-  QAction *m_flipBoardAct;
-  QAction *m_newTournamentAct;
-  QAction *m_stopTournamentAct;
-  QAction *m_showTournamentResultsAct;
-  QAction *m_minimizeAct;
-  QAction *m_showGameDatabaseWindowAct;
-  QAction *m_showGameWallAct;
-  QAction *m_showPreviousTabAct;
-  QAction *m_showNextTabAct;
-  QAction *m_aboutAct;
-  QAction *m_showSettingsAct;
+  QAction* m_quitGameAct;
+  QAction* m_newGameAct;
+  QAction* m_openPgnAct;
+  QAction* m_adjudicateBlackWinAct;
+  QAction* m_adjudicateRedWinAct;
+  QAction* m_adjudicateDrawAct;
+  QAction* m_resignGameAct;
+  QAction* m_closeGameAct;
+  QAction* m_saveGameAct;
+  QAction* m_saveGameAsAct;
+  QAction* m_copyFenAct;
+  QAction* m_pasteFenAct;
+  QAction* m_copyPgnAct;
+  QAction* m_flipBoardAct;
+  QAction* m_newTournamentAct;
+  QAction* m_stopTournamentAct;
+  QAction* m_showTournamentResultsAct;
+  QAction* m_minimizeAct;
+  QAction* m_showGameDatabaseWindowAct;
+  QAction* m_showGameWallAct;
+  QAction* m_showPreviousTabAct;
+  QAction* m_showNextTabAct;
+  QAction* m_aboutAct;
+  QAction* m_showSettingsAct;
 
-  QAction *m_linkChessBoardAct;
-  QAction *m_engineThinkAct;
-  QAction *m_engineStopAct;
-  QAction *m_engineAnalyzeAct;
-  QAction *m_engineSettingAct;
+  QAction* m_linkChessBoardAct;
+  QAction* m_engineThinkAct;
+  QAction* m_engineStopAct;
+  QAction* m_engineAnalyzeAct;
+  QAction* m_engineSettingAct;
 
-  PlainTextLog *m_engineDebugLog;
+  PlainTextLog* m_engineDebugLog;
 
-  EvalHistory *m_evalHistory;
-  EvalWidget *m_evalWidgets[2];
+  EvalHistory* m_evalHistory;
+  EvalWidget* m_evalWidgets[2];
 
   QPointer<ChessGame> m_game;
   QPointer<ChessPlayer> m_players[2];
@@ -188,4 +188,4 @@ private:
   bool m_firstTabAutoCloseEnabled;
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

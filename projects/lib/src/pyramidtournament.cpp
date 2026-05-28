@@ -18,9 +18,10 @@
 */
 
 #include "pyramidtournament.h"
+
 #include <algorithm>
 
-PyramidTournament::PyramidTournament(GameManager *gameManager, QObject *parent)
+PyramidTournament::PyramidTournament(GameManager* gameManager, QObject* parent)
     : Tournament(gameManager, parent), m_pairNumber(0), m_currentPlayer(1) {}
 
 QString PyramidTournament::type() const { return "pyramid"; }
@@ -35,17 +36,14 @@ int PyramidTournament::gamesPerCycle() const {
   return (playerCount() * (playerCount() - 1)) / 2;
 }
 
-TournamentPair *PyramidTournament::nextPair(int gameNumber) {
-  if (gameNumber >= finalGameCount())
-    return nullptr;
-  if (gameNumber % gamesPerEncounter() != 0)
-    return currentPair();
+TournamentPair* PyramidTournament::nextPair(int gameNumber) {
+  if (gameNumber >= finalGameCount()) return nullptr;
+  if (gameNumber % gamesPerEncounter() != 0) return currentPair();
 
   if (m_pairNumber >= m_currentPlayer) {
     m_pairNumber = 0;
     setCurrentRound(currentRound() + 1);
-    if (++m_currentPlayer >= playerCount())
-      m_currentPlayer = 1;
+    if (++m_currentPlayer >= playerCount()) m_currentPlayer = 1;
   }
 
   int red = m_currentPlayer;

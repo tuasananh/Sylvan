@@ -31,22 +31,22 @@ class QAction;
 class PlainTextLog : public QPlainTextEdit {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs a new plain text log with the given \a parent. */
-  PlainTextLog(QWidget *parent = nullptr);
+  PlainTextLog(QWidget* parent = nullptr);
   /*!
    * Constructs a new plain text log with the initial text \a text and
    * given \a parent.
    */
-  PlainTextLog(const QString &text, QWidget *parent = nullptr);
+  PlainTextLog(const QString& text, QWidget* parent = nullptr);
 
-public slots:
+ public slots:
   /*! Save the log to file \a filename. */
-  void saveLogToFile(const QString &fileName);
+  void saveLogToFile(const QString& fileName);
 
-protected:
+ protected:
   // Inherited from QPlainTextEdit
-  virtual void contextMenuEvent(QContextMenuEvent *event);
+  virtual void contextMenuEvent(QContextMenuEvent* event);
 };
 
-#endif // PLAIN_TEXT_LOG_H
+#endif  // PLAIN_TEXT_LOG_H

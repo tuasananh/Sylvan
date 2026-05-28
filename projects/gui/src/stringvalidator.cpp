@@ -18,28 +18,27 @@
 */
 
 #include "stringvalidator.h"
+
 #include <QAbstractItemModel>
 
-StringValidator::StringValidator(QObject *parent)
+StringValidator::StringValidator(QObject* parent)
     : QValidator(parent), m_model(nullptr) {}
 
-void StringValidator::setModel(const QAbstractItemModel *model) {
+void StringValidator::setModel(const QAbstractItemModel* model) {
   m_model = model;
   m_startIndex = model->index(0, 0);
 }
 
-void StringValidator::setStartIndex(const QModelIndex &index) {
+void StringValidator::setStartIndex(const QModelIndex& index) {
   m_startIndex = index;
 }
 
-QValidator::State StringValidator::validate(QString &input, int &pos) const {
+QValidator::State StringValidator::validate(QString& input, int& pos) const {
   Q_UNUSED(pos);
 
-  if (m_model == nullptr || m_model->rowCount() == 0)
-    return Acceptable;
+  if (m_model == nullptr || m_model->rowCount() == 0) return Acceptable;
 
-  if (input.isEmpty())
-    return Intermediate;
+  if (input.isEmpty()) return Intermediate;
 
   if (!m_model
            ->match(m_startIndex, Qt::EditRole, input, 1,

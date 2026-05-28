@@ -30,7 +30,7 @@
  * TODO: players should be pointers to TournamentPlayer objects, not indexes
  */
 class LIB_EXPORT TournamentPair {
-public:
+ public:
   /*!
    * Creates a new TournamentPair object.
    *
@@ -63,7 +63,7 @@ public:
    *
    * \note The players may be in different order in \a other.
    */
-  bool hasSamePlayers(const TournamentPair *other) const;
+  bool hasSamePlayers(const TournamentPair* other) const;
   /*!
    * Returns true if both players are real (ie. not BYEs);
    * otherwise returns false.
@@ -111,7 +111,7 @@ public:
    */
   void swapPlayers();
 
-private:
+ private:
   struct Player {
     int index;
     int score;
@@ -123,4 +123,4 @@ private:
   bool m_hasOriginalOrder;
 };
 
-#endif // TOURNAMENTPAIR_H
+#endif  // TOURNAMENTPAIR_H

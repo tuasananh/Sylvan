@@ -20,11 +20,20 @@
 #include "moveevaluation.h"
 
 MoveEvaluation::MoveEvaluation()
-    : m_isBookEval(false), m_isTrusted(false), m_depth(0), m_selDepth(0),
-      m_score(NULL_SCORE), m_time(0), m_pvNumber(0), m_hashUsage(0),
-      m_ponderhitRate(0), m_nodeCount(0), m_nps(0), m_tbHits(0) {}
+    : m_isBookEval(false),
+      m_isTrusted(false),
+      m_depth(0),
+      m_selDepth(0),
+      m_score(NULL_SCORE),
+      m_time(0),
+      m_pvNumber(0),
+      m_hashUsage(0),
+      m_ponderhitRate(0),
+      m_nodeCount(0),
+      m_nps(0),
+      m_tbHits(0) {}
 
-bool MoveEvaluation::operator==(const MoveEvaluation &other) const {
+bool MoveEvaluation::operator==(const MoveEvaluation& other) const {
   if (m_isBookEval == other.m_isBookEval && m_isTrusted == other.m_isTrusted &&
       m_depth == other.m_depth && m_selDepth == other.m_selDepth &&
       m_score == other.m_score && m_time == other.m_time &&
@@ -36,7 +45,7 @@ bool MoveEvaluation::operator==(const MoveEvaluation &other) const {
   return false;
 }
 
-bool MoveEvaluation::operator!=(const MoveEvaluation &other) const {
+bool MoveEvaluation::operator!=(const MoveEvaluation& other) const {
   if (m_isBookEval != other.m_isBookEval || m_isTrusted != other.m_isTrusted ||
       m_depth != other.m_depth || m_selDepth != other.m_selDepth ||
       m_score != other.m_score || m_time != other.m_time ||
@@ -68,22 +77,18 @@ int MoveEvaluation::selectiveDepth() const { return m_selDepth; }
 int MoveEvaluation::score() const { return m_score; }
 
 QString MoveEvaluation::scoreText() const {
-  if (isBookEval())
-    return "book";
-  if (m_score == NULL_SCORE)
-    return QString();
+  if (isBookEval()) return "book";
+  if (m_score == NULL_SCORE) return QString();
 
   QString str;
   if (depth() > 0) {
     int absScore = qAbs(m_score);
-    if (m_score > 0)
-      str += "+";
+    if (m_score > 0) str += "+";
 
     // Detect mate-in-n scores
     if (absScore > MATE_SCORE - 200 &&
         (absScore = 1000 - (absScore % 1000)) < 200) {
-      if (m_score < 0)
-        str += "-";
+      if (m_score < 0) str += "-";
       str += "M" + QString::number(absScore);
     } else
       str += QString::number(double(m_score) / 100.0, 'f', 2);
@@ -97,8 +102,7 @@ int MoveEvaluation::time() const { return m_time; }
 quint64 MoveEvaluation::nodeCount() const { return m_nodeCount; }
 
 quint64 MoveEvaluation::nps() const {
-  if (m_nps || !m_time)
-    return m_nps;
+  if (m_nps || !m_time) return m_nps;
   return quint64(m_nodeCount / (double(m_time) / 1000.0));
 }
 
@@ -154,36 +158,24 @@ void MoveEvaluation::setHashUsage(int hashUsage) { m_hashUsage = hashUsage; }
 
 void MoveEvaluation::setPonderhitRate(int rate) { m_ponderhitRate = rate; }
 
-void MoveEvaluation::setPonderMove(const QString &san) { m_ponderMove = san; }
+void MoveEvaluation::setPonderMove(const QString& san) { m_ponderMove = san; }
 
-void MoveEvaluation::setPv(const QString &pv) { m_pv = pv; }
+void MoveEvaluation::setPv(const QString& pv) { m_pv = pv; }
 
 void MoveEvaluation::setPvNumber(int number) { m_pvNumber = number; }
 
-void MoveEvaluation::merge(const MoveEvaluation &other) {
-  if (other.m_depth)
-    m_depth = other.m_depth;
-  if (other.m_selDepth)
-    m_selDepth = other.m_selDepth;
+void MoveEvaluation::merge(const MoveEvaluation& other) {
+  if (other.m_depth) m_depth = other.m_depth;
+  if (other.m_selDepth) m_selDepth = other.m_selDepth;
   m_isBookEval = other.m_isBookEval;
-  if (other.m_nodeCount)
-    m_nodeCount = other.m_nodeCount;
-  if (other.m_nps)
-    m_nps = other.m_nps;
-  if (other.m_tbHits)
-    m_tbHits = other.m_tbHits;
-  if (other.m_hashUsage)
-    m_hashUsage = other.m_hashUsage;
-  if (other.m_ponderhitRate)
-    m_ponderhitRate = other.m_ponderhitRate;
-  if (!other.m_ponderMove.isEmpty())
-    m_ponderMove = other.m_ponderMove;
-  if (!other.m_pv.isEmpty())
-    m_pv = other.m_pv;
-  if (other.m_pvNumber)
-    m_pvNumber = other.m_pvNumber;
-  if (other.m_score != NULL_SCORE)
-    m_score = other.m_score;
-  if (other.m_time)
-    m_time = other.m_time;
+  if (other.m_nodeCount) m_nodeCount = other.m_nodeCount;
+  if (other.m_nps) m_nps = other.m_nps;
+  if (other.m_tbHits) m_tbHits = other.m_tbHits;
+  if (other.m_hashUsage) m_hashUsage = other.m_hashUsage;
+  if (other.m_ponderhitRate) m_ponderhitRate = other.m_ponderhitRate;
+  if (!other.m_ponderMove.isEmpty()) m_ponderMove = other.m_ponderMove;
+  if (!other.m_pv.isEmpty()) m_pv = other.m_pv;
+  if (other.m_pvNumber) m_pvNumber = other.m_pvNumber;
+  if (other.m_score != NULL_SCORE) m_score = other.m_score;
+  if (other.m_time) m_time = other.m_time;
 }

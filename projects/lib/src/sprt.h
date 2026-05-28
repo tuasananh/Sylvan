@@ -31,28 +31,28 @@
  * \sa http://en.wikipedia.org/wiki/Sequential_probability_ratio_test
  */
 class LIB_EXPORT Sprt {
-public:
+ public:
   /*! The result of the test. */
   enum Result {
-    Continue, //!< Continue monitoring
-    AcceptH0, //!< Accept null hypothesis H0
-    AcceptH1  //!< Accept alternative hypothesis H1
+    Continue,  //!< Continue monitoring
+    AcceptH0,  //!< Accept null hypothesis H0
+    AcceptH1   //!< Accept alternative hypothesis H1
   };
 
   /*! The result of a chess game. */
   enum GameResult {
-    NoResult, //!< Game ended with no result
-    Win,      //!< First player won
-    Loss,     //!< First player lost
-    Draw      //!< Game was drawn
+    NoResult,  //!< Game ended with no result
+    Win,       //!< First player won
+    Loss,      //!< First player lost
+    Draw       //!< Game was drawn
   };
 
   /*! The status of the test. */
   struct Status {
-    Result result; //!< Test result
-    double llr;    //!< Log-likelihood ratio
-    double lBound; //!< Lower bound
-    double uBound; //!< Upper bound
+    Result result;  //!< Test result
+    double llr;     //!< Log-likelihood ratio
+    double lBound;  //!< Lower bound
+    double uBound;  //!< Upper bound
   };
 
   /*! Creates a new uninitialized Sprt object. */
@@ -84,7 +84,7 @@ public:
    */
   void addGameResult(GameResult result);
 
-private:
+ private:
   double m_elo0;
   double m_elo1;
   double m_alpha;
@@ -94,4 +94,4 @@ private:
   int m_draws;
 };
 
-#endif // SPRT_H
+#endif  // SPRT_H

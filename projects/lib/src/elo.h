@@ -32,7 +32,7 @@
  * are calculated as if each player's results were against a single opponent.
  */
 class LIB_EXPORT Elo {
-public:
+ public:
   /*! Creates a new Elo object. */
   Elo(int wins, int losses, int draws);
 
@@ -47,7 +47,7 @@ public:
   /*! Returns the likelihood of superiority. */
   qreal LOS() const;
 
-private:
+ private:
   int m_wins;
   int m_losses;
   int m_draws;
@@ -63,4 +63,4 @@ private:
   static qreal phiInv(qreal p);
 };
 
-#endif // ELO_H
+#endif  // ELO_H

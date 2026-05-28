@@ -17,6 +17,13 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "engineconfigurationdlg.h"
+
+#include <chessplayer.h>
+#include <enginebuilder.h>
+#include <enginefactory.h>
+#include <engineoption.h>
+
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -24,12 +31,6 @@
 #include <QSettings>
 #include <QTimer>
 
-#include <chessplayer.h>
-#include <enginebuilder.h>
-#include <enginefactory.h>
-#include <engineoption.h>
-
-#include "engineconfigurationdlg.h"
 #include "engineoptiondelegate.h"
 #include "engineoptionmodel.h"
 #include "ui_engineconfigdlg.h"
@@ -39,9 +40,11 @@
 #endif
 
 EngineConfigurationDialog::EngineConfigurationDialog(
-    EngineConfigurationDialog::DialogMode mode, QWidget *parent)
-    : QDialog(parent), m_hasError(false),
-      m_engineOptionModel(new EngineOptionModel(this)), m_engine(nullptr),
+    EngineConfigurationDialog::DialogMode mode, QWidget* parent)
+    : QDialog(parent),
+      m_hasError(false),
+      m_engineOptionModel(new EngineOptionModel(this)),
+      m_engine(nullptr),
       ui(new Ui::EngineConfigurationDialog) {
   ui->setupUi(this);
 
@@ -66,7 +69,7 @@ EngineConfigurationDialog::EngineConfigurationDialog(
   connect(m_engineOptionModel, SIGNAL(modelReset()), this,
           SLOT(resizeColumns()));
 
-  EngineOptionDelegate *delegate = new EngineOptionDelegate(this);
+  EngineOptionDelegate* delegate = new EngineOptionDelegate(this);
   ui->m_optionsView->setItemDelegate(delegate);
   connect(ui->m_workingDirEdit, SIGNAL(textChanged(QString)), delegate,
           SLOT(setEngineDirectory(QString)));
@@ -86,7 +89,7 @@ EngineConfigurationDialog::EngineConfigurationDialog(
           SLOT(onNameOrCommandChanged()));
   connect(ui->m_buttonBox, SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(ui->m_protocolCombo, &QComboBox::currentTextChanged,
-          [=](const QString &text) {
+          [=](const QString& text) {
             if (text == "xboard") {
               ui->m_redPovCheck->setEnabled(true);
             } else {
@@ -105,7 +108,7 @@ EngineConfigurationDialog::~EngineConfigurationDialog() {
 }
 
 void EngineConfigurationDialog::applyEngineInformation(
-    const EngineConfiguration &engine) {
+    const EngineConfiguration& engine) {
   ui->m_nameEdit->setText(engine.name());
   ui->m_commandEdit->setText(engine.command());
   ui->m_workingDirEdit->setText(engine.workingDirectory());
@@ -115,12 +118,10 @@ void EngineConfigurationDialog::applyEngineInformation(
 
   ui->m_initStringEdit->setPlainText(engine.initStrings().join("\n"));
 
-  if (engine.redEvalPov())
-    ui->m_redPovCheck->setCheckState(Qt::Checked);
+  if (engine.redEvalPov()) ui->m_redPovCheck->setCheckState(Qt::Checked);
 
   const auto options = engine.options();
-  for (const EngineOption *option : options)
-    m_options << option->copy();
+  for (const EngineOption* option : options) m_options << option->copy();
   m_engineOptionModel->setOptions(m_options);
   ui->m_restoreBtn->setDisabled(m_options.isEmpty());
 
@@ -139,13 +140,12 @@ EngineConfiguration EngineConfigurationDialog::engineConfiguration() {
   engine.setProtocol(ui->m_protocolCombo->currentText());
 
   QString initStr(ui->m_initStringEdit->toPlainText());
-  if (!initStr.isEmpty())
-    engine.setInitStrings(initStr.split('\n'));
+  if (!initStr.isEmpty()) engine.setInitStrings(initStr.split('\n'));
 
   engine.setRedEvalPov(ui->m_redPovCheck->checkState() == Qt::Checked);
 
-  QList<EngineOption *> optionCopies;
-  for (const EngineOption *option : qAsConst(m_options))
+  QList<EngineOption*> optionCopies;
+  for (const EngineOption* option : qAsConst(m_options))
     optionCopies << option->copy();
 
   engine.setOptions(optionCopies);
@@ -154,7 +154,7 @@ EngineConfiguration EngineConfigurationDialog::engineConfiguration() {
   return engine;
 }
 
-void EngineConfigurationDialog::setReservedNames(const QSet<QString> &names) {
+void EngineConfigurationDialog::setReservedNames(const QSet<QString>& names) {
   m_reservedNames = names;
 }
 
@@ -195,7 +195,7 @@ void EngineConfigurationDialog::browseCommand() {
   dlg->open();
 }
 
-void EngineConfigurationDialog::setExecutable(const QString &file) {
+void EngineConfigurationDialog::setExecutable(const QString& file) {
   QString fileName = file;
   const QFileInfo info(fileName);
   QString prefix;
@@ -207,8 +207,7 @@ void EngineConfigurationDialog::setExecutable(const QString &file) {
     ui->m_workingDirEdit->setText(
         QDir::toNativeSeparators(info.absolutePath()));
 
-  if (ui->m_nameEdit->text().isEmpty())
-    ui->m_nameEdit->setText(name);
+  if (ui->m_nameEdit->text().isEmpty()) ui->m_nameEdit->setText(name);
 
   // Use a relative path in the "command" field if possible
   const QDir dir(ui->m_workingDirEdit->text());
@@ -240,15 +239,14 @@ void EngineConfigurationDialog::browseWorkingDir() {
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setAcceptMode(QFileDialog::AcceptOpen);
 
-  connect(dlg, &QFileDialog::fileSelected, [=](const QString &dir) {
+  connect(dlg, &QFileDialog::fileSelected, [=](const QString& dir) {
     ui->m_workingDirEdit->setText(QDir::toNativeSeparators(dir));
   });
   dlg->open();
 }
 
 void EngineConfigurationDialog::detectEngineOptions() {
-  if (m_engine != nullptr)
-    return;
+  if (m_engine != nullptr) return;
 
   if (!m_hasError && QObject::sender() != ui->m_detectBtn &&
       ui->m_commandEdit->text() == m_oldCommand &&
@@ -271,7 +269,7 @@ void EngineConfigurationDialog::detectEngineOptions() {
 
   EngineBuilder builder(engineConfiguration());
   QString error;
-  m_engine = qobject_cast<ChessEngine *>(
+  m_engine = qobject_cast<ChessEngine*>(
       builder.create(nullptr, nullptr, this, &error));
 
   if (m_engine != nullptr) {
@@ -298,8 +296,7 @@ void EngineConfigurationDialog::onEngineReady() {
 
   // Make copies of the engine options
   const auto options = m_engine->options();
-  for (const EngineOption *option : options)
-    m_options << option->copy();
+  for (const EngineOption* option : options) m_options << option->copy();
 
   m_engineOptionModel->setOptions(m_options);
   m_variants = m_engine->variants();
@@ -326,8 +323,7 @@ void EngineConfigurationDialog::onEngineQuit() {
 }
 
 void EngineConfigurationDialog::onTabChanged(int index) {
-  if (index == 1)
-    detectEngineOptions();
+  if (index == 1) detectEngineOptions();
 }
 
 void EngineConfigurationDialog::onNameOrCommandChanged() {
@@ -339,8 +335,7 @@ void EngineConfigurationDialog::onNameOrCommandChanged() {
 }
 
 void EngineConfigurationDialog::onDetectionFinished() {
-  if (!m_hasError)
-    accept();
+  if (!m_hasError) accept();
 }
 
 void EngineConfigurationDialog::onAccepted() {
@@ -360,7 +355,7 @@ void EngineConfigurationDialog::resizeColumns() {
 }
 
 void EngineConfigurationDialog::restoreDefaults() {
-  for (EngineOption *option : qAsConst(m_options))
+  for (EngineOption* option : qAsConst(m_options))
     option->setValue(option->defaultValue());
 
   m_engineOptionModel->setOptions(m_options);

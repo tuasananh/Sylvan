@@ -17,17 +17,16 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <limits>
+#include "tournamentresultsdlg.h"
+
+#include <tournament.h>
 
 #include <QBoxLayout>
 #include <QFont>
 #include <QPlainTextEdit>
+#include <limits>
 
-#include <tournament.h>
-
-#include "tournamentresultsdlg.h"
-
-TournamentResultsDialog::TournamentResultsDialog(QWidget *parent)
+TournamentResultsDialog::TournamentResultsDialog(QWidget* parent)
     : QDialog(parent) {
   setWindowTitle(tr("Tournament Results"));
 
@@ -50,13 +49,13 @@ TournamentResultsDialog::TournamentResultsDialog(QWidget *parent)
 
 TournamentResultsDialog::~TournamentResultsDialog() {}
 
-void TournamentResultsDialog::setTournament(Tournament *tournament) {
+void TournamentResultsDialog::setTournament(Tournament* tournament) {
   setWindowTitle(tournament->name());
   m_resultsEdit->setPlainText(tournament->results());
 }
 
 void TournamentResultsDialog::update() {
-  auto tournament = qobject_cast<Tournament *>(QObject::sender());
+  auto tournament = qobject_cast<Tournament*>(QObject::sender());
   Q_ASSERT(tournament != nullptr);
   QString text;
 
@@ -66,8 +65,7 @@ void TournamentResultsDialog::update() {
     TournamentPlayer scp = tournament->playerAt(1);
     int totalResults = fcp.gamesFinished();
     double scoreRatio = std::numeric_limits<double>::quiet_NaN();
-    if (totalResults > 0)
-      scoreRatio = double(fcp.score()) / (totalResults * 2);
+    if (totalResults > 0) scoreRatio = double(fcp.score()) / (totalResults * 2);
     text = tr("Score of %1 vs %2: %3 - %4 - %5 [%6]\n")
                .arg(fcp.name())
                .arg(scp.name())

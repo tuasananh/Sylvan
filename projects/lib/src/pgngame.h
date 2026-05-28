@@ -18,8 +18,6 @@
 #ifndef PGNGAME_H
 #define PGNGAME_H
 
-#include "board/genericmove.h"
-#include "board/result.h"
 #include <QDate>
 #include <QList>
 #include <QMap>
@@ -27,6 +25,9 @@
 #include <QString>
 #include <QVector>
 #include <climits>
+
+#include "board/genericmove.h"
+#include "board/result.h"
 
 class QTextStream;
 class PgnStream;
@@ -51,7 +52,7 @@ class Board;
  * \sa ChessGame
  */
 class LIB_EXPORT PgnGame {
-public:
+ public:
   /*! The mode for writing PGN games. */
   enum PgnMode {
     //! Only use data which is required by the PGN standard
@@ -82,13 +83,13 @@ public:
   /*! Returns the tags that are used to describe the game. */
   QList<QPair<QString, QString>> tags() const;
   /*! Returns the moves that were played in the game. */
-  const QVector<MoveData> &moves() const;
+  const QVector<MoveData>& moves() const;
   /*! Adds a new move to the game.
    * \param data The move to add.
    * \param addEco Adds opening information if true.
    */
-  void addMove(const MoveData &data, bool addEco = true);
-  void setMove(int ply, const MoveData &data);
+  void addMove(const MoveData& data, bool addEco = true);
+  void setMove(int ply, const MoveData& data);
 
   /*!
    * Creates a board object for viewing or analyzing the game.
@@ -96,7 +97,7 @@ public:
    * The board is set to the game's starting position.
    * Returns 0 on error.
    */
-  Chess::Board *createBoard() const;
+  Chess::Board* createBoard() const;
 
   /*!
    * Reads a game from a PGN text stream.
@@ -110,13 +111,13 @@ public:
    *
    * Returns true if any tags and/or moves were read.
    */
-  bool read(PgnStream &in, int maxMoves = INT_MAX - 1, bool addEco = true);
+  bool read(PgnStream& in, int maxMoves = INT_MAX - 1, bool addEco = true);
   /*!
    * Writes the game to a text stream.
    *
    * Returns true if successful; otherwise returns false.
    */
-  bool write(QTextStream &out, PgnMode mode = Verbose) const;
+  bool write(QTextStream& out, PgnMode mode = Verbose) const;
   /*!
    * Writes the game to a file.
    * If the file already exists, the game will be appended
@@ -124,7 +125,7 @@ public:
    *
    * Returns true if successful; otherwise returns false.
    */
-  bool write(const QString &filename, PgnMode mode = Verbose) const;
+  bool write(const QString& filename, PgnMode mode = Verbose) const;
 
   /*!
    * Returns true if the game's variant is "standard" and it's
@@ -136,7 +137,7 @@ public:
    * Returns the value of tag \a tag.
    * If \a tag doesn't exist, an empty string is returned.
    */
-  QString tagValue(const QString &tag) const;
+  QString tagValue(const QString& tag) const;
   /*! Returns the name of the tournament or match event. */
   QString event() const;
   /*! Returns the location of the event. */
@@ -160,25 +161,25 @@ public:
    * Sets \a tag's value to \a value.
    * If \a tag doesn't exist, a new tag is created.
    */
-  void setTag(const QString &tag, const QString &value);
+  void setTag(const QString& tag, const QString& value);
   /*! Sets the name of the tournament or match event. */
-  void setEvent(const QString &event);
+  void setEvent(const QString& event);
   /*! Sets the location of the event. */
-  void setSite(const QString &site);
+  void setSite(const QString& site);
   /*! Sets the starting date of the game. */
-  void setDate(const QDate &date);
+  void setDate(const QDate& date);
   /*! Sets the playing round ordinal of the game. */
   void setRound(int round);
   /*! Sets the player's name who plays \a side. */
-  void setPlayerName(Chess::Side side, const QString &name);
+  void setPlayerName(Chess::Side side, const QString& name);
   /*! Sets the result of the game. */
-  void setResult(const Chess::Result &result);
+  void setResult(const Chess::Result& result);
   /*! Sets the chess variant of the game. */
-  void setVariant(const QString &variant);
+  void setVariant(const QString& variant);
   /*! Sets the side that starts the game. */
   void setStartingSide(Chess::Side side);
   /*! Sets the starting position's FEN string. */
-  void setStartingFenString(Chess::Side side, const QString &fen);
+  void setStartingFenString(Chess::Side side, const QString& fen);
   /*!
    * Sets a description for the result.
    *
@@ -186,7 +187,7 @@ public:
    * \note This is not the same as the "Termination" tag which can
    *       only hold one of the standardized values.
    */
-  void setResultDescription(const QString &description);
+  void setResultDescription(const QString& description);
 
   /*!
    * Sets a receiver for PGN tags
@@ -194,33 +195,33 @@ public:
    * \a receiver is an object whose "setTag(QString tag, QString value)"
    * slot is called when a PGN tag changes.
    */
-  void setTagReceiver(QObject *receiver);
+  void setTagReceiver(QObject* receiver);
   /*! Sets the starting time of the game */
-  void setGameStartTime(const QDateTime &dateTime);
+  void setGameStartTime(const QDateTime& dateTime);
   /*! Sets the end time and the duration of the game */
-  void setGameEndTime(const QDateTime &dateTime);
+  void setGameEndTime(const QDateTime& dateTime);
 
   /*! Returns QMap of scores extracted from PGN comments */
   QMap<int, int> extractScores() const;
 
-private:
-  bool parseMove(PgnStream &in, bool addEco);
+ private:
+  bool parseMove(PgnStream& in, bool addEco);
 
   Chess::Side m_startingSide;
-  const EcoNode *m_eco;
+  const EcoNode* m_eco;
   QMap<QString, QString> m_tags;
   QVector<MoveData> m_moves;
-  QObject *m_tagReceiver;
+  QObject* m_tagReceiver;
   QString m_initialComment;
-  static QString timeStamp(const QDateTime &dateTime);
+  static QString timeStamp(const QDateTime& dateTime);
   QDateTime m_gameStartTime;
 };
 
 /*! Reads a PGN game from a PGN stream. */
-extern LIB_EXPORT PgnStream &operator>>(PgnStream &in, PgnGame &game);
+extern LIB_EXPORT PgnStream& operator>>(PgnStream& in, PgnGame& game);
 
 /*! Writes a PGN game in verbose mode to a text stream. */
-extern LIB_EXPORT QTextStream &operator<<(QTextStream &out,
-                                          const PgnGame &game);
+extern LIB_EXPORT QTextStream& operator<<(QTextStream& out,
+                                          const PgnGame& game);
 
-#endif // PGNGAME_H
+#endif  // PGNGAME_H

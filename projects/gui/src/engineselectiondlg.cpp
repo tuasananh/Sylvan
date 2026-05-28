@@ -18,11 +18,12 @@
 */
 
 #include "engineselectiondlg.h"
+
 #include "engineconfigproxymodel.h"
 #include "ui_engineselectiondlg.h"
 
 EngineSelectionDialog::EngineSelectionDialog(
-    EngineConfigurationProxyModel *model, QWidget *parent)
+    EngineConfigurationProxyModel* model, QWidget* parent)
     : QDialog(parent), m_model(model), ui(new Ui::EngineSelectionDialog) {
   Q_ASSERT(model != nullptr);
   ui->setupUi(this);
@@ -43,6 +44,6 @@ QItemSelection EngineSelectionDialog::selection() const {
       ui->m_enginesList->selectionModel()->selection());
 }
 
-QListView *EngineSelectionDialog::enginesList() const {
+QListView* EngineSelectionDialog::enginesList() const {
   return ui->m_enginesList;
 }

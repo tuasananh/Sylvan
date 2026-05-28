@@ -20,9 +20,10 @@
 #ifndef RESULT_H
 #define RESULT_H
 
-#include "side.h"
 #include <QCoreApplication>
 #include <QMetaType>
+
+#include "side.h"
 
 namespace Chess {
 
@@ -35,7 +36,7 @@ namespace Chess {
 class LIB_EXPORT Result {
   Q_DECLARE_TR_FUNCTIONS(Result)
 
-public:
+ public:
   /*! Result type. */
   enum Type {
     //! Win by any means.
@@ -72,14 +73,14 @@ public:
    *        additional description is appended to it.
    */
   explicit Result(Type type = NoResult, Side winner = Side(),
-                  const QString &description = QString());
+                  const QString& description = QString());
   /*! Creates a new result from a string. */
-  explicit Result(const QString &str);
+  explicit Result(const QString& str);
 
   /*! Returns true if \a other is the same as this result. */
-  bool operator==(const Result &other) const;
+  bool operator==(const Result& other) const;
   /*! Returns true if \a other different from this result. */
-  bool operator!=(const Result &other) const;
+  bool operator!=(const Result& other) const;
   /*! Returns true if the result is NoResult. */
   bool isNone() const;
   /*! Returns true if the result is Draw. */
@@ -107,14 +108,14 @@ public:
    */
   QString toVerboseString() const;
 
-private:
+ private:
   Type m_type;
   Side m_winner;
   QString m_description;
 };
 
-} // namespace Chess
+}  // namespace Chess
 
 Q_DECLARE_METATYPE(Chess::Result)
 
-#endif // RESULT_H
+#endif  // RESULT_H

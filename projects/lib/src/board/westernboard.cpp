@@ -18,16 +18,22 @@
 */
 
 #include "westernboard.h"
-#include "boardtransition.h"
-#include "westernzobrist.h"
+
 #include <QStringList>
 #include <QVariant>
 
+#include "boardtransition.h"
+#include "westernzobrist.h"
+
 namespace Chess {
 
-WesternBoard::WesternBoard(WesternZobrist *zobrist)
-    : Board(zobrist), m_arwidth(0), m_sign(1), m_plyOffset(0),
-      m_reversibleMoveCount(0), m_zobrist(zobrist) {
+WesternBoard::WesternBoard(WesternZobrist* zobrist)
+    : Board(zobrist),
+      m_arwidth(0),
+      m_sign(1),
+      m_plyOffset(0),
+      m_reversibleMoveCount(0),
+      m_zobrist(zobrist) {
   setPieceType(Pawn, tr("pawn"), "P");
   setPieceType(Horse, tr("horse"), "N");
   setPieceType(Elephant, tr("elephant"), "B");
@@ -158,15 +164,14 @@ void WesternBoard::vInitialize() {
   strnumName[15] = " ";
 }
 
-int WesternBoard::captureType(const Move &move) const {
+int WesternBoard::captureType(const Move& move) const {
   return Board::captureType(move);
 }
 
-Move WesternBoard::moveFromStandardString(const QString &str) {
+Move WesternBoard::moveFromStandardString(const QString& str) {
   // Thử parse theo chuẩn coordinate (ví dụ: "c3c4") trước
   Move move = moveFromLanString(str);
-  if (!move.isNull() && vIsLegalMove(move))
-    return move;
+  if (!move.isNull() && vIsLegalMove(move)) return move;
 
   // Nếu không khớp, fallback về standard Chinese algebraic notation
   QVarLengthArray<Move> moves;
@@ -185,11 +190,11 @@ Move WesternBoard::moveFromStandardString(const QString &str) {
   return Move();
 }
 
-QString WesternBoard::lanMoveString(const Move &move) {
+QString WesternBoard::lanMoveString(const Move& move) {
   return Board::lanMoveString(move);
 }
 
-QString WesternBoard::standardMoveString(const Move &move) {
+QString WesternBoard::standardMoveString(const Move& move) {
   QString str;
   int source = move.sourceSquare();
   int target = move.targetSquare();
@@ -212,8 +217,7 @@ QString WesternBoard::standardMoveString(const Move &move) {
     int targetSquare = source;
     while (true) {
       targetSquare -= 11;
-      if (!isValidSquare(chessSquare(targetSquare)))
-        break;
+      if (!isValidSquare(chessSquare(targetSquare))) break;
       Piece mpiece = pieceAt(targetSquare);
       if (mpiece.side() == side) {
         if (mpiece.type() == chessType) {
@@ -230,8 +234,7 @@ QString WesternBoard::standardMoveString(const Move &move) {
     targetSquare = source;
     while (true) {
       targetSquare += 11;
-      if (!isValidSquare(chessSquare(targetSquare)))
-        break;
+      if (!isValidSquare(chessSquare(targetSquare))) break;
       Piece mpiece = pieceAt(targetSquare);
       if (mpiece.side() == side) {
         if (mpiece.type() == chessType) {
@@ -332,7 +335,7 @@ QH_BRANCH:
   return str;
 }
 
-Move WesternBoard::moveFromLanString(const QString &str) {
+Move WesternBoard::moveFromLanString(const QString& str) {
   Move move(Board::moveFromEnglishString(str));
   return move;
 }
@@ -356,9 +359,8 @@ QString WesternBoard::vFenString(FenNotation notation) const {
   return fen;
 }
 
-bool WesternBoard::vSetFenString(const QStringList &fen) {
-  if (fen.size() < 2)
-    return false;
+bool WesternBoard::vSetFenString(const QStringList& fen) {
+  if (fen.size() < 2) return false;
   QStringList::const_iterator token = fen.begin();
 
   // Find the king squares
@@ -375,25 +377,21 @@ bool WesternBoard::vSetFenString(const QStringList &fen) {
 
   // Short non-standard format without castling and ep fields?
   bool isShortFormat = false;
-  if (fen.size() < 3)
-    token->toInt(&isShortFormat);
+  if (fen.size() < 3) token->toInt(&isShortFormat);
 
-  if (!isShortFormat)
-    ++token;
+  if (!isShortFormat) ++token;
 
   // En-passant square
   Side side(sideToMove());
   m_sign = (side == Side::Red) ? 1 : -1;
 
-  if (!isShortFormat)
-    ++token;
+  if (!isShortFormat) ++token;
 
   // Reversible halfmove count
   if (token != fen.end()) {
     bool ok;
     int tmp = token->toInt(&ok);
-    if (!ok || tmp < 0)
-      return false;
+    if (!ok || tmp < 0) return false;
     m_reversibleMoveCount = tmp;
     ++token;
   } else
@@ -403,20 +401,18 @@ bool WesternBoard::vSetFenString(const QStringList &fen) {
   if (token != fen.end()) {
     bool ok;
     int tmp = token->toInt(&ok);
-    if (!ok || tmp < 1)
-      return false;
+    if (!ok || tmp < 1) return false;
     m_plyOffset = 2 * (tmp - 1);
   } else
     m_plyOffset = 0;
 
-  if (m_sign != 1)
-    m_plyOffset++;
+  if (m_sign != 1) m_plyOffset++;
 
   m_history.clear();
   return true;
 }
 
-void WesternBoard::vMakeMove(const Move &move, BoardTransition *transition) {
+void WesternBoard::vMakeMove(const Move& move, BoardTransition* transition) {
   Side side = sideToMove();
   int source = move.sourceSquare();
   int target = move.targetSquare();
@@ -430,14 +426,11 @@ void WesternBoard::vMakeMove(const Move &move, BoardTransition *transition) {
 
   MoveData md = {capture, m_reversibleMoveCount};
 
-  if (source == target)
-    clearSource = 0;
+  if (source == target) clearSource = 0;
 
-  if (pieceType == King)
-    m_kingSquare[side] = target;
+  if (pieceType == King) m_kingSquare[side] = target;
 
-  if (captureType(move) != Piece::NoPiece)
-    isReversible = false;
+  if (captureType(move) != Piece::NoPiece) isReversible = false;
 
   if (transition != nullptr)
     if (source != 0)
@@ -445,8 +438,7 @@ void WesternBoard::vMakeMove(const Move &move, BoardTransition *transition) {
 
   setSquare(target, Piece(side, pieceType));
 
-  if (clearSource)
-    setSquare(source, Piece::NoPiece);
+  if (clearSource) setSquare(source, Piece::NoPiece);
 
   if (isReversible)
     m_reversibleMoveCount++;
@@ -457,8 +449,8 @@ void WesternBoard::vMakeMove(const Move &move, BoardTransition *transition) {
   m_sign *= -1;
 }
 
-void WesternBoard::vUndoMove(const Move &move) {
-  const MoveData &md = m_history.last();
+void WesternBoard::vUndoMove(const Move& move) {
+  const MoveData& md = m_history.last();
   int source = move.sourceSquare();
   int target = move.targetSquare();
 
@@ -467,158 +459,140 @@ void WesternBoard::vUndoMove(const Move &move) {
 
   m_reversibleMoveCount = md.reversibleMoveCount;
 
-  if (target == m_kingSquare[side])
-    m_kingSquare[side] = source;
+  if (target == m_kingSquare[side]) m_kingSquare[side] = source;
 
   setSquare(source, pieceAt(target));
   setSquare(target, md.capture);
   m_history.pop_back();
 }
 
-void WesternBoard::generateMovesForPiece(QVarLengthArray<Move> &moves,
+void WesternBoard::generateMovesForPiece(QVarLengthArray<Move>& moves,
                                          int pieceType,
                                          int sourceSquare) const {
   switch (pieceType) {
-  case Pawn: {
-    Piece piece = pieceAt(sourceSquare);
-    if (piece.side() == Side::Red) {
-      Side opSide = sideToMove().opposite();
-      for (int i = 0; i < m_RPawnOffsets.size(); i++) {
-        int targetSquare = sourceSquare + m_RPawnOffsets[i];
-        if (!isValidSquare(chessSquare(targetSquare)))
-          continue;
-        if (sourceSquare > 75)
-          if (i != 0)
-            continue;
+    case Pawn: {
+      Piece piece = pieceAt(sourceSquare);
+      if (piece.side() == Side::Red) {
+        Side opSide = sideToMove().opposite();
+        for (int i = 0; i < m_RPawnOffsets.size(); i++) {
+          int targetSquare = sourceSquare + m_RPawnOffsets[i];
+          if (!isValidSquare(chessSquare(targetSquare))) continue;
+          if (sourceSquare > 75)
+            if (i != 0) continue;
 
-        Piece capture = pieceAt(targetSquare);
-        if (capture.isEmpty() || capture.side() == opSide)
-          moves.append(Move(sourceSquare, targetSquare));
-      }
-    } else {
-      Side opSide = sideToMove().opposite();
-      for (int i = 0; i < m_BPawnOffsets.size(); i++) {
-        int targetSquare = sourceSquare + m_BPawnOffsets[i];
-        if (!isValidSquare(chessSquare(targetSquare)))
-          continue;
-        if (sourceSquare < 78)
-          if (i != 0)
-            continue;
-
-        Piece capture = pieceAt(targetSquare);
-        if (capture.isEmpty() || capture.side() == opSide)
-          moves.append(Move(sourceSquare, targetSquare));
-      }
-    }
-  } break;
-  case King: {
-    Side opSide = sideToMove().opposite();
-    for (int i = 0; i < m_RookOffsets.size(); i++) {
-      int targetSquare = sourceSquare + m_RookOffsets[i];
-      if (!isValidSquare(chessSquare(targetSquare)))
-        continue;
-
-      if (!isInFort(chessSquare(targetSquare)))
-        continue;
-
-      Piece capture = pieceAt(targetSquare);
-      if (capture.isEmpty() || capture.side() == opSide)
-        moves.append(Move(sourceSquare, targetSquare));
-    }
-  } break;
-  case Guard: {
-    Side opSide = sideToMove().opposite();
-    for (int i = 0; i < m_GuardOffsets.size(); i++) {
-      int targetSquare = sourceSquare + m_GuardOffsets[i];
-      if (!isValidSquare(chessSquare(targetSquare)))
-        continue;
-
-      if (!isInFort(chessSquare(targetSquare)))
-        continue;
-
-      Piece capture = pieceAt(targetSquare);
-      if (capture.isEmpty() || capture.side() == opSide)
-        moves.append(Move(sourceSquare, targetSquare));
-    }
-  } break;
-  case Rook: {
-    Side side = sideToMove();
-    for (int i = 0; i < m_RookOffsets.size(); i++) {
-      int offset = m_RookOffsets[i];
-      int targetSquare = sourceSquare + offset;
-      Piece capture;
-      while (!(capture = pieceAt(targetSquare)).isWall() &&
-             capture.side() != side) {
-        moves.append(Move(sourceSquare, targetSquare));
-        if (!capture.isEmpty())
-          break;
-        targetSquare += offset;
-      }
-    }
-  } break;
-  case Cannon: {
-    Side side = sideToMove();
-    for (int i = 0; i < m_RookOffsets.size(); i++) {
-      int offset = m_RookOffsets[i];
-      int targetSquare = sourceSquare + offset;
-      Piece capture;
-      while (!(capture = pieceAt(targetSquare)).isWall() && capture.isEmpty()) {
-        moves.append(Move(sourceSquare, targetSquare));
-        if (!capture.isEmpty())
-          break;
-        targetSquare += offset;
-      }
-      if (!capture.isEmpty()) {
-        while (true) {
-          targetSquare += offset;
-          capture = pieceAt(targetSquare);
-          if (capture.isEmpty())
-            continue;
-          if (capture.isWall())
-            break;
-          if (capture.side() != side) {
+          Piece capture = pieceAt(targetSquare);
+          if (capture.isEmpty() || capture.side() == opSide)
             moves.append(Move(sourceSquare, targetSquare));
-            break;
+        }
+      } else {
+        Side opSide = sideToMove().opposite();
+        for (int i = 0; i < m_BPawnOffsets.size(); i++) {
+          int targetSquare = sourceSquare + m_BPawnOffsets[i];
+          if (!isValidSquare(chessSquare(targetSquare))) continue;
+          if (sourceSquare < 78)
+            if (i != 0) continue;
+
+          Piece capture = pieceAt(targetSquare);
+          if (capture.isEmpty() || capture.side() == opSide)
+            moves.append(Move(sourceSquare, targetSquare));
+        }
+      }
+    } break;
+    case King: {
+      Side opSide = sideToMove().opposite();
+      for (int i = 0; i < m_RookOffsets.size(); i++) {
+        int targetSquare = sourceSquare + m_RookOffsets[i];
+        if (!isValidSquare(chessSquare(targetSquare))) continue;
+
+        if (!isInFort(chessSquare(targetSquare))) continue;
+
+        Piece capture = pieceAt(targetSquare);
+        if (capture.isEmpty() || capture.side() == opSide)
+          moves.append(Move(sourceSquare, targetSquare));
+      }
+    } break;
+    case Guard: {
+      Side opSide = sideToMove().opposite();
+      for (int i = 0; i < m_GuardOffsets.size(); i++) {
+        int targetSquare = sourceSquare + m_GuardOffsets[i];
+        if (!isValidSquare(chessSquare(targetSquare))) continue;
+
+        if (!isInFort(chessSquare(targetSquare))) continue;
+
+        Piece capture = pieceAt(targetSquare);
+        if (capture.isEmpty() || capture.side() == opSide)
+          moves.append(Move(sourceSquare, targetSquare));
+      }
+    } break;
+    case Rook: {
+      Side side = sideToMove();
+      for (int i = 0; i < m_RookOffsets.size(); i++) {
+        int offset = m_RookOffsets[i];
+        int targetSquare = sourceSquare + offset;
+        Piece capture;
+        while (!(capture = pieceAt(targetSquare)).isWall() &&
+               capture.side() != side) {
+          moves.append(Move(sourceSquare, targetSquare));
+          if (!capture.isEmpty()) break;
+          targetSquare += offset;
+        }
+      }
+    } break;
+    case Cannon: {
+      Side side = sideToMove();
+      for (int i = 0; i < m_RookOffsets.size(); i++) {
+        int offset = m_RookOffsets[i];
+        int targetSquare = sourceSquare + offset;
+        Piece capture;
+        while (!(capture = pieceAt(targetSquare)).isWall() &&
+               capture.isEmpty()) {
+          moves.append(Move(sourceSquare, targetSquare));
+          if (!capture.isEmpty()) break;
+          targetSquare += offset;
+        }
+        if (!capture.isEmpty()) {
+          while (true) {
+            targetSquare += offset;
+            capture = pieceAt(targetSquare);
+            if (capture.isEmpty()) continue;
+            if (capture.isWall()) break;
+            if (capture.side() != side) {
+              moves.append(Move(sourceSquare, targetSquare));
+              break;
+            }
           }
         }
       }
+      break;
     }
-    break;
-  }
-  case Horse: {
-    Side opSide = sideToMove().opposite();
-    for (int i = 0; i < m_HorseOffsets.size(); i++) {
-      int targetSquare = sourceSquare + m_HorseOffsets[i];
-      if (!isValidSquare(chessSquare(targetSquare)))
-        continue;
-      int leg = sourceSquare + m_HorseLegOffsets[i];
-      if (!pieceAt(leg).isEmpty())
-        continue;
-      Piece capture = pieceAt(targetSquare);
-      if (capture.isEmpty() || capture.side() == opSide)
-        moves.append(Move(sourceSquare, targetSquare));
-    }
-  } break;
-  case Elephant: {
-    Side opSide = sideToMove().opposite();
-    for (int i = 0; i < m_ElephantOffsets.size(); i++) {
-      int targetSquare = sourceSquare + m_ElephantOffsets[i];
-      if (!isValidSquare(chessSquare(targetSquare)))
-        continue;
-      int leg = sourceSquare + m_ElephantEyeOffsets[i];
-      if (!pieceAt(leg).isEmpty())
-        continue;
-
-      Piece capture = pieceAt(targetSquare);
-      if (capture.isEmpty() || capture.side() == opSide) {
-        if (sourceSquare > 78 && targetSquare < 78)
-          continue;
-        if (sourceSquare < 78 && targetSquare > 78)
-          continue;
-        moves.append(Move(sourceSquare, targetSquare));
+    case Horse: {
+      Side opSide = sideToMove().opposite();
+      for (int i = 0; i < m_HorseOffsets.size(); i++) {
+        int targetSquare = sourceSquare + m_HorseOffsets[i];
+        if (!isValidSquare(chessSquare(targetSquare))) continue;
+        int leg = sourceSquare + m_HorseLegOffsets[i];
+        if (!pieceAt(leg).isEmpty()) continue;
+        Piece capture = pieceAt(targetSquare);
+        if (capture.isEmpty() || capture.side() == opSide)
+          moves.append(Move(sourceSquare, targetSquare));
       }
-    }
-  } break;
+    } break;
+    case Elephant: {
+      Side opSide = sideToMove().opposite();
+      for (int i = 0; i < m_ElephantOffsets.size(); i++) {
+        int targetSquare = sourceSquare + m_ElephantOffsets[i];
+        if (!isValidSquare(chessSquare(targetSquare))) continue;
+        int leg = sourceSquare + m_ElephantEyeOffsets[i];
+        if (!pieceAt(leg).isEmpty()) continue;
+
+        Piece capture = pieceAt(targetSquare);
+        if (capture.isEmpty() || capture.side() == opSide) {
+          if (sourceSquare > 78 && targetSquare < 78) continue;
+          if (sourceSquare < 78 && targetSquare > 78) continue;
+          moves.append(Move(sourceSquare, targetSquare));
+        }
+      }
+    } break;
   }
 }
 
@@ -634,8 +608,7 @@ bool WesternBoard::inCheck(Side side) const {
 
     int count = 0;
     while (true) {
-      if (!isValidSquare(chessSquare(targetSquare)))
-        break;
+      if (!isValidSquare(chessSquare(targetSquare))) break;
 
       piece = pieceAt(targetSquare);
       if (!piece.isEmpty()) {
@@ -645,21 +618,17 @@ bool WesternBoard::inCheck(Side side) const {
             if (piece.type() == Rook || piece.type() == King)
               return true;
             else if (piece.type() == Pawn) {
-              if (abs(targetSquare - ksquare) == 1)
-                return true;
+              if (abs(targetSquare - ksquare) == 1) return true;
               if (side == Side::Red) {
-                if (targetSquare == ksquare - 11)
-                  return true;
+                if (targetSquare == ksquare - 11) return true;
               } else {
-                if (targetSquare == ksquare + 11)
-                  return true;
+                if (targetSquare == ksquare + 11) return true;
               }
             }
           }
         } else if (count == 2) {
           if (piece.side() == opSide)
-            if (piece.type() == Cannon)
-              return true;
+            if (piece.type() == Cannon) return true;
           break;
         }
       }
@@ -673,8 +642,7 @@ bool WesternBoard::inCheck(Side side) const {
     if (piece.side() == opSide && piece.type() == Horse) {
       Piece leg = pieceAt(ksquare + m_HorseCheckLegOffsets[i]);
 
-      if (leg.isEmpty())
-        return true;
+      if (leg.isEmpty()) return true;
     }
   }
 
@@ -683,16 +651,14 @@ bool WesternBoard::inCheck(Side side) const {
 
 bool WesternBoard::isLegalPosition() {
   Side side = sideToMove().opposite();
-  if (inCheck(side))
-    return false;
+  if (inCheck(side)) return false;
 
-  if (m_history.isEmpty())
-    return true;
+  if (m_history.isEmpty()) return true;
 
   return true;
 }
 
-bool WesternBoard::vIsLegalMove(const Move &move) {
+bool WesternBoard::vIsLegalMove(const Move& move) {
   Q_ASSERT(!move.isNull());
   return Board::vIsLegalMove(move);
 }
@@ -718,21 +684,20 @@ Result WesternBoard::result() {
   int material = 0;
 
   for (int i = 0; i < arraySize(); i++) {
-    const Piece &piece = pieceAt(i);
-    if (!piece.isValid())
-      continue;
+    const Piece& piece = pieceAt(i);
+    if (!piece.isValid()) continue;
 
     switch (piece.type()) {
-    case King:
-      break;
-    case Guard:
-      break;
-    case Elephant:
-      material++;
-      break;
-    default:
-      material += 2;
-      break;
+      case King:
+        break;
+      case Guard:
+        break;
+      case Elephant:
+        material++;
+        break;
+      default:
+        material += 2;
+        break;
     }
   }
 
@@ -754,4 +719,4 @@ Result WesternBoard::result() {
   return Result();
 }
 
-} // namespace Chess
+}  // namespace Chess

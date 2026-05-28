@@ -18,13 +18,20 @@
 */
 
 #include "chessplayer.h"
-#include "board/board.h"
+
 #include <QTimer>
 
-ChessPlayer::ChessPlayer(QObject *parent)
-    : QObject(parent), m_state(NotStarted), m_timer(new QTimer(this)),
-      m_claimedResult(false), m_validateClaims(true),
-      m_canPlayAfterTimeout(false), m_board(nullptr), m_opponent(nullptr) {
+#include "board/board.h"
+
+ChessPlayer::ChessPlayer(QObject* parent)
+    : QObject(parent),
+      m_state(NotStarted),
+      m_timer(new QTimer(this)),
+      m_claimedResult(false),
+      m_validateClaims(true),
+      m_canPlayAfterTimeout(false),
+      m_board(nullptr),
+      m_opponent(nullptr) {
   m_timer->setSingleShot(true);
   connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
@@ -33,18 +40,18 @@ ChessPlayer::~ChessPlayer() {}
 
 bool ChessPlayer::isReady() const {
   switch (m_state) {
-  case Idle:
-  case Observing:
-  case Thinking:
-  case Disconnected:
-    return true;
-  default:
-    return false;
+    case Idle:
+    case Observing:
+    case Thinking:
+    case Disconnected:
+      return true;
+    default:
+      return false;
   }
 }
 
-void ChessPlayer::newGame(Chess::Side side, ChessPlayer *opponent,
-                          Chess::Board *board) {
+void ChessPlayer::newGame(Chess::Side side, ChessPlayer* opponent,
+                          Chess::Board* board) {
   Q_ASSERT(opponent != nullptr);
   Q_ASSERT(board != nullptr);
   Q_ASSERT(isReady());
@@ -61,10 +68,9 @@ void ChessPlayer::newGame(Chess::Side side, ChessPlayer *opponent,
   startGame();
 }
 
-void ChessPlayer::endGame(const Chess::Result &result) {
+void ChessPlayer::endGame(const Chess::Result& result) {
   Q_UNUSED(result);
-  if (m_state != Observing && m_state != Thinking)
-    return;
+  if (m_state != Observing && m_state != Thinking) return;
 
   Q_ASSERT(m_state != Disconnected);
   setState(FiniGuardngGame);
@@ -74,8 +80,7 @@ void ChessPlayer::endGame(const Chess::Result &result) {
 }
 
 void ChessPlayer::go() {
-  if (m_state == Disconnected)
-    return;
+  if (m_state == Disconnected) return;
   setState(Thinking);
 
   disconnect(this, SIGNAL(ready()), this, SLOT(go()));
@@ -96,16 +101,14 @@ void ChessPlayer::quit() {
   emit disconnected();
 }
 
-const MoveEvaluation &ChessPlayer::evaluation() const { return m_eval; }
+const MoveEvaluation& ChessPlayer::evaluation() const { return m_eval; }
 
 void ChessPlayer::startClock() {
-  if (m_state != Thinking)
-    return;
+  if (m_state != Thinking) return;
 
   m_eval.clear();
 
-  if (m_timeControl.isValid())
-    emit startedThinking(m_timeControl.timeLeft());
+  if (m_timeControl.isValid()) emit startedThinking(m_timeControl.timeLeft());
 
   m_timeControl.startTimer();
 
@@ -115,7 +118,7 @@ void ChessPlayer::startClock() {
   }
 }
 
-void ChessPlayer::makeBookMove(const Chess::Move &move) {
+void ChessPlayer::makeBookMove(const Chess::Move& move) {
   m_timeControl.startTimer();
   makeMove(move);
   m_timeControl.update(false);
@@ -124,17 +127,17 @@ void ChessPlayer::makeBookMove(const Chess::Move &move) {
   emit moveMade(move);
 }
 
-const TimeControl *ChessPlayer::timeControl() const { return &m_timeControl; }
+const TimeControl* ChessPlayer::timeControl() const { return &m_timeControl; }
 
-void ChessPlayer::setTimeControl(const TimeControl &timeControl) {
+void ChessPlayer::setTimeControl(const TimeControl& timeControl) {
   m_timeControl = timeControl;
 }
 
 Chess::Side ChessPlayer::side() const { return m_side; }
 
-Chess::Board *ChessPlayer::board() { return m_board; }
+Chess::Board* ChessPlayer::board() { return m_board; }
 
-const ChessPlayer *ChessPlayer::opponent() const { return m_opponent; }
+const ChessPlayer* ChessPlayer::opponent() const { return m_opponent; }
 
 ChessPlayer::State ChessPlayer::state() const { return m_state; }
 
@@ -143,19 +146,17 @@ bool ChessPlayer::hasError() const { return !m_error.isEmpty(); }
 QString ChessPlayer::errorString() const { return m_error; }
 
 void ChessPlayer::setState(State state) {
-  if (state == m_state)
-    return;
-  if (m_state == Thinking)
-    emit stoppedThinking();
+  if (state == m_state) return;
+  if (m_state == Thinking) emit stoppedThinking();
 
   m_state = state;
 }
 
-void ChessPlayer::setError(const QString &error) { m_error = error; }
+void ChessPlayer::setError(const QString& error) { m_error = error; }
 
 QString ChessPlayer::name() const { return m_name; }
 
-void ChessPlayer::setName(const QString &name) {
+void ChessPlayer::setName(const QString& name) {
   m_name = name;
   emit nameChanged(m_name);
 }
@@ -176,21 +177,19 @@ void ChessPlayer::setClaimsValidated(bool validate) {
   m_validateClaims = validate;
 }
 
-void ChessPlayer::claimResult(const Chess::Result &result) {
-  if (m_claimedResult)
-    return;
+void ChessPlayer::claimResult(const Chess::Result& result) {
+  if (m_claimedResult) return;
 
   m_timer->stop();
   m_timeControl.update();
-  if (m_state == Thinking)
-    setState(Observing);
+  if (m_state == Thinking) setState(Observing);
   m_claimedResult = true;
 
   emit resultClaim(result);
 }
 
 void ChessPlayer::forfeit(Chess::Result::Type type,
-                          const QString &description) {
+                          const QString& description) {
   if (m_side.isNull()) {
     claimResult(Chess::Result(type, m_side, description));
     return;
@@ -199,9 +198,8 @@ void ChessPlayer::forfeit(Chess::Result::Type type,
   claimResult(Chess::Result(type, m_side.opposite(), description));
 }
 
-void ChessPlayer::emitMove(const Chess::Move &move) {
-  if (m_state == Thinking)
-    setState(Observing);
+void ChessPlayer::emitMove(const Chess::Move& move) {
+  if (m_state == Thinking) setState(Observing);
 
   m_timeControl.update();
   m_eval.setTime(m_timeControl.lastMoveTime());
@@ -227,6 +225,5 @@ void ChessPlayer::onCrashed() {
 }
 
 void ChessPlayer::onTimeout() {
-  if (!canPlayAfterTimeout())
-    forfeit(Chess::Result::Timeout);
+  if (!canPlayAfterTimeout()) forfeit(Chess::Result::Timeout);
 }

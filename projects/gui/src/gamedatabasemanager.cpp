@@ -17,11 +17,12 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "gamedatabasemanager.h"
+
 #include <QDataStream>
 #include <QFileInfo>
 #include <QThreadPool>
 
-#include "gamedatabasemanager.h"
 #include "importprogressdlg.h"
 #include "pgndatabase.h"
 #include "pgngameentry.h"
@@ -31,23 +32,22 @@
 #define GAME_DATABASE_STATE_MAGIC 0xDEADD00D
 #define GAME_DATABASE_STATE_VERSION 1
 
-GameDatabaseManager::GameDatabaseManager(QObject *parent)
+GameDatabaseManager::GameDatabaseManager(QObject* parent)
     : QObject(parent), m_modified(false) {}
 
 GameDatabaseManager::~GameDatabaseManager() { qDeleteAll(m_databases); }
 
-QList<PgnDatabase *> GameDatabaseManager::databases() const {
+QList<PgnDatabase*> GameDatabaseManager::databases() const {
   return m_databases;
 }
 
-bool GameDatabaseManager::writeState(const QString &fileName) {
+bool GameDatabaseManager::writeState(const QString& fileName) {
   QFile stateFile(fileName);
 
-  if (!stateFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    return false;
+  if (!stateFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) return false;
 
   QDataStream out(&stateFile);
-  out.setVersion(QDataStream::Qt_4_6); // don't change
+  out.setVersion(QDataStream::Qt_4_6);  // don't change
 
   // Write magic number and version
   out << (quint32)GAME_DATABASE_STATE_MAGIC;
@@ -57,15 +57,14 @@ bool GameDatabaseManager::writeState(const QString &fileName) {
   out << (qint32)m_databases.count();
 
   // Write the contents of the databases
-  for (const PgnDatabase *db : qAsConst(m_databases)) {
+  for (const PgnDatabase* db : qAsConst(m_databases)) {
     out << db->fileName();
     out << db->lastModified();
     out << db->displayName();
     out << (qint32)db->entries().count();
 
     const auto entries = db->entries();
-    for (const PgnGameEntry *entry : entries)
-      entry->write(out);
+    for (const PgnGameEntry* entry : entries) entry->write(out);
   }
 
   m_modified = false;
@@ -73,14 +72,13 @@ bool GameDatabaseManager::writeState(const QString &fileName) {
   return true;
 }
 
-bool GameDatabaseManager::readState(const QString &fileName) {
+bool GameDatabaseManager::readState(const QString& fileName) {
   QFile stateFile(fileName);
 
-  if (!stateFile.open(QIODevice::ReadOnly))
-    return false;
+  if (!stateFile.open(QIODevice::ReadOnly)) return false;
 
   QDataStream in(&stateFile);
-  in.setVersion(QDataStream::Qt_4_6); // don't change
+  in.setVersion(QDataStream::Qt_4_6);  // don't change
 
   // Read and verify the magic value
   quint32 magic;
@@ -110,7 +108,7 @@ bool GameDatabaseManager::readState(const QString &fileName) {
   QString dbFileName;
   QDateTime dbLastModified;
   QString dbDisplayName;
-  QList<PgnDatabase *> readDatabases;
+  QList<PgnDatabase*> readDatabases;
 
   for (int i = 0; i < dbCount; i++) {
     in >> dbFileName;
@@ -135,14 +133,14 @@ bool GameDatabaseManager::readState(const QString &fileName) {
     in >> dbEntryCount;
 
     // Read the entries
-    QList<const PgnGameEntry *> entries;
+    QList<const PgnGameEntry*> entries;
     for (int j = 0; j < dbEntryCount; j++) {
-      PgnGameEntry *entry = new PgnGameEntry;
+      PgnGameEntry* entry = new PgnGameEntry;
       entry->read(in);
       entries << entry;
     }
 
-    PgnDatabase *db = new PgnDatabase(dbFileName);
+    PgnDatabase* db = new PgnDatabase(dbFileName);
     db->setEntries(entries);
     db->setLastModified(dbLastModified);
     db->setDisplayName(dbDisplayName);
@@ -158,10 +156,10 @@ bool GameDatabaseManager::readState(const QString &fileName) {
   return true;
 }
 
-void GameDatabaseManager::importPgnFile(const QString &fileName) {
-  PgnImporter *pgnImporter = new PgnImporter(fileName);
-  connect(pgnImporter, SIGNAL(databaseRead(PgnDatabase *)), this,
-          SLOT(addDatabase(PgnDatabase *)));
+void GameDatabaseManager::importPgnFile(const QString& fileName) {
+  PgnImporter* pgnImporter = new PgnImporter(fileName);
+  connect(pgnImporter, SIGNAL(databaseRead(PgnDatabase*)), this,
+          SLOT(addDatabase(PgnDatabase*)));
 
   auto dlg = new ImportProgressDialog(pgnImporter);
   dlg->show();
@@ -171,7 +169,7 @@ void GameDatabaseManager::importPgnFile(const QString &fileName) {
   QThreadPool::globalInstance()->start(pgnImporter);
 }
 
-void GameDatabaseManager::addDatabase(PgnDatabase *database) {
+void GameDatabaseManager::addDatabase(PgnDatabase* database) {
   m_databases << database;
   m_modified = true;
   emit databaseAdded(m_databases.count() - 1);

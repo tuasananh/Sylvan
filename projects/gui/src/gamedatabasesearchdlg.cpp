@@ -18,9 +18,10 @@
 */
 
 #include "gamedatabasesearchdlg.h"
+
 #include "ui_gamedatabasesearchdlg.h"
 
-GameDatabaseSearchDialog::GameDatabaseSearchDialog(QWidget *parent)
+GameDatabaseSearchDialog::GameDatabaseSearchDialog(QWidget* parent)
     : QDialog(parent, Qt::Window), ui(new Ui::GameDatabaseSearchDialog) {
   ui->setupUi(this);
 
@@ -57,8 +58,7 @@ PgnGameFilter GameDatabaseSearchDialog::filter() const {
   filter.setResultInverted(ui->m_invertResultCheck->isChecked());
 
   int side = ui->m_playerSideCombo->currentIndex() - 1;
-  if (side == -1)
-    side = Chess::Side::NoSide;
+  if (side == -1) side = Chess::Side::NoSide;
   filter.setPlayer(ui->m_playerEdit->text(), Chess::Side::Type(side));
   filter.setOpponent(ui->m_opponentEdit->text());
 

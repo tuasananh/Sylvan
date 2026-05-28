@@ -32,26 +32,26 @@ class SettingsDialog;
 class SettingsDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new SettingsDialog. */
-  SettingsDialog(QWidget *parent = nullptr);
+  SettingsDialog(QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~SettingsDialog();
 
-protected:
+ protected:
   // Inherited from QDialog
-  virtual void closeEvent(QCloseEvent *event);
+  virtual void closeEvent(QCloseEvent* event);
 
-private slots:
+ private slots:
   void browseTbPath();
   void browseDefaultPgnOutFile();
   void browseTournamentDefaultPgnOutFile();
   void browseTournamentDefaultEpdOutFile();
 
-private:
+ private:
   void readSettings();
 
-  Ui::SettingsDialog *ui;
+  Ui::SettingsDialog* ui;
 };
 
-#endif // SETTINGSDIALOG_H
+#endif  // SETTINGSDIALOG_H

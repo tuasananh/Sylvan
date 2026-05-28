@@ -21,10 +21,10 @@
 
 namespace Chess {
 
-Result::Result(Type type, Side winner, const QString &description)
+Result::Result(Type type, Side winner, const QString& description)
     : m_type(type), m_winner(winner), m_description(description) {}
 
-Result::Result(const QString &str) : m_type(ResultError) {
+Result::Result(const QString& str) : m_type(ResultError) {
   if (str.startsWith("1-0")) {
     m_type = Win;
     m_winner = Side::Red;
@@ -42,12 +42,12 @@ Result::Result(const QString &str) : m_type(ResultError) {
     m_description = str.mid(start + 1, end - start - 1);
 }
 
-bool Result::operator==(const Result &other) const {
+bool Result::operator==(const Result& other) const {
   return (m_type == other.m_type && m_winner == other.m_winner &&
           m_description == other.m_description);
 }
 
-bool Result::operator!=(const Result &other) const {
+bool Result::operator!=(const Result& other) const {
   return (m_type != other.m_type || m_winner != other.m_winner ||
           m_description != other.m_description);
 }
@@ -61,8 +61,7 @@ bool Result::isDraw() const {
 Side Result::winner() const { return m_winner; }
 
 Side Result::loser() const {
-  if (m_winner.isNull())
-    return Side::NoSide;
+  if (m_winner.isNull()) return Side::NoSide;
   return m_winner.opposite();
 }
 
@@ -113,8 +112,7 @@ QString Result::description() const {
     else if (m_type == Draw)
       str = tr("Draw");
   } else {
-    if (!str.isEmpty())
-      str += ": ";
+    if (!str.isEmpty()) str += ": ";
     str += m_description;
   }
 
@@ -124,12 +122,9 @@ QString Result::description() const {
 }
 
 QString Result::toShortString() const {
-  if (m_type == NoResult || m_type == ResultError)
-    return tr("*");
-  if (m_winner == Side::Red)
-    return tr("1-0");
-  if (m_winner == Side::Black)
-    return tr("0-1");
+  if (m_type == NoResult || m_type == ResultError) return tr("*");
+  if (m_winner == Side::Red) return tr("1-0");
+  if (m_winner == Side::Black) return tr("0-1");
   return tr("1/2-1/2");
 }
 
@@ -137,4 +132,4 @@ QString Result::toVerboseString() const {
   return toShortString() + QString(" {") + description() + "}";
 }
 
-} // namespace Chess
+}  // namespace Chess

@@ -20,12 +20,12 @@
 #ifndef PGN_GAME_ENTRY_MODEL_H
 #define PGN_GAME_ENTRY_MODEL_H
 
+#include <pgngamefilter.h>
+
 #include <QAbstractItemModel>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QList>
-
-#include <pgngamefilter.h>
 
 class PgnGameEntry;
 
@@ -35,12 +35,12 @@ class PgnGameEntry;
 class PgnGameEntryModel : public QAbstractItemModel {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs a PGN game entry model with the given \a parent. */
-  PgnGameEntryModel(QObject *parent = nullptr);
+  PgnGameEntryModel(QObject* parent = nullptr);
 
   /*! Returns the PGN entry at \a row. */
-  const PgnGameEntry *entryAt(int row) const;
+  const PgnGameEntry* entryAt(int row) const;
   /*!
    * Returns the total number of PGN game entries matching the
    * current filter.
@@ -55,34 +55,34 @@ public:
    */
   int sourceIndex(int row) const;
   /*! Associates a list of PGN game entries with this model. */
-  void setEntries(const QList<const PgnGameEntry *> &entries);
+  void setEntries(const QList<const PgnGameEntry*>& entries);
 
   // Inherited from QAbstractItemModel
   virtual QModelIndex index(int row, int column,
-                            const QModelIndex &parent = QModelIndex()) const;
-  virtual QModelIndex parent(const QModelIndex &index) const;
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual QVariant data(const QModelIndex &index, int role) const;
+                            const QModelIndex& parent = QModelIndex()) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex& index, int role) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;
 
-public slots:
+ public slots:
   /*! Sets the filter for filtering the contents of the database. */
-  void setFilter(const PgnGameFilter &filter);
+  void setFilter(const PgnGameFilter& filter);
 
-protected:
+ protected:
   // Inherited from QAbstractItemModel
-  virtual bool canFetchMore(const QModelIndex &parent) const;
-  virtual void fetchMore(const QModelIndex &parent);
+  virtual bool canFetchMore(const QModelIndex& parent) const;
+  virtual void fetchMore(const QModelIndex& parent);
 
-private slots:
+ private slots:
   void onResultsReady();
 
-private:
-  void applyFilter(const PgnGameFilter &filter);
+ private:
+  void applyFilter(const PgnGameFilter& filter);
 
-  QList<const PgnGameEntry *> m_entries;
+  QList<const PgnGameEntry*> m_entries;
   QVector<int> m_indexes;
   int m_entryCount;
   QFuture<int> m_filtered;
@@ -90,4 +90,4 @@ private:
   PgnGameFilter m_filter;
 };
 
-#endif // PGN_GAME_ENTRY_MODEL_H
+#endif  // PGN_GAME_ENTRY_MODEL_H

@@ -43,9 +43,9 @@ class QTextStream;
 class LIB_EXPORT JsonParser {
   Q_DECLARE_TR_FUNCTIONS(JsonParser)
 
-public:
+ public:
   /*! Creates a new parser that reads data from \a stream. */
-  JsonParser(QTextStream &stream);
+  JsonParser(QTextStream& stream);
   /*!
    * Parses JSON data from the stream.
    *
@@ -61,7 +61,7 @@ public:
   /*! Returns the line number on which the error occured. */
   qint64 errorLineNumber() const;
 
-private:
+ private:
   enum Token {
     JsonError,
     JsonGeneric,
@@ -79,14 +79,14 @@ private:
     JsonString
   };
 
-  static QString tokenString(Token type, const QString &str = QString());
+  static QString tokenString(Token type, const QString& str = QString());
 
   Token parseToken();
-  QVariant parseValue(Token *tokenType = 0);
+  QVariant parseValue(Token* tokenType = 0);
   QVariant parseObject();
   QVariant parseArray();
   QString parseString();
-  void setError(const QString &message);
+  void setError(const QString& message);
   void clearError();
 
   bool m_error;
@@ -95,7 +95,7 @@ private:
   QString m_errorString;
   QString m_lastToken;
   QChar m_buffer;
-  QTextStream &m_stream;
+  QTextStream& m_stream;
 };
 
-#endif // JSONPARSER_H
+#endif  // JSONPARSER_H

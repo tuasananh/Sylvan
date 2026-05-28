@@ -19,12 +19,12 @@
 
 #include "movecommenttoken.h"
 
-MoveCommentToken::MoveCommentToken(int ply, const QString &text)
+MoveCommentToken::MoveCommentToken(int ply, const QString& text)
     : PgnToken(), m_ply(ply), m_text(text) {}
 
 QString MoveCommentToken::toString() const { return m_text; }
 
-void MoveCommentToken::vInsert(QTextCursor &cursor) {
+void MoveCommentToken::vInsert(QTextCursor& cursor) {
   QString html = QString("<a class=\"comment\" href=\"comment://%1@\">%2</a> ")
                      .arg(m_ply)
                      .arg(m_text);
@@ -37,4 +37,4 @@ void MoveCommentToken::vInsert(QTextCursor &cursor) {
   cursor.insertHtml(html);
 }
 
-void MoveCommentToken::setValue(const QString &text) { m_text = text; }
+void MoveCommentToken::setValue(const QString& text) { m_text = text; }

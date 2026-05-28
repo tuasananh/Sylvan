@@ -18,20 +18,28 @@
 */
 
 #include "engineprocess_win.h"
-#include "pipereader_win.h"
+
 #include <QDir>
 #include <QFile>
 #include <QMutexLocker>
 #include <QRegExp>
 
+#include "pipereader_win.h"
+
 HANDLE EngineProcess::s_job = NULL;
 QMutex EngineProcess::s_mutex;
 
-EngineProcess::EngineProcess(QObject *parent)
-    : QIODevice(parent), m_started(false), m_finished(false), m_exitCode(0),
-      m_exitStatus(EngineProcess::NormalExit), m_stdErrFileMode(Truncate),
-      m_inWrite(INVALID_HANDLE_VALUE), m_outRead(INVALID_HANDLE_VALUE),
-      m_errRead(INVALID_HANDLE_VALUE), m_reader(0) {}
+EngineProcess::EngineProcess(QObject* parent)
+    : QIODevice(parent),
+      m_started(false),
+      m_finished(false),
+      m_exitCode(0),
+      m_exitStatus(EngineProcess::NormalExit),
+      m_stdErrFileMode(Truncate),
+      m_inWrite(INVALID_HANDLE_VALUE),
+      m_outRead(INVALID_HANDLE_VALUE),
+      m_errRead(INVALID_HANDLE_VALUE),
+      m_reader(0) {}
 
 EngineProcess::~EngineProcess() {
   if (m_started) {
@@ -51,22 +59,18 @@ EngineProcess::ExitStatus EngineProcess::exitStatus() const {
 qint64 EngineProcess::bytesAvailable() const {
   qint64 n = QIODevice::bytesAvailable();
 
-  if (!m_started)
-    return n;
+  if (!m_started) return n;
   return m_reader->bytesAvailable() + n;
 }
 
 bool EngineProcess::canReadLine() const {
-  if (!m_started)
-    return QIODevice::canReadLine();
+  if (!m_started) return QIODevice::canReadLine();
   return m_reader->canReadLine() || QIODevice::canReadLine();
 }
 
-void EngineProcess::killHandle(HANDLE *handle) {
-  if (*handle == INVALID_HANDLE_VALUE)
-    return;
-  if (*handle != NULL)
-    CloseHandle(*handle);
+void EngineProcess::killHandle(HANDLE* handle) {
+  if (*handle == INVALID_HANDLE_VALUE) return;
+  if (*handle != NULL) CloseHandle(*handle);
   *handle = INVALID_HANDLE_VALUE;
 }
 
@@ -90,8 +94,7 @@ void EngineProcess::cleanup() {
 }
 
 void EngineProcess::close() {
-  if (!m_started)
-    return;
+  if (!m_started) return;
 
   emit aboutToClose();
   kill();
@@ -102,44 +105,38 @@ void EngineProcess::close() {
 
 bool EngineProcess::isSequential() const { return true; }
 
-void EngineProcess::setWorkingDirectory(const QString &dir) { m_workDir = dir; }
+void EngineProcess::setWorkingDirectory(const QString& dir) { m_workDir = dir; }
 
-void EngineProcess::setStandardErrorFile(const QString &fileName,
+void EngineProcess::setStandardErrorFile(const QString& fileName,
                                          OpenMode mode) {
   m_stdErrFile = fileName;
   m_stdErrFileMode = mode;
 }
 
 QString EngineProcess::quote(QString str) {
-  if (!str.contains(' '))
-    return str;
+  if (!str.contains(' ')) return str;
 
-  if (!str.startsWith('\"'))
-    str.prepend('\"');
-  if (!str.endsWith('\"'))
-    str.append('\"');
+  if (!str.startsWith('\"')) str.prepend('\"');
+  if (!str.endsWith('\"')) str.append('\"');
 
   return str;
 }
 
 QString EngineProcess::unquote(QString str) {
-  if (str.startsWith('\"'))
-    str.remove(0, 1);
-  if (str.endsWith('\"'))
-    str.chop(1);
+  if (str.startsWith('\"')) str.remove(0, 1);
+  if (str.endsWith('\"')) str.chop(1);
 
   return str;
 }
 
-QString EngineProcess::cmdLine(const QString &wdir, const QString &prog,
-                               const QStringList &args) {
+QString EngineProcess::cmdLine(const QString& wdir, const QString& prog,
+                               const QStringList& args) {
   bool useArgs = true;
   QString cmd = unquote(prog);
 
   // Make sure we find the program
   if (!QFile::exists(cmd) && !wdir.isEmpty()) {
-    if (!wdir.endsWith('\\') && !wdir.endsWith('/'))
-      cmd.prepend('/');
+    if (!wdir.endsWith('\\') && !wdir.endsWith('/')) cmd.prepend('/');
     cmd.prepend(wdir);
 
     // Maybe the args are actually a part of the command
@@ -158,8 +155,7 @@ QString EngineProcess::cmdLine(const QString &wdir, const QString &prog,
 
   cmd = QDir::toNativeSeparators(quote(cmd));
   if (useArgs) {
-    for (const QString &arg : args)
-      cmd += ' ' + quote(arg);
+    for (const QString& arg : args) cmd += ' ' + quote(arg);
   }
 
   return cmd;
@@ -167,8 +163,7 @@ QString EngineProcess::cmdLine(const QString &wdir, const QString &prog,
 
 HANDLE EngineProcess::mainJob() {
   QMutexLocker locker(&s_mutex);
-  if (s_job)
-    return s_job;
+  if (s_job) return s_job;
 
   s_job = CreateJobObject(NULL, NULL);
   JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli;
@@ -182,9 +177,8 @@ HANDLE EngineProcess::mainJob() {
   return s_job;
 }
 
-HANDLE EngineProcess::createFile(const QString &fileName, OpenMode mode) {
-  if (fileName.isEmpty())
-    return NULL;
+HANDLE EngineProcess::createFile(const QString& fileName, OpenMode mode) {
+  if (fileName.isEmpty()) return NULL;
 
   SECURITY_ATTRIBUTES sa;
   sa.nLength = sizeof(sa);
@@ -192,18 +186,16 @@ HANDLE EngineProcess::createFile(const QString &fileName, OpenMode mode) {
   sa.bInheritHandle = TRUE;
 
   DWORD dwMode = GENERIC_WRITE;
-  if (mode == Append)
-    dwMode = FILE_APPEND_DATA;
+  if (mode == Append) dwMode = FILE_APPEND_DATA;
 
   return CreateFileW((LPCWSTR)fileName.utf16(), dwMode,
                      FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, OPEN_ALWAYS,
                      FILE_ATTRIBUTE_NORMAL, NULL);
 }
 
-void EngineProcess::start(const QString &program, const QStringList &arguments,
+void EngineProcess::start(const QString& program, const QStringList& arguments,
                           OpenMode mode) {
-  if (m_started)
-    close();
+  if (m_started) close();
 
   m_started = false;
   m_finished = false;
@@ -235,19 +227,19 @@ void EngineProcess::start(const QString &program, const QStringList &arguments,
   // Call DuplicateHandle with a NULL target to get non-inheritable
   // handles for the parent process' ends of the pipes
   DuplicateHandle(GetCurrentProcess(),
-                  m_outRead, // child's stdout read end
+                  m_outRead,  // child's stdout read end
                   GetCurrentProcess(),
-                  NULL,                   // no target
-                  0,                      // flags
-                  FALSE,                  // not inheritable
-                  DUPLICATE_SAME_ACCESS); // same handle access
+                  NULL,                    // no target
+                  0,                       // flags
+                  FALSE,                   // not inheritable
+                  DUPLICATE_SAME_ACCESS);  // same handle access
   DuplicateHandle(GetCurrentProcess(),
-                  m_inWrite, // child's stdin write end
+                  m_inWrite,  // child's stdin write end
                   GetCurrentProcess(),
-                  NULL,                   // no target
-                  0,                      // flags
-                  FALSE,                  // not inheritable
-                  DUPLICATE_SAME_ACCESS); // same handle access
+                  NULL,                    // no target
+                  0,                       // flags
+                  FALSE,                   // not inheritable
+                  DUPLICATE_SAME_ACCESS);  // same handle access
 
   BOOL ok = FALSE;
   QString cmd = cmdLine(m_workDir, program, arguments);
@@ -255,26 +247,26 @@ void EngineProcess::start(const QString &program, const QStringList &arguments,
   ZeroMemory(&m_processInfo, sizeof(m_processInfo));
 
 #ifdef UNICODE
-  ok = CreateProcessW(NULL, (WCHAR *)cmd.utf16(),
-                      NULL, // process attributes
-                      NULL, // thread attributes
-                      TRUE, // inherit handles
-                      CREATE_NEW_PROCESS_GROUP |
-                          CREATE_NO_WINDOW, // creation flags
-                      NULL,                 // environment
-                      wdir.isEmpty() ? NULL : (WCHAR *)wdir.utf16(),
-                      &startupInfo, &m_processInfo);
-#else  // not UNICODE
-  ok = CreateProcessA(NULL, cmd.toLocal8Bit().data(),
-                      NULL, // process attributes
-                      NULL, // thread attributes
-                      TRUE, // inherit handles
-                      CREATE_NEW_PROCESS_GROUP |
-                          CREATE_NO_WINDOW, // creation flags
-                      NULL,                 // environment
-                      wdir.isEmpty() ? NULL : wdir.toLocal8Bit().data(),
-                      &startupInfo, &m_processInfo);
-#endif // not UNICODE
+  ok = CreateProcessW(
+      NULL, (WCHAR*)cmd.utf16(),
+      NULL,                                         // process attributes
+      NULL,                                         // thread attributes
+      TRUE,                                         // inherit handles
+      CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW,  // creation flags
+      NULL,                                         // environment
+      wdir.isEmpty() ? NULL : (WCHAR*)wdir.utf16(), &startupInfo,
+      &m_processInfo);
+#else   // not UNICODE
+  ok = CreateProcessA(
+      NULL, cmd.toLocal8Bit().data(),
+      NULL,                                         // process attributes
+      NULL,                                         // thread attributes
+      TRUE,                                         // inherit handles
+      CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW,  // creation flags
+      NULL,                                         // environment
+      wdir.isEmpty() ? NULL : wdir.toLocal8Bit().data(), &startupInfo,
+      &m_processInfo);
+#endif  // not UNICODE
 
   m_started = (bool)ok;
   if (ok) {
@@ -302,7 +294,7 @@ void EngineProcess::start(const QString &program, const QStringList &arguments,
     cleanup();
 }
 
-void EngineProcess::start(const QString &program, OpenMode mode) {
+void EngineProcess::start(const QString& program, OpenMode mode) {
   QStringList args;
 
   QRegExp rx("((?:[^\\s\"]+)|(?:\"(?:\\\\\"|[^\"])*\"))");
@@ -311,8 +303,7 @@ void EngineProcess::start(const QString &program, OpenMode mode) {
     args << rx.cap();
     pos += rx.matchedLength();
   }
-  if (args.isEmpty())
-    return;
+  if (args.isEmpty()) return;
 
   QString prog = args.first();
   args.removeFirst();
@@ -320,20 +311,17 @@ void EngineProcess::start(const QString &program, OpenMode mode) {
 }
 
 void EngineProcess::kill() {
-  if (m_started)
-    TerminateProcess(m_processInfo.hProcess, 0xf291);
+  if (m_started) TerminateProcess(m_processInfo.hProcess, 0xf291);
 }
 
 void EngineProcess::onFinished() {
-  if (!m_started || m_finished)
-    return;
+  if (!m_started || m_finished) return;
 
   if (GetExitCodeProcess(m_processInfo.hProcess, &m_exitCode) &&
       m_exitCode != STILL_ACTIVE) {
     m_finished = true;
     m_exitStatus = NormalExit;
-    if (m_exitCode != 0)
-      m_exitStatus = CrashExit;
+    if (m_exitCode != 0) m_exitStatus = CrashExit;
 
     Q_ASSERT(m_reader == 0 || m_reader->isFinished());
     cleanup();
@@ -342,8 +330,7 @@ void EngineProcess::onFinished() {
 }
 
 bool EngineProcess::waitForFinished(int msecs) {
-  if (!m_started)
-    return true;
+  if (!m_started) return true;
 
   DWORD dwWait;
   if (msecs == -1)
@@ -373,19 +360,16 @@ bool EngineProcess::waitForStarted(int msecs) {
 
 QString EngineProcess::workingDirectory() const { return m_workDir; }
 
-qint64 EngineProcess::readData(char *data, qint64 maxSize) {
-  if (!m_started)
-    return -1;
+qint64 EngineProcess::readData(char* data, qint64 maxSize) {
+  if (!m_started) return -1;
 
   return m_reader->readData(data, maxSize);
 }
 
-qint64 EngineProcess::writeData(const char *data, qint64 maxSize) {
-  if (!m_started)
-    return -1;
+qint64 EngineProcess::writeData(const char* data, qint64 maxSize) {
+  if (!m_started) return -1;
 
   DWORD dwWritten = 0;
-  if (!WriteFile(m_inWrite, data, (DWORD)maxSize, &dwWritten, 0))
-    return -1;
+  if (!WriteFile(m_inWrite, data, (DWORD)maxSize, &dwWritten, 0)) return -1;
   return (qint64)dwWritten;
 }

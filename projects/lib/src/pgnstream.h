@@ -43,11 +43,11 @@ class Board;
  * \sa OpeningBook
  */
 class LIB_EXPORT PgnStream {
-public:
+ public:
   /*! The current status of the PGN stream. */
   enum Status {
-    Ok,         //!< The stream is operating normally.
-    ReadPastEnd //!< The stream has read past the end of the data.
+    Ok,          //!< The stream is operating normally.
+    ReadPastEnd  //!< The stream has read past the end of the data.
   };
   /*! The type of a PGN token. */
   enum TokenType {
@@ -85,12 +85,12 @@ public:
    * A device or a string must be set before the stream
    * can be used.
    */
-  explicit PgnStream(const QString &variant = "standard");
+  explicit PgnStream(const QString& variant = "standard");
   /*! Creates a PgnStream that operates on \a device. */
-  explicit PgnStream(QIODevice *device, const QString &variant = "standard");
+  explicit PgnStream(QIODevice* device, const QString& variant = "standard");
   /*! Creates a PgnStream that operates on \a string. */
-  explicit PgnStream(const QByteArray *string,
-                     const QString &variant = "standard");
+  explicit PgnStream(const QByteArray* string,
+                     const QString& variant = "standard");
 
   /*! Destructs the PgnStream object. */
   ~PgnStream();
@@ -99,17 +99,17 @@ public:
    * Returns the Board object which is used to verify the moves
    * and FEN strings in the stream.
    */
-  Chess::Board *board();
+  Chess::Board* board();
 
   /*! Returns the assigned device, or 0 if no device is in use. */
-  QIODevice *device() const;
+  QIODevice* device() const;
   /*! Sets the current device to \a device. */
-  void setDevice(QIODevice *device);
+  void setDevice(QIODevice* device);
 
   /*! Returns the assigned string, or 0 if no string is in use. */
-  const QByteArray *string() const;
+  const QByteArray* string() const;
   /*! Sets the current string to \a string. */
-  void setString(const QByteArray *string);
+  void setString(const QByteArray* string);
 
   /*! Returns the chess variant. */
   QString variant() const;
@@ -117,7 +117,7 @@ public:
    * Sets the chess variant to \a variant.
    * Returns true if successful; otherwise returns false.
    */
-  bool setVariant(const QString &variant);
+  bool setVariant(const QString& variant);
 
   /*! Returns true if the stream is open. */
   bool isOpen() const;
@@ -192,14 +192,14 @@ public:
   /*! Returns the value of the current PGN tag. */
   QByteArray tagValue() const;
 
-private:
+ private:
   enum Phase { OutOfGame, InTags, InGame };
 
-  void parseUntil(const char *chars);
+  void parseUntil(const char* chars);
   void parseTag();
   void parseComment(char opBracket);
 
-  Chess::Board *m_board;
+  Chess::Board* m_board;
   qint64 m_pos;
   qint64 m_lineNumber;
   char m_lastChar;
@@ -207,10 +207,10 @@ private:
   QByteArray m_tagName;
   QByteArray m_tagValue;
   TokenType m_tokenType;
-  QIODevice *m_device;
-  const QByteArray *m_string;
+  QIODevice* m_device;
+  const QByteArray* m_string;
   Status m_status;
   Phase m_phase;
 };
 
-#endif // PGNSTREAM_H
+#endif  // PGNSTREAM_H

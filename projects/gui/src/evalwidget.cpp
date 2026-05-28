@@ -17,6 +17,10 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "evalwidget.h"
+
+#include <chessplayer.h>
+
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -24,14 +28,12 @@
 #include <QVBoxLayout>
 #include <QVector>
 
-#include <chessplayer.h>
-
-#include "evalwidget.h"
-
-EvalWidget::EvalWidget(QWidget *parent)
-    : QWidget(parent), m_player(nullptr),
+EvalWidget::EvalWidget(QWidget* parent)
+    : QWidget(parent),
+      m_player(nullptr),
       m_statsTable(new QTableWidget(1, 5, this)),
-      m_pvTable(new QTableWidget(0, 4, this)), m_depth(-1) {
+      m_pvTable(new QTableWidget(0, 4, this)),
+      m_depth(-1) {
   m_statsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
   auto hHeader = m_statsTable->horizontalHeader();
   auto vHeader = m_statsTable->verticalHeader();
@@ -68,7 +70,7 @@ EvalWidget::EvalWidget(QWidget *parent)
   m_pvTable->horizontalHeader()->setStretchLastSection(true);
   m_pvTable->setWordWrap(true);
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->addWidget(m_statsTable);
   layout->addWidget(m_pvTable);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -83,21 +85,18 @@ void EvalWidget::clear() {
   m_pvTable->setRowCount(0);
 }
 
-void EvalWidget::setPlayer(ChessPlayer *player) {
-  if (player != m_player || !player)
-    clear();
-  if (m_player)
-    m_player->disconnect(this);
+void EvalWidget::setPlayer(ChessPlayer* player) {
+  if (player != m_player || !player) clear();
+  if (m_player) m_player->disconnect(this);
   m_player = player;
-  if (!player)
-    return;
+  if (!player) return;
 
   connect(player, SIGNAL(startedThinking(int)), this, SLOT(clear()));
   connect(player, SIGNAL(thinking(MoveEvaluation)), this,
           SLOT(onEval(MoveEvaluation)));
 }
 
-void EvalWidget::onEval(const MoveEvaluation &eval) {
+void EvalWidget::onEval(const MoveEvaluation& eval) {
   auto nps = eval.nps();
   if (nps) {
     QString npsStr =
@@ -147,7 +146,7 @@ void EvalWidget::onEval(const MoveEvaluation &eval) {
 
   QString score = eval.scoreText();
 
-  QVector<QTableWidgetItem *> items;
+  QVector<QTableWidgetItem*> items;
   items << new QTableWidgetItem(depth) << new QTableWidgetItem(time)
         << new QTableWidgetItem(score) << new QTableWidgetItem(eval.pv());
 
@@ -160,6 +159,5 @@ void EvalWidget::onEval(const MoveEvaluation &eval) {
   m_depth = eval.depth();
   m_pv = eval.pv();
 
-  for (int i = 0; i < items.size(); i++)
-    m_pvTable->setItem(0, i, items.at(i));
+  for (int i = 0; i < items.size(); i++) m_pvTable->setItem(0, i, items.at(i));
 }

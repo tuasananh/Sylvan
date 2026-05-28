@@ -52,9 +52,9 @@ class QTextStream;
 class LIB_EXPORT JsonSerializer {
   Q_DECLARE_TR_FUNCTIONS(JsonSerializer)
 
-public:
+ public:
   /*! Creates a new serializer that operates on \a data. */
-  JsonSerializer(const QVariant &data);
+  JsonSerializer(const QVariant& data);
   /*!
    * Converts the data into JSON format and writes it to
    * \a stream.
@@ -62,21 +62,21 @@ public:
    * Returns false if an invalid or unsupported variant type
    * is encountered. Otherwise returns true.
    */
-  bool serialize(QTextStream &stream);
+  bool serialize(QTextStream& stream);
 
   /*! Returns true if an error occured. */
   bool hasError() const;
   /*! Returns a detailed description of the error. */
   QString errorString() const;
 
-private:
-  bool serializeNode(QTextStream &stream, const QVariant &node,
+ private:
+  bool serializeNode(QTextStream& stream, const QVariant& node,
                      int indentLevel);
-  void setError(const QString &message);
+  void setError(const QString& message);
 
   bool m_error;
   const QVariant m_data;
   QString m_errorString;
 };
 
-#endif // JSONSERIALIZER_H
+#endif  // JSONSERIALIZER_H

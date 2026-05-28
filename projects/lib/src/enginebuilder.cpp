@@ -18,17 +18,19 @@
 */
 
 #include "enginebuilder.h"
-#include "enginefactory.h"
-#include "engineprocess.h"
+
 #include <QDir>
 
-EngineBuilder::EngineBuilder(const EngineConfiguration &config)
+#include "enginefactory.h"
+#include "engineprocess.h"
+
+EngineBuilder::EngineBuilder(const EngineConfiguration& config)
     : PlayerBuilder(config.name()), m_config(config) {}
 
 bool EngineBuilder::isHuman() const { return false; }
 
-ChessPlayer *EngineBuilder::create(QObject *receiver, const char *method,
-                                   QObject *parent, QString *error) const {
+ChessPlayer* EngineBuilder::create(QObject* receiver, const char* method,
+                                   QObject* parent, QString* error) const {
   QString workDir = m_config.workingDirectory();
   QString cmd = m_config.command().trimmed();
   QString stderrFile = m_config.stderrFile();
@@ -43,14 +45,13 @@ ChessPlayer *EngineBuilder::create(QObject *receiver, const char *method,
     return nullptr;
   }
 
-  EngineProcess *process = new EngineProcess();
+  EngineProcess* process = new EngineProcess();
 
   if (workDir.isEmpty()) {
     process->setWorkingDirectory(QDir::tempPath());
 
     QFileInfo cmdInfo(cmd);
-    if (cmdInfo.isFile())
-      cmd = cmdInfo.absoluteFilePath();
+    if (cmdInfo.isFile()) cmd = cmdInfo.absoluteFilePath();
   } else
     process->setWorkingDirectory(workDir);
 
@@ -69,7 +70,7 @@ ChessPlayer *EngineBuilder::create(QObject *receiver, const char *method,
     return nullptr;
   }
 
-  ChessEngine *engine = EngineFactory::create(m_config.protocol());
+  ChessEngine* engine = EngineFactory::create(m_config.protocol());
   Q_ASSERT(engine != nullptr);
 
   engine->setParent(parent);
@@ -82,7 +83,7 @@ ChessPlayer *EngineBuilder::create(QObject *receiver, const char *method,
   return engine;
 }
 
-void EngineBuilder::setError(QString *error, const QString &message) const {
+void EngineBuilder::setError(QString* error, const QString& message) const {
   QChar sep = error ? '\n' : ' ';
   QString str(
       tr("Cannot start engine %1:%2%3").arg(name()).arg(sep).arg(message));

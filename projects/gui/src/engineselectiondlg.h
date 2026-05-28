@@ -33,17 +33,17 @@ class EngineSelectionDialog;
 class EngineSelectionDialog : public QDialog {
   Q_OBJECT
 
-public:
-  explicit EngineSelectionDialog(EngineConfigurationProxyModel *model,
-                                 QWidget *parent = nullptr);
+ public:
+  explicit EngineSelectionDialog(EngineConfigurationProxyModel* model,
+                                 QWidget* parent = nullptr);
   virtual ~EngineSelectionDialog();
 
   QItemSelection selection() const;
-  QListView *enginesList() const;
+  QListView* enginesList() const;
 
-private:
-  EngineConfigurationProxyModel *m_model;
-  Ui::EngineSelectionDialog *ui;
+ private:
+  EngineConfigurationProxyModel* m_model;
+  Ui::EngineSelectionDialog* ui;
 };
 
-#endif // ENGINESELECTIONDLG_H
+#endif  // ENGINESELECTIONDLG_H

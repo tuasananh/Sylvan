@@ -29,8 +29,8 @@ class TournamentSettingsWidget;
 class TournamentSettingsWidget : public QWidget {
   Q_OBJECT
 
-public:
-  explicit TournamentSettingsWidget(QWidget *parent = nullptr);
+ public:
+  explicit TournamentSettingsWidget(QWidget* parent = nullptr);
   virtual ~TournamentSettingsWidget();
 
   QString tournamentType() const;
@@ -44,10 +44,10 @@ public:
 
   void enableSettingsUpdates();
 
-private:
+ private:
   void readSettings();
 
-  Ui::TournamentSettingsWidget *ui;
+  Ui::TournamentSettingsWidget* ui;
 };
 
-#endif // TOURNAMENTSETTINGSWIDGET_H
+#endif  // TOURNAMENTSETTINGSWIDGET_H

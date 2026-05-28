@@ -18,9 +18,10 @@
 */
 
 #include "humanplayer.h"
+
 #include "board/board.h"
 
-HumanPlayer::HumanPlayer(QObject *parent) : ChessPlayer(parent) {
+HumanPlayer::HumanPlayer(QObject* parent) : ChessPlayer(parent) {
   setState(Idle);
   setName("Human");
 }
@@ -28,44 +29,40 @@ HumanPlayer::HumanPlayer(QObject *parent) : ChessPlayer(parent) {
 void HumanPlayer::startGame() { Q_ASSERT(m_bufferMove.isNull()); }
 
 void HumanPlayer::startThinking() {
-  if (m_bufferMove.isNull())
-    return;
+  if (m_bufferMove.isNull()) return;
 
   Chess::Move move(board()->moveFromGenericMove(m_bufferMove));
   m_bufferMove = Chess::GenericMove();
 
-  if (board()->isLegalMove(move))
-    emitMove(move);
+  if (board()->isLegalMove(move)) emitMove(move);
 }
 
-void HumanPlayer::endGame(const Chess::Result &result) {
+void HumanPlayer::endGame(const Chess::Result& result) {
   Q_ASSERT(m_bufferMove.isNull());
 
   ChessPlayer::endGame(result);
   setState(Idle);
 }
 
-void HumanPlayer::makeMove(const Chess::Move &move) {
+void HumanPlayer::makeMove(const Chess::Move& move) {
   Q_UNUSED(move);
   Q_ASSERT(m_bufferMove.isNull());
 }
 
-bool HumanPlayer::supportsVariant(const QString &variant) const {
+bool HumanPlayer::supportsVariant(const QString& variant) const {
   Q_UNUSED(variant);
   return true;
 }
 
 bool HumanPlayer::isHuman() const { return true; }
 
-void HumanPlayer::onHumanMove(const Chess::GenericMove &move,
-                              const Chess::Side &side) {
-  if (side != this->side())
-    return;
+void HumanPlayer::onHumanMove(const Chess::GenericMove& move,
+                              const Chess::Side& side) {
+  if (side != this->side()) return;
 
   Q_ASSERT(m_bufferMove.isNull());
   if (state() != Thinking) {
-    if (state() == Observing)
-      m_bufferMove = move;
+    if (state() == Observing) m_bufferMove = move;
 
     emit wokeUp();
     return;

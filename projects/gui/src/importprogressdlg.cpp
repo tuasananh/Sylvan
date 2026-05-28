@@ -17,15 +17,18 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "importprogressdlg.h"
+
 #include <QFileInfo>
 
-#include "importprogressdlg.h"
 #include "pgnimporter.h"
 #include "ui_importprogressdlg.h"
 
-ImportProgressDialog::ImportProgressDialog(PgnImporter *pgnImporter,
-                                           QWidget *parent)
-    : QDialog(parent), m_lastUpdateSecs(0), m_importError(false),
+ImportProgressDialog::ImportProgressDialog(PgnImporter* pgnImporter,
+                                           QWidget* parent)
+    : QDialog(parent),
+      m_lastUpdateSecs(0),
+      m_importError(false),
       ui(new Ui::ImportProgressDialog) {
   ui->setupUi(this);
 
@@ -41,22 +44,20 @@ ImportProgressDialog::ImportProgressDialog(PgnImporter *pgnImporter,
   connect(ui->m_buttonBox, SIGNAL(rejected()), pgnImporter, SLOT(cancel()));
   connect(pgnImporter, SIGNAL(finished()), this, SLOT(onImporterFinished()));
   connect(pgnImporter, SIGNAL(error(int)), this, SLOT(onImportError(int)));
-  connect(pgnImporter, SIGNAL(databaseReadStatus(const QTime &, int, qint64)),
-          this, SLOT(updateImportStatus(const QTime &, int, qint64)));
+  connect(pgnImporter, SIGNAL(databaseReadStatus(const QTime&, int, qint64)),
+          this, SLOT(updateImportStatus(const QTime&, int, qint64)));
 }
 
 ImportProgressDialog::~ImportProgressDialog() { delete ui; }
 
-void ImportProgressDialog::updateImportStatus(const QTime &startTime,
+void ImportProgressDialog::updateImportStatus(const QTime& startTime,
                                               int numReadGames,
                                               qint64 numReadBytes) {
   int elapsed = startTime.secsTo(QTime::currentTime());
-  if (elapsed == 0)
-    return;
+  if (elapsed == 0) return;
 
   // Update the status once a second
-  if (elapsed <= m_lastUpdateSecs)
-    return;
+  if (elapsed <= m_lastUpdateSecs) return;
 
   m_lastUpdateSecs = elapsed;
 
@@ -75,7 +76,7 @@ void ImportProgressDialog::updateImportStatus(const QTime &startTime,
 
 void ImportProgressDialog::onImporterFinished() {
   if (!m_importError)
-    accept(); // close the dialog automatically if no error occured
+    accept();  // close the dialog automatically if no error occured
 }
 
 void ImportProgressDialog::onImportError(int error) {
@@ -83,17 +84,17 @@ void ImportProgressDialog::onImportError(int error) {
   setWindowTitle(tr("Import failed"));
 
   switch (error) {
-  case PgnImporter::FileDoesNotExist:
-    ui->m_statusLabel->setText(tr("Import failed: file does not exist"));
-    break;
+    case PgnImporter::FileDoesNotExist:
+      ui->m_statusLabel->setText(tr("Import failed: file does not exist"));
+      break;
 
-  case PgnImporter::IoError:
-    ui->m_statusLabel->setText(tr("Import failed: I/O error"));
-    break;
+    case PgnImporter::IoError:
+      ui->m_statusLabel->setText(tr("Import failed: I/O error"));
+      break;
 
-  default:
-    ui->m_statusLabel->setText(tr("Import failed: unknown error"));
-    break;
+    default:
+      ui->m_statusLabel->setText(tr("Import failed: unknown error"));
+      break;
   }
 
   // replace the cancel button with close button because the
@@ -103,17 +104,13 @@ void ImportProgressDialog::onImportError(int error) {
 }
 
 QString ImportProgressDialog::humaniseTime(int sec) {
-  if (sec <= 5)
-    return QString(tr("About 5 seconds"));
+  if (sec <= 5) return QString(tr("About 5 seconds"));
 
-  if (sec <= 10)
-    return QString(tr("About 10 seconds"));
+  if (sec <= 10) return QString(tr("About 10 seconds"));
 
-  if (sec <= 60)
-    return QString(tr("Less than a minute"));
+  if (sec <= 60) return QString(tr("Less than a minute"));
 
-  if (sec <= 120)
-    return QString(tr("About a minute"));
+  if (sec <= 120) return QString(tr("About a minute"));
 
   return QString(tr("About %1 minutes").arg(sec / 60));
 }

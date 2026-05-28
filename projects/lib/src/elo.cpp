@@ -1,4 +1,5 @@
 #include "elo.h"
+
 #include <cmath>
 
 Elo::Elo(int wins, int losses, int draws) {
@@ -47,8 +48,7 @@ qreal Elo::erfInv(qreal x) {
 
   qreal ret = std::sqrt(std::sqrt(z * z - y / a) - z);
 
-  if (x < 0.0)
-    return -ret;
+  if (x < 0.0) return -ret;
   return ret;
 }
 

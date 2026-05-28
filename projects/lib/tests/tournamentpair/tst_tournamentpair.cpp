@@ -1,10 +1,11 @@
-#include <QtTest/QtTest>
 #include <tournamentpair.h>
+
+#include <QtTest/QtTest>
 
 class tst_TournamentPair : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void initialValues();
   void hasOriginalOrder();
   void leader();

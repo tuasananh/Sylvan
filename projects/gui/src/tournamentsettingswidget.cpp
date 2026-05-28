@@ -17,12 +17,13 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "tournamentsettingswidget.h"
+
 #include <QSettings>
 
-#include "tournamentsettingswidget.h"
 #include "ui_tournamentsettingswidget.h"
 
-TournamentSettingsWidget::TournamentSettingsWidget(QWidget *parent)
+TournamentSettingsWidget::TournamentSettingsWidget(QWidget* parent)
     : QWidget(parent), ui(new Ui::TournamentSettingsWidget) {
   ui->setupUi(this);
 
@@ -108,20 +109,16 @@ void TournamentSettingsWidget::readSettings() {
 
 void TournamentSettingsWidget::enableSettingsUpdates() {
   connect(ui->m_roundRobinRadio, &QRadioButton::toggled, [=](bool checked) {
-    if (checked)
-      QSettings().setValue("tournament/type", "round-robin");
+    if (checked) QSettings().setValue("tournament/type", "round-robin");
   });
   connect(ui->m_gauntletRadio, &QRadioButton::toggled, [=](bool checked) {
-    if (checked)
-      QSettings().setValue("tournament/type", "gauntlet");
+    if (checked) QSettings().setValue("tournament/type", "gauntlet");
   });
   connect(ui->m_knockoutRadio, &QRadioButton::toggled, [=](bool checked) {
-    if (checked)
-      QSettings().setValue("tournament/type", "knockout");
+    if (checked) QSettings().setValue("tournament/type", "knockout");
   });
   connect(ui->m_pyramidRadio, &QRadioButton::toggled, [=](bool checked) {
-    if (checked)
-      QSettings().setValue("tournament/type", "pyramid");
+    if (checked) QSettings().setValue("tournament/type", "pyramid");
   });
 
   connect(ui->m_seedsSpin,

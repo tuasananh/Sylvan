@@ -18,6 +18,7 @@
 */
 
 #include "standardboard.h"
+
 #include "westernzobrist.h"
 
 namespace {
@@ -25,13 +26,13 @@ namespace {
 // Zobrist keys for Polyglot opening book compatibility
 // Specs: http://alpha.uhasselt.be/Research/Algebra/Toga/book_format.html
 
-} // anonymous namespace
+}  // anonymous namespace
 
 namespace Chess {
 
 StandardBoard::StandardBoard() : WesternBoard(new WesternZobrist(nullptr)) {}
 
-Board *StandardBoard::copy() const { return new StandardBoard(*this); }
+Board* StandardBoard::copy() const { return new StandardBoard(*this); }
 
 QString StandardBoard::variant() const { return "standard"; }
 
@@ -40,9 +41,9 @@ QString StandardBoard::defaultFenString() const {
          "1";
 }
 
-Result StandardBoard::tablebaseResult(unsigned int *dtz) const {
+Result StandardBoard::tablebaseResult(unsigned int* dtz) const {
   Q_UNUSED(dtz);
   return Result();
 }
 
-} // namespace Chess
+}  // namespace Chess

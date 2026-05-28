@@ -17,24 +17,37 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "openingsuite.h"
+
 #include <QFile>
 #include <QTextStream>
 
 #include "epdrecord.h"
 #include "mersenne.h"
-#include "openingsuite.h"
 #include "pgnstream.h"
 
-OpeningSuite::OpeningSuite(const QString &fen)
-    : m_format(EpdFormat), m_order(SequentialOrder), m_gamesRead(0),
-      m_gameIndex(0), m_startIndex(0), m_fen(fen), m_file(nullptr),
-      m_epdStream(nullptr), m_pgnStream(nullptr) {}
+OpeningSuite::OpeningSuite(const QString& fen)
+    : m_format(EpdFormat),
+      m_order(SequentialOrder),
+      m_gamesRead(0),
+      m_gameIndex(0),
+      m_startIndex(0),
+      m_fen(fen),
+      m_file(nullptr),
+      m_epdStream(nullptr),
+      m_pgnStream(nullptr) {}
 
-OpeningSuite::OpeningSuite(const QString &fileName, Format format, Order order,
+OpeningSuite::OpeningSuite(const QString& fileName, Format format, Order order,
                            int startIndex)
-    : m_format(format), m_order(order), m_gamesRead(0), m_gameIndex(0),
-      m_startIndex(startIndex), m_fileName(fileName), m_file(nullptr),
-      m_epdStream(nullptr), m_pgnStream(nullptr) {}
+    : m_format(format),
+      m_order(order),
+      m_gamesRead(0),
+      m_gameIndex(0),
+      m_startIndex(startIndex),
+      m_fileName(fileName),
+      m_file(nullptr),
+      m_epdStream(nullptr),
+      m_pgnStream(nullptr) {}
 
 OpeningSuite::~OpeningSuite() {
   if (m_epdStream != nullptr) {
@@ -56,8 +69,7 @@ bool OpeningSuite::isNull() const {
 }
 
 bool OpeningSuite::initialize() {
-  if (!m_fen.isEmpty())
-    return true;
+  if (!m_fen.isEmpty()) return true;
 
   m_gamesRead = 0;
   m_gameIndex = 0;
@@ -81,8 +93,7 @@ bool OpeningSuite::initialize() {
     return false;
   }
 
-  if (m_format == PgnFormat)
-    m_pgnStream = new PgnStream(m_file);
+  if (m_format == PgnFormat) m_pgnStream = new PgnStream(m_file);
 
   if (m_order == RandomOrder) {
     // Create a shuffled vector of file positions
@@ -93,8 +104,7 @@ bool OpeningSuite::initialize() {
       else if (m_format == PgnFormat)
         pos = getPgnPos();
 
-      if (pos.pos == -1)
-        break;
+      if (pos.pos == -1) break;
 
       int i = Mersenne::random() % (m_filePositions.size() + 1);
       if (i == m_filePositions.size())
@@ -112,8 +122,7 @@ bool OpeningSuite::initialize() {
       else if (m_format == PgnFormat)
         pos = getPgnPos();
 
-      if (pos.pos == -1)
-        break;
+      if (pos.pos == -1) break;
     }
   }
 
@@ -132,14 +141,12 @@ PgnGame OpeningSuite::nextGame(int maxPlies) {
     Chess::Side side(m_fen.section(' ', 1, 1));
     game.setStartingFenString(side, m_fen);
   }
-  if (isNull())
-    return game;
+  if (isNull()) return game;
 
   FilePosition pos = {-1, -1};
   if (m_order == RandomOrder) {
     pos = m_filePositions.at(m_gameIndex++);
-    if (m_gameIndex >= m_filePositions.size())
-      m_gameIndex = 0;
+    if (m_gameIndex >= m_filePositions.size()) m_gameIndex = 0;
   }
 
   bool ok = false;
@@ -163,8 +170,7 @@ PgnGame OpeningSuite::nextGame(int maxPlies) {
     Chess::Side side(epd.fen().section(' ', 1, 1));
     game.setStartingFenString(side, epd.fen());
   } else if (m_format == PgnFormat) {
-    if (pos.pos != -1)
-      m_pgnStream->seek(pos.pos, pos.lineNumber);
+    if (pos.pos != -1) m_pgnStream->seek(pos.pos, pos.lineNumber);
 
     ok = game.read(*m_pgnStream, maxPlies);
 
@@ -175,15 +181,13 @@ PgnGame OpeningSuite::nextGame(int maxPlies) {
     }
   }
 
-  if (ok)
-    m_gamesRead++;
+  if (ok) m_gamesRead++;
   return game;
 }
 
 OpeningSuite::FilePosition OpeningSuite::getPgnPos() {
   FilePosition pos = {-1, -1};
-  if (!m_pgnStream->nextGame())
-    return pos;
+  if (!m_pgnStream->nextGame()) return pos;
 
   pos.pos = m_pgnStream->pos();
   pos.lineNumber = m_pgnStream->lineNumber();

@@ -19,11 +19,10 @@
 
 #include "gametabbar.h"
 
-GameTabBar::GameTabBar(QWidget *parent) : QTabBar(parent) { setMovable(true); }
+GameTabBar::GameTabBar(QWidget* parent) : QTabBar(parent) { setMovable(true); }
 
 void GameTabBar::showNextTab() {
-  if (count() < 2)
-    return;
+  if (count() < 2) return;
 
   if (currentIndex() == count() - 1)
     setCurrentIndex(0);
@@ -32,8 +31,7 @@ void GameTabBar::showNextTab() {
 }
 
 void GameTabBar::showPreviousTab() {
-  if (count() < 2)
-    return;
+  if (count() < 2) return;
 
   if (currentIndex() == 0)
     setCurrentIndex(count() - 1);

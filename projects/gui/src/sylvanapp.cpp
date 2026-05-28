@@ -17,12 +17,7 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QFileInfo>
-#include <QSettings>
-#include <QTextCodec>
-#include <QTime>
+#include "sylvanapp.h"
 
 #include <board/boardfactory.h>
 #include <chessgame.h>
@@ -33,6 +28,13 @@
 #include <mersenne.h>
 #include <timecontrol.h>
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QSettings>
+#include <QTextCodec>
+#include <QTime>
+
 #include "gamedatabasedlg.h"
 #include "gamedatabasemanager.h"
 #include "gamewall.h"
@@ -40,19 +42,22 @@
 #include "mainwindow.h"
 #include "pgnimporter.h"
 #include "settingsdlg.h"
-#include "sylvanapp.h"
 #include "tournamentresultsdlg.h"
 
 #ifndef Q_OS_WIN32
-#include <sys/types.h>
 #include <pwd.h>
+#include <sys/types.h>
 #endif
 
-SylvanApplication::SylvanApplication(int &argc, char *argv[])
-    : QApplication(argc, argv), m_settingsDialog(nullptr),
-      m_tournamentResultsDialog(nullptr), m_engineManager(nullptr),
-      m_gameManager(nullptr), m_gameDatabaseManager(nullptr),
-      m_gameDatabaseDialog(nullptr), m_gameWall(nullptr),
+SylvanApplication::SylvanApplication(int& argc, char* argv[])
+    : QApplication(argc, argv),
+      m_settingsDialog(nullptr),
+      m_tournamentResultsDialog(nullptr),
+      m_engineManager(nullptr),
+      m_gameManager(nullptr),
+      m_gameDatabaseManager(nullptr),
+      m_gameDatabaseDialog(nullptr),
+      m_gameWall(nullptr),
       m_initialWindowCreated(false) {
   Mersenne::initialize(
       static_cast<quint32>(QTime(0, 0, 0).msecsTo(QTime::currentTime())));
@@ -88,8 +93,8 @@ SylvanApplication::~SylvanApplication() {
   delete m_gameWall;
 }
 
-SylvanApplication *SylvanApplication::instance() {
-  return static_cast<SylvanApplication *>(QApplication::instance());
+SylvanApplication* SylvanApplication::instance() {
+  return static_cast<SylvanApplication*>(QApplication::instance());
 }
 
 QString SylvanApplication::userName() {
@@ -108,8 +113,7 @@ QString SylvanApplication::userName() {
 #else
   if (QSettings().value("ui/use_full_user_name", true).toBool()) {
     auto pwd = getpwnam(qgetenv("USER"));
-    if (pwd != nullptr)
-      return QString(pwd->pw_gecos).split(',')[0];
+    if (pwd != nullptr) return QString(pwd->pw_gecos).split(',')[0];
   }
   return qgetenv("USER");
 #endif
@@ -122,20 +126,18 @@ QString SylvanApplication::configPath() {
   QFileInfo fi(settings.fileName());
   QDir dir(fi.absolutePath());
 
-  if (!dir.exists())
-    dir.mkpath(fi.absolutePath());
+  if (!dir.exists()) dir.mkpath(fi.absolutePath());
 
   return fi.absolutePath();
 }
 
-EngineManager *SylvanApplication::engineManager() {
-  if (m_engineManager == nullptr)
-    m_engineManager = new EngineManager(this);
+EngineManager* SylvanApplication::engineManager() {
+  if (m_engineManager == nullptr) m_engineManager = new EngineManager(this);
 
   return m_engineManager;
 }
 
-GameManager *SylvanApplication::gameManager() {
+GameManager* SylvanApplication::gameManager() {
   if (m_gameManager == nullptr) {
     m_gameManager = new GameManager(this);
     int concurrency = QSettings().value("tournament/concurrency", 1).toInt();
@@ -145,19 +147,18 @@ GameManager *SylvanApplication::gameManager() {
   return m_gameManager;
 }
 
-QList<MainWindow *> SylvanApplication::gameWindows() {
+QList<MainWindow*> SylvanApplication::gameWindows() {
   m_gameWindows.removeAll(nullptr);
 
-  QList<MainWindow *> gameWindowList;
+  QList<MainWindow*> gameWindowList;
   const auto gameWindows = m_gameWindows;
-  for (const auto &window : gameWindows)
-    gameWindowList << window.data();
+  for (const auto& window : gameWindows) gameWindowList << window.data();
 
   return gameWindowList;
 }
 
-MainWindow *SylvanApplication::newGameWindow(ChessGame *game) {
-  MainWindow *mainWindow = new MainWindow(game);
+MainWindow* SylvanApplication::newGameWindow(ChessGame* game) {
+  MainWindow* mainWindow = new MainWindow(game);
   m_gameWindows.prepend(mainWindow);
   mainWindow->show();
   m_initialWindowCreated = true;
@@ -168,14 +169,14 @@ MainWindow *SylvanApplication::newGameWindow(ChessGame *game) {
 void SylvanApplication::newDefaultGame() {
   // Default game is a human versus human game using standard variant and
   // infinite time control
-  ChessGame *game =
+  ChessGame* game =
       new ChessGame(Chess::BoardFactory::create("standard"), new PgnGame());
 
   game->setTimeControl(TimeControl("inf"));
   game->pause();
 
-  connect(game, SIGNAL(started(ChessGame *)), this,
-          SLOT(newGameWindow(ChessGame *)));
+  connect(game, SIGNAL(started(ChessGame*)), this,
+          SLOT(newGameWindow(ChessGame*)));
 
   const auto engines = engineManager()->engines();
 
@@ -200,7 +201,7 @@ void SylvanApplication::showGameWindow(int index) {
   gameWindow->raise();
 }
 
-GameDatabaseManager *SylvanApplication::gameDatabaseManager() {
+GameDatabaseManager* SylvanApplication::gameDatabaseManager() {
   if (m_gameDatabaseManager == nullptr)
     m_gameDatabaseManager = new GameDatabaseManager(this);
 
@@ -208,8 +209,7 @@ GameDatabaseManager *SylvanApplication::gameDatabaseManager() {
 }
 
 void SylvanApplication::showSettingsDialog() {
-  if (m_settingsDialog == nullptr)
-    m_settingsDialog = new SettingsDialog();
+  if (m_settingsDialog == nullptr) m_settingsDialog = new SettingsDialog();
 
   showDialog(m_settingsDialog);
 }
@@ -218,7 +218,7 @@ void SylvanApplication::showTournamentResultsDialog() {
   showDialog(tournamentResultsDialog());
 }
 
-TournamentResultsDialog *SylvanApplication::tournamentResultsDialog() {
+TournamentResultsDialog* SylvanApplication::tournamentResultsDialog() {
   if (m_tournamentResultsDialog == nullptr)
     m_tournamentResultsDialog = new TournamentResultsDialog();
 
@@ -250,8 +250,7 @@ void SylvanApplication::onQuitAction() {
 }
 
 void SylvanApplication::onLastWindowClosed() {
-  if (!m_initialWindowCreated)
-    return;
+  if (!m_initialWindowCreated) return;
 
   if (m_gameManager != nullptr) {
     connect(m_gameManager, SIGNAL(finished()), this, SLOT(quit()));
@@ -266,7 +265,7 @@ void SylvanApplication::onAboutToQuit() {
                                       QLatin1String("/gamedb.bin"));
 }
 
-void SylvanApplication::showDialog(QWidget *dlg) {
+void SylvanApplication::showDialog(QWidget* dlg) {
   Q_ASSERT(dlg != nullptr);
 
   if (dlg->isMinimized())
@@ -279,12 +278,8 @@ void SylvanApplication::showDialog(QWidget *dlg) {
 }
 
 void SylvanApplication::closeDialogs() {
-  if (m_tournamentResultsDialog)
-    m_tournamentResultsDialog->close();
-  if (m_gameDatabaseDialog)
-    m_gameDatabaseDialog->close();
-  if (m_settingsDialog)
-    m_settingsDialog->close();
-  if (m_gameWall)
-    m_gameWall->close();
+  if (m_tournamentResultsDialog) m_tournamentResultsDialog->close();
+  if (m_gameDatabaseDialog) m_gameDatabaseDialog->close();
+  if (m_settingsDialog) m_settingsDialog->close();
+  if (m_gameWall) m_gameWall->close();
 }

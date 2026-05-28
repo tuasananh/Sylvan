@@ -18,10 +18,11 @@
 */
 
 #include "roundrobintournament.h"
+
 #include <algorithm>
 
-RoundRobinTournament::RoundRobinTournament(GameManager *gameManager,
-                                           QObject *parent)
+RoundRobinTournament::RoundRobinTournament(GameManager* gameManager,
+                                           QObject* parent)
     : Tournament(gameManager, parent), m_pairNumber(0) {}
 
 QString RoundRobinTournament::type() const { return "round-robin"; }
@@ -32,21 +33,17 @@ void RoundRobinTournament::initializePairing() {
   m_bottomHalf.clear();
   int count = playerCount() + (playerCount() % 2);
 
-  for (int i = 0; i < count / 2; i++)
-    m_topHalf.append(i);
-  for (int i = count - 1; i >= count / 2; i--)
-    m_bottomHalf.append(i);
+  for (int i = 0; i < count / 2; i++) m_topHalf.append(i);
+  for (int i = count - 1; i >= count / 2; i--) m_bottomHalf.append(i);
 }
 
 int RoundRobinTournament::gamesPerCycle() const {
   return (playerCount() * (playerCount() - 1)) / 2;
 }
 
-TournamentPair *RoundRobinTournament::nextPair(int gameNumber) {
-  if (gameNumber >= finalGameCount())
-    return nullptr;
-  if (gameNumber % gamesPerEncounter() != 0)
-    return currentPair();
+TournamentPair* RoundRobinTournament::nextPair(int gameNumber) {
+  if (gameNumber >= finalGameCount()) return nullptr;
+  if (gameNumber % gamesPerEncounter() != 0) return currentPair();
 
   if (m_pairNumber >= m_topHalf.size()) {
     m_pairNumber = 0;

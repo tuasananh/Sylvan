@@ -24,19 +24,30 @@
 #include "enginetextoption.h"
 
 EngineConfiguration::EngineConfiguration()
-    : m_variants(QStringList() << "standard"), m_redEvalPov(false),
-      m_pondering(false), m_validateClaims(true), m_restartMode(RestartAuto) {}
+    : m_variants(QStringList() << "standard"),
+      m_redEvalPov(false),
+      m_pondering(false),
+      m_validateClaims(true),
+      m_restartMode(RestartAuto) {}
 
-EngineConfiguration::EngineConfiguration(const QString &name,
-                                         const QString &command,
-                                         const QString &protocol)
-    : m_name(name), m_command(command), m_protocol(protocol),
-      m_variants(QStringList() << "standard"), m_redEvalPov(false),
-      m_pondering(false), m_validateClaims(true), m_restartMode(RestartAuto) {}
+EngineConfiguration::EngineConfiguration(const QString& name,
+                                         const QString& command,
+                                         const QString& protocol)
+    : m_name(name),
+      m_command(command),
+      m_protocol(protocol),
+      m_variants(QStringList() << "standard"),
+      m_redEvalPov(false),
+      m_pondering(false),
+      m_validateClaims(true),
+      m_restartMode(RestartAuto) {}
 
-EngineConfiguration::EngineConfiguration(const QVariant &variant)
-    : m_variants(QStringList() << "standard"), m_redEvalPov(false),
-      m_pondering(false), m_validateClaims(true), m_restartMode(RestartAuto) {
+EngineConfiguration::EngineConfiguration(const QVariant& variant)
+    : m_variants(QStringList() << "standard"),
+      m_redEvalPov(false),
+      m_pondering(false),
+      m_validateClaims(true),
+      m_restartMode(RestartAuto) {
   const QVariantMap map = variant.toMap();
 
   setName(map["name"].toString());
@@ -47,10 +58,8 @@ EngineConfiguration::EngineConfiguration(const QVariant &variant)
 
   if (map.contains("initStrings"))
     setInitStrings(map["initStrings"].toStringList());
-  if (map.contains("redpov"))
-    setRedEvalPov(map["redpov"].toBool());
-  if (map.contains("ponder"))
-    setPondering(map["ponder"].toBool());
+  if (map.contains("redpov")) setRedEvalPov(map["redpov"].toBool());
+  if (map.contains("ponder")) setPondering(map["ponder"].toBool());
 
   if (map.contains("restart")) {
     const QString val(map["restart"].toString());
@@ -70,9 +79,9 @@ EngineConfiguration::EngineConfiguration(const QVariant &variant)
 
   if (map.contains("options")) {
     const QVariantList optionsList = map["options"].toList();
-    EngineOption *option = nullptr;
+    EngineOption* option = nullptr;
 
-    for (const QVariant &optionVariant : optionsList) {
+    for (const QVariant& optionVariant : optionsList) {
       if ((option = EngineOptionFactory::create(optionVariant.toMap())) !=
           nullptr)
         addOption(option);
@@ -80,23 +89,26 @@ EngineConfiguration::EngineConfiguration(const QVariant &variant)
   }
 }
 
-EngineConfiguration::EngineConfiguration(const EngineConfiguration &other)
-    : m_name(other.m_name), m_command(other.m_command),
+EngineConfiguration::EngineConfiguration(const EngineConfiguration& other)
+    : m_name(other.m_name),
+      m_command(other.m_command),
       m_workingDirectory(other.m_workingDirectory),
-      m_stderrFile(other.m_stderrFile), m_protocol(other.m_protocol),
-      m_arguments(other.m_arguments), m_initStrings(other.m_initStrings),
-      m_variants(other.m_variants), m_redEvalPov(other.m_redEvalPov),
-      m_pondering(other.m_pondering), m_validateClaims(other.m_validateClaims),
+      m_stderrFile(other.m_stderrFile),
+      m_protocol(other.m_protocol),
+      m_arguments(other.m_arguments),
+      m_initStrings(other.m_initStrings),
+      m_variants(other.m_variants),
+      m_redEvalPov(other.m_redEvalPov),
+      m_pondering(other.m_pondering),
+      m_validateClaims(other.m_validateClaims),
       m_restartMode(other.m_restartMode) {
   const auto options = other.options();
-  for (const EngineOption *option : options)
-    addOption(option->copy());
+  for (const EngineOption* option : options) addOption(option->copy());
 }
 
-EngineConfiguration &
-EngineConfiguration::operator=(EngineConfiguration &&other) {
-  if (this == &other)
-    return *this;
+EngineConfiguration& EngineConfiguration::operator=(
+    EngineConfiguration&& other) {
+  if (this == &other) return *this;
 
   qDeleteAll(m_options);
   m_name = other.m_name;
@@ -129,27 +141,23 @@ QVariant EngineConfiguration::toVariant() const {
   map.insert("stderrFile", m_stderrFile);
   map.insert("protocol", m_protocol);
 
-  if (!m_initStrings.isEmpty())
-    map.insert("initStrings", m_initStrings);
-  if (m_redEvalPov)
-    map.insert("redpov", true);
-  if (m_pondering)
-    map.insert("ponder", true);
+  if (!m_initStrings.isEmpty()) map.insert("initStrings", m_initStrings);
+  if (m_redEvalPov) map.insert("redpov", true);
+  if (m_pondering) map.insert("ponder", true);
 
   if (m_restartMode == RestartOn)
     map.insert("restart", "on");
   else if (m_restartMode == RestartOff)
     map.insert("restart", "off");
 
-  if (!m_validateClaims)
-    map.insert("validateClaims", false);
+  if (!m_validateClaims) map.insert("validateClaims", false);
 
   if (m_variants.count("standard") != m_variants.count())
     map.insert("variants", m_variants);
 
   if (!m_options.isEmpty()) {
     QVariantList optionsList;
-    for (const EngineOption *option : qAsConst(m_options))
+    for (const EngineOption* option : qAsConst(m_options))
       optionsList.append(option->toVariant());
 
     map.insert("options", optionsList);
@@ -158,21 +166,21 @@ QVariant EngineConfiguration::toVariant() const {
   return map;
 }
 
-void EngineConfiguration::setName(const QString &name) { m_name = name; }
+void EngineConfiguration::setName(const QString& name) { m_name = name; }
 
-void EngineConfiguration::setCommand(const QString &command) {
+void EngineConfiguration::setCommand(const QString& command) {
   m_command = command;
 }
 
-void EngineConfiguration::setProtocol(const QString &protocol) {
+void EngineConfiguration::setProtocol(const QString& protocol) {
   m_protocol = protocol;
 }
 
-void EngineConfiguration::setWorkingDirectory(const QString &workingDir) {
+void EngineConfiguration::setWorkingDirectory(const QString& workingDir) {
   m_workingDirectory = workingDir;
 }
 
-void EngineConfiguration::setStderrFile(const QString &fileName) {
+void EngineConfiguration::setStderrFile(const QString& fileName) {
   m_stderrFile = fileName;
 }
 
@@ -190,21 +198,21 @@ QString EngineConfiguration::protocol() const { return m_protocol; }
 
 QStringList EngineConfiguration::arguments() const { return m_arguments; }
 
-void EngineConfiguration::setArguments(const QStringList &arguments) {
+void EngineConfiguration::setArguments(const QStringList& arguments) {
   m_arguments = arguments;
 }
 
-void EngineConfiguration::addArgument(const QString &argument) {
+void EngineConfiguration::addArgument(const QString& argument) {
   m_arguments << argument;
 }
 
 QStringList EngineConfiguration::initStrings() const { return m_initStrings; }
 
-void EngineConfiguration::setInitStrings(const QStringList &initStrings) {
+void EngineConfiguration::setInitStrings(const QStringList& initStrings) {
   m_initStrings = initStrings;
 }
 
-void EngineConfiguration::addInitString(const QString &initString) {
+void EngineConfiguration::addInitString(const QString& initString) {
   m_initStrings << initString.split('\n');
 }
 
@@ -212,30 +220,30 @@ QStringList EngineConfiguration::supportedVariants() const {
   return m_variants;
 }
 
-bool EngineConfiguration::supportsVariant(const QString &variant) const {
+bool EngineConfiguration::supportsVariant(const QString& variant) const {
   return m_variants.contains(variant);
 }
 
-void EngineConfiguration::setSupportedVariants(const QStringList &variants) {
+void EngineConfiguration::setSupportedVariants(const QStringList& variants) {
   m_variants = variants;
 }
 
-QList<EngineOption *> EngineConfiguration::options() const { return m_options; }
+QList<EngineOption*> EngineConfiguration::options() const { return m_options; }
 
-void EngineConfiguration::setOptions(const QList<EngineOption *> &options) {
+void EngineConfiguration::setOptions(const QList<EngineOption*>& options) {
   qDeleteAll(m_options);
   m_options = options;
 }
 
-void EngineConfiguration::addOption(EngineOption *option) {
+void EngineConfiguration::addOption(EngineOption* option) {
   Q_ASSERT(option != nullptr);
 
   m_options << option;
 }
 
-void EngineConfiguration::setOption(const QString &name,
-                                    const QVariant &value) {
-  for (EngineOption *option : qAsConst(m_options)) {
+void EngineConfiguration::setOption(const QString& name,
+                                    const QVariant& value) {
+  for (EngineOption* option : qAsConst(m_options)) {
     if (option->name() == name) {
       if (!option->isValid(value)) {
         qWarning("Invalid value for engine option %s: %s", qUtf8Printable(name),
@@ -276,8 +284,8 @@ void EngineConfiguration::setClaimsValidated(bool validate) {
   m_validateClaims = validate;
 }
 
-EngineConfiguration &
-EngineConfiguration::operator=(const EngineConfiguration &other) {
+EngineConfiguration& EngineConfiguration::operator=(
+    const EngineConfiguration& other) {
   if (this != &other) {
     m_name = other.m_name;
     m_command = other.m_command;
@@ -295,7 +303,7 @@ EngineConfiguration::operator=(const EngineConfiguration &other) {
     qDeleteAll(m_options);
     m_options.clear();
 
-    for (const EngineOption *option : qAsConst(other.m_options))
+    for (const EngineOption* option : qAsConst(other.m_options))
       m_options.append(option->copy());
   }
   return *this;

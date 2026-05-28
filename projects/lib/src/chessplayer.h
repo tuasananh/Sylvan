@@ -20,13 +20,14 @@
 #ifndef CHESSPLAYER_H
 #define CHESSPLAYER_H
 
+#include <QObject>
+#include <QString>
+#include <QVector>
+
 #include "board/move.h"
 #include "board/result.h"
 #include "moveevaluation.h"
 #include "timecontrol.h"
-#include <QObject>
-#include <QString>
-#include <QVector>
 
 class QTimer;
 namespace Chess {
@@ -41,20 +42,20 @@ class Board;
 class LIB_EXPORT ChessPlayer : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The different states of ChessPlayer. */
   enum State {
-    NotStarted,      //!< Not started or uninitialized
-    Starting,        //!< Starting or initializing
-    Idle,            //!< Idle and ready to start a game
-    Observing,       //!< Observing a game, or waiting for turn
-    Thinking,        //!< Thinking of the next move
-    FiniGuardngGame, //!< FiniGuardng or cleaning up after a game
-    Disconnected     //!< Disconnected or terminated
+    NotStarted,       //!< Not started or uninitialized
+    Starting,         //!< Starting or initializing
+    Idle,             //!< Idle and ready to start a game
+    Observing,        //!< Observing a game, or waiting for turn
+    Thinking,         //!< Thinking of the next move
+    FiniGuardngGame,  //!< FiniGuardng or cleaning up after a game
+    Disconnected      //!< Disconnected or terminated
   };
 
   /*! Creates and initializes a new ChessPlayer object. */
-  ChessPlayer(QObject *parent = nullptr);
+  ChessPlayer(QObject* parent = nullptr);
   virtual ~ChessPlayer();
 
   /*!
@@ -85,7 +86,7 @@ public:
    *
    * \sa startGame()
    */
-  void newGame(Chess::Side side, ChessPlayer *opponent, Chess::Board *board);
+  void newGame(Chess::Side side, ChessPlayer* opponent, Chess::Board* board);
 
   /*!
    * Tells the player that the game ended by \a result.
@@ -93,16 +94,16 @@ public:
    * \note Subclasses that reimplement this function must call
    * the base implementation.
    */
-  virtual void endGame(const Chess::Result &result);
+  virtual void endGame(const Chess::Result& result);
 
   /*! Returns the player's evaluation of the current position. */
-  const MoveEvaluation &evaluation() const;
+  const MoveEvaluation& evaluation() const;
 
   /*! Returns the player's time control. */
-  const TimeControl *timeControl() const;
+  const TimeControl* timeControl() const;
 
   /*! Sets the time control for the player. */
-  void setTimeControl(const TimeControl &timeControl);
+  void setTimeControl(const TimeControl& timeControl);
 
   /*! Returns the side of the player. */
   Chess::Side side() const;
@@ -112,19 +113,19 @@ public:
    * If the player is in force/observer mode, the move wasn't
    * necessarily made by the opponent.
    */
-  virtual void makeMove(const Chess::Move &move) = 0;
+  virtual void makeMove(const Chess::Move& move) = 0;
 
   /*! Forces the player to play \a move as its next move. */
-  virtual void makeBookMove(const Chess::Move &move);
+  virtual void makeBookMove(const Chess::Move& move);
 
   /*! Returns the player's name. */
   QString name() const;
 
   /*! Sets the player's name. */
-  void setName(const QString &name);
+  void setName(const QString& name);
 
   /*! Returns true if the player can play \a variant. */
-  virtual bool supportsVariant(const QString &variant) const = 0;
+  virtual bool supportsVariant(const QString& variant) const = 0;
 
   /*!
    * Tells the player to start pondering (thinking on the
@@ -155,7 +156,7 @@ public:
    */
   void setCanPlayAfterTimeout(bool enable);
 
-public slots:
+ public slots:
   /*!
    * Waits (without blocking) until the player is ready,
    * starts the chess clock, and tells the player to start thinking
@@ -180,7 +181,7 @@ public slots:
    */
   virtual void kill();
 
-signals:
+ signals:
   /*! This signal is emitted when the player disconnects. */
   void disconnected();
 
@@ -206,24 +207,24 @@ signals:
    * This signal is emitted when the player's evaluation of the
    * current position changes.
    */
-  void thinking(const MoveEvaluation &eval);
+  void thinking(const MoveEvaluation& eval);
 
   /*! Signals the player's move. */
-  void moveMade(const Chess::Move &move);
+  void moveMade(const Chess::Move& move);
 
   /*!
    * Emitted when the player claims the game to end
    * with result \a result.
    */
-  void resultClaim(const Chess::Result &result);
+  void resultClaim(const Chess::Result& result);
 
   /*! Signals a debugging message from the player. */
-  void debugMessage(const QString &data);
+  void debugMessage(const QString& data);
 
   /*! Emitted when player's name is changed. */
-  void nameChanged(const QString &name);
+  void nameChanged(const QString& name);
 
-protected slots:
+ protected slots:
   /*!
    * Called when the player's process or connection
    * crashes unexpectedly.
@@ -238,9 +239,9 @@ protected slots:
    */
   virtual void onTimeout();
 
-protected:
+ protected:
   /*! Returns the chessboard on which the player is playing. */
-  Chess::Board *board();
+  Chess::Board* board();
 
   /*! Starts the chess game set up by newGame(). */
   virtual void startGame() = 0;
@@ -260,29 +261,29 @@ protected:
   virtual bool canPlayAfterTimeout() const;
 
   /*! Emits the resultClaim() signal with result \a result. */
-  void claimResult(const Chess::Result &result);
+  void claimResult(const Chess::Result& result);
   /*!
    * Emits the resultClaim() signal with a result of type
    * \a type, description \a description, and this player
    * as the loser.
    */
   void forfeit(Chess::Result::Type type,
-               const QString &description = QString());
+               const QString& description = QString());
 
   /*!
    * Emits the player's move, and a timeout signal if the
    * move came too late.
    */
-  void emitMove(const Chess::Move &move);
+  void emitMove(const Chess::Move& move);
 
   /*! Returns the opposing player. */
-  const ChessPlayer *opponent() const;
+  const ChessPlayer* opponent() const;
 
   /*! Sets the player's state to \a state. */
   void setState(State state);
 
   /*! Sets the current error to \a error. */
-  void setError(const QString &error);
+  void setError(const QString& error);
 
   /*!
    * Move evaluation for the current move.
@@ -293,20 +294,20 @@ protected:
    */
   MoveEvaluation m_eval;
 
-private:
+ private:
   void startClock();
 
   QString m_name;
   QString m_error;
   State m_state;
   TimeControl m_timeControl;
-  QTimer *m_timer;
+  QTimer* m_timer;
   bool m_claimedResult;
   bool m_validateClaims;
   bool m_canPlayAfterTimeout;
   Chess::Side m_side;
-  Chess::Board *m_board;
-  ChessPlayer *m_opponent;
+  Chess::Board* m_board;
+  ChessPlayer* m_opponent;
 };
 
-#endif // CHESSPLAYER_H
+#endif  // CHESSPLAYER_H

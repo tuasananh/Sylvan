@@ -36,24 +36,24 @@ class ImportProgressDialog;
 class ImportProgressDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs a new ImportProgressDialog with \a importer. */
-  ImportProgressDialog(PgnImporter *pgnImporter, QWidget *parent = nullptr);
+  ImportProgressDialog(PgnImporter* pgnImporter, QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~ImportProgressDialog();
 
-private slots:
+ private slots:
   void onImporterFinished();
   void onImportError(int error);
-  void updateImportStatus(const QTime &startTime, int numReadGames,
+  void updateImportStatus(const QTime& startTime, int numReadGames,
                           qint64 numReadBytes);
 
-private:
+ private:
   QString humaniseTime(int sec);
   qint64 m_totalFileSize;
   int m_lastUpdateSecs;
   bool m_importError;
-  Ui::ImportProgressDialog *ui;
+  Ui::ImportProgressDialog* ui;
 };
 
-#endif // IMPORT_PROGRESS_DIALOG_H
+#endif  // IMPORT_PROGRESS_DIALOG_H

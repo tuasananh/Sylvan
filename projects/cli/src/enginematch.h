@@ -20,11 +20,12 @@
 #ifndef ENGINEMATCH_H
 #define ENGINEMATCH_H
 
+#include <openingbook.h>
+
 #include <QElapsedTimer>
 #include <QMap>
 #include <QObject>
 #include <QString>
-#include <openingbook.h>
 
 class ChessGame;
 class OpeningBook;
@@ -33,11 +34,11 @@ class Tournament;
 class EngineMatch : public QObject {
   Q_OBJECT
 
-public:
-  EngineMatch(Tournament *tournament, QObject *parent = nullptr);
+ public:
+  EngineMatch(Tournament* tournament, QObject* parent = nullptr);
   virtual ~EngineMatch();
 
-  OpeningBook *addOpeningBook(const QString &fileName);
+  OpeningBook* addOpeningBook(const QString& fileName);
   void setDebugMode(bool debug);
   void setRatingInterval(int interval);
   void setBookMode(OpeningBook::BookMoveMode mode);
@@ -45,24 +46,24 @@ public:
   void start();
   void stop();
 
-signals:
+ signals:
   void finished();
 
-private slots:
-  void onGameStarted(ChessGame *game, int number);
-  void onGameFinished(ChessGame *game, int number);
+ private slots:
+  void onGameStarted(ChessGame* game, int number);
+  void onGameFinished(ChessGame* game, int number);
   void onTournamentFinished();
-  void print(const QString &msg);
+  void print(const QString& msg);
 
-private:
+ private:
   void printRanking();
 
-  Tournament *m_tournament;
+  Tournament* m_tournament;
   bool m_debug;
   int m_ratingInterval;
   OpeningBook::BookMoveMode m_bookMode;
-  QMap<QString, OpeningBook *> m_books;
+  QMap<QString, OpeningBook*> m_books;
   QElapsedTimer m_startTime;
 };
 
-#endif // ENGINEMATCH_H
+#endif  // ENGINEMATCH_H

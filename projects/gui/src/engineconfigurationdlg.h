@@ -20,10 +20,10 @@
 #ifndef ENGINECONFIGURATIONDIALOG_H
 #define ENGINECONFIGURATIONDIALOG_H
 
+#include <engineconfiguration.h>
+
 #include <QDialog>
 #include <QSet>
-
-#include <engineconfiguration.h>
 
 class EngineOption;
 class EngineOptionModel;
@@ -40,7 +40,7 @@ class EngineConfigurationDialog;
 class EngineConfigurationDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*! The mode that is used in the dialog. */
   enum DialogMode {
     /*! Mode for adding new engine. */
@@ -53,14 +53,14 @@ public:
    * Creates a new engine configuration dialog with \a parent as
    * parent
    */
-  EngineConfigurationDialog(DialogMode mode, QWidget *parent = nullptr);
+  EngineConfigurationDialog(DialogMode mode, QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~EngineConfigurationDialog();
 
   /*!
    * Applies the information of \a engine to the dialog.
    */
-  void applyEngineInformation(const EngineConfiguration &engine);
+  void applyEngineInformation(const EngineConfiguration& engine);
   /*!
    * Returns an engine based on the information user selected.
    */
@@ -72,14 +72,14 @@ public:
    * If the user tries to use a reserved name they'll see a
    * warning message.
    */
-  void setReservedNames(const QSet<QString> &names);
+  void setReservedNames(const QSet<QString>& names);
 
-signals:
+ signals:
   void detectionFinished();
 
-private slots:
+ private slots:
   void browseCommand();
-  void setExecutable(const QString &file);
+  void setExecutable(const QString& file);
   void browseWorkingDir();
   void detectEngineOptions();
   void restoreDefaults();
@@ -91,17 +91,17 @@ private slots:
   void onAccepted();
   void resizeColumns();
 
-private:
+ private:
   bool m_hasError;
-  EngineOptionModel *m_engineOptionModel;
+  EngineOptionModel* m_engineOptionModel;
   QString m_oldCommand;
   QString m_oldPath;
   QString m_oldProtocol;
-  QList<EngineOption *> m_options;
+  QList<EngineOption*> m_options;
   QStringList m_variants;
-  ChessEngine *m_engine;
-  Ui::EngineConfigurationDialog *ui;
+  ChessEngine* m_engine;
+  Ui::EngineConfigurationDialog* ui;
   QSet<QString> m_reservedNames;
 };
 
-#endif // ENGINECONFIGURATIONDIALOG_H
+#endif  // ENGINECONFIGURATIONDIALOG_H

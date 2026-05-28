@@ -26,9 +26,9 @@
  * \brief A comment token for a move in a PGN game
  */
 class MoveCommentToken : public PgnToken {
-public:
+ public:
   /*! Creates a new MoveCommentToken with text \a text at \a ply. */
-  MoveCommentToken(int ply, const QString &text);
+  MoveCommentToken(int ply, const QString& text);
 
   // Inherited from PgnToken
   virtual QString toString() const;
@@ -37,15 +37,15 @@ public:
    * Sets the comment's text to \a text.
    * Changes to the text document have to be made separately.
    */
-  void setValue(const QString &text);
+  void setValue(const QString& text);
 
-protected:
+ protected:
   // Inherited from PgnToken
-  virtual void vInsert(QTextCursor &cursor);
+  virtual void vInsert(QTextCursor& cursor);
 
-private:
+ private:
   int m_ply;
   QString m_text;
 };
 
-#endif // MOVECOMMENTTOKEN_H
+#endif  // MOVECOMMENTTOKEN_H

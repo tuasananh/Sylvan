@@ -20,8 +20,9 @@
 #ifndef GENERICMOVE_H
 #define GENERICMOVE_H
 
-#include "square.h"
 #include <QMetaType>
+
+#include "square.h"
 
 namespace Chess {
 
@@ -33,16 +34,16 @@ namespace Chess {
  * by a Chess::Board object.
  */
 class LIB_EXPORT GenericMove {
-public:
+ public:
   /*! Constructs a new null (empty) move. */
   GenericMove();
   /*! Constructs and initializes a new move. */
-  GenericMove(const Square &sourceSquare, const Square &targetSquare);
+  GenericMove(const Square& sourceSquare, const Square& targetSquare);
 
   /*! Returns true if \a other is the same as this move. */
-  bool operator==(const GenericMove &other) const;
+  bool operator==(const GenericMove& other) const;
   /*! Returns true if \a other is different from this move. */
-  bool operator!=(const GenericMove &other) const;
+  bool operator!=(const GenericMove& other) const;
 
   /*! Returns true if this is a null move. */
   bool isNull() const;
@@ -53,17 +54,17 @@ public:
   Square targetSquare() const;
 
   /*! Sets the source square to \a square. */
-  void setSourceSquare(const Square &square);
+  void setSourceSquare(const Square& square);
   /*! Sets the target square to \a square. */
-  void setTargetSquare(const Square &square);
+  void setTargetSquare(const Square& square);
 
-private:
+ private:
   Square m_sourceSquare;
   Square m_targetSquare;
 };
 
-} // namespace Chess
+}  // namespace Chess
 
 Q_DECLARE_METATYPE(Chess::GenericMove)
 
-#endif // GENERICMOVE_H
+#endif  // GENERICMOVE_H

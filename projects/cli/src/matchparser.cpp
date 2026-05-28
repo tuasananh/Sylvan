@@ -19,21 +19,20 @@
 
 #include "matchparser.h"
 
-MatchParser::MatchParser(const QStringList &args)
+MatchParser::MatchParser(const QStringList& args)
     : m_args(args), m_priority(0) {}
 
-void MatchParser::addOption(const QString &name, QVariant::Type type,
+void MatchParser::addOption(const QString& name, QVariant::Type type,
                             int minArgs, int maxArgs, bool duplicates) {
   PrivateOption option = {type, m_priority++, minArgs, maxArgs, duplicates};
   m_validOptions[name] = option;
 }
 
-QVariant MatchParser::takeOption(const QString &name) {
+QVariant MatchParser::takeOption(const QString& name) {
   Q_ASSERT(m_validOptions.contains(name));
 
   int i = m_validOptions.value(name).priority;
-  if (m_options.contains(i))
-    return m_options.take(i).value;
+  if (m_options.contains(i)) return m_options.take(i).value;
 
   return QVariant();
 }
@@ -44,18 +43,16 @@ QList<MatchParser::Option> MatchParser::options() const {
   const auto uniqueKeys = m_options.uniqueKeys();
   for (int key : uniqueKeys) {
     QList<Option> values(m_options.values(key));
-    while (!values.isEmpty())
-      list.append(values.takeLast());
+    while (!values.isEmpty()) list.append(values.takeLast());
   }
 
   return list;
 }
 
-bool MatchParser::contains(const QString &optionName) const {
+bool MatchParser::contains(const QString& optionName) const {
   QMultiMap<int, Option>::const_iterator it;
   for (it = m_options.constBegin(); it != m_options.constEnd(); ++it) {
-    if (it.value().name == optionName)
-      return true;
+    if (it.value().name == optionName) return true;
   }
 
   return false;
@@ -69,15 +66,14 @@ bool MatchParser::parse() {
       return false;
     }
     QString name = *it;
-    PrivateOption &option = m_validOptions[name];
+    PrivateOption& option = m_validOptions[name];
 
     QStringList list;
     while (++it != m_args.constEnd()) {
       if (it->size() > 1 && it->startsWith('-')) {
         bool ok = false;
         it->toDouble(&ok);
-        if (!ok)
-          break;
+        if (!ok) break;
       }
       list << *it;
     }
@@ -127,14 +123,14 @@ bool MatchParser::parse() {
   return true;
 }
 
-QMap<QString, QString>
-MatchParser::Option::toMap(const QString &validArgs) const {
+QMap<QString, QString> MatchParser::Option::toMap(
+    const QString& validArgs) const {
   const QStringList args = value.toStringList();
   QMap<QString, QString> defaults;
   QMap<QString, QString> map;
 
   const auto splitArgs = validArgs.split('|');
-  for (const auto &arg : splitArgs) {
+  for (const auto& arg : splitArgs) {
     QString argName = arg.section('=', 0, 0);
     QString argVal = arg.section('=', 1);
 
@@ -144,7 +140,7 @@ MatchParser::Option::toMap(const QString &validArgs) const {
       defaults[argName] = argVal;
   }
 
-  for (const auto &arg : args) {
+  for (const auto& arg : args) {
     QString argName = arg.section('=', 0, 0);
     QString argVal = arg.section('=', 1);
 
@@ -162,8 +158,7 @@ MatchParser::Option::toMap(const QString &validArgs) const {
     QStringList missing;
     QMap<QString, QString>::const_iterator it;
     for (it = defaults.constBegin(); it != defaults.constEnd(); ++it) {
-      if (map.contains(it.key()))
-        continue;
+      if (map.contains(it.key())) continue;
 
       if (it.value().isEmpty())
         missing.append(QString("\"%1\"").arg(it.key()));

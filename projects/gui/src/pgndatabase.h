@@ -20,13 +20,13 @@
 #ifndef PGN_DATABASE_H
 #define PGN_DATABASE_H
 
+#include <pgngame.h>
+#include <pgngameentry.h>
+
 #include <QDateTime>
 #include <QFile>
 #include <QList>
 #include <QObject>
-
-#include <pgngame.h>
-#include <pgngameentry.h>
 
 class PgnStream;
 
@@ -40,21 +40,21 @@ class PgnStream;
 class PgnDatabase : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The current status of the database. */
   enum Status {
-    Ok,           //!< The database can be used normally
-    Modified,     //!< Database file was modified externally
-    DoesNotExist, //!< Database file does not exist
-    Unreadable,   //!< Database file cannot be read
-    Corrupted     //!< Database contains corrupted or invalid data
+    Ok,            //!< The database can be used normally
+    Modified,      //!< Database file was modified externally
+    DoesNotExist,  //!< Database file does not exist
+    Unreadable,    //!< Database file cannot be read
+    Corrupted      //!< Database contains corrupted or invalid data
   };
 
   /*!
    * Constructs a new PgnDatabase with \a parent and \a fileName as
    * the underlying database.
    */
-  PgnDatabase(const QString &fileName, QObject *parent = nullptr);
+  PgnDatabase(const QString& fileName, QObject* parent = nullptr);
   /*! Destroys the database and the game entries it contains. */
   virtual ~PgnDatabase();
 
@@ -64,7 +64,7 @@ public:
    * The database takes ownerGuardp of the PgnGameEntry objects
    * in \a entries.
    */
-  void setEntries(const QList<const PgnGameEntry *> &entries);
+  void setEntries(const QList<const PgnGameEntry*>& entries);
   /*!
    * Returns the list of game entries in this database.
    *
@@ -73,7 +73,7 @@ public:
    *
    * \sa game()
    */
-  QList<const PgnGameEntry *> entries() const;
+  QList<const PgnGameEntry*> entries() const;
 
   /*! Returns the file name of this database. */
   QString fileName() const;
@@ -96,7 +96,7 @@ public:
    *
    * \sa lastModified
    */
-  void setLastModified(const QDateTime &lastModified);
+  void setLastModified(const QDateTime& lastModified);
 
   /*!
    * Returns the display name of this database.
@@ -113,20 +113,20 @@ public:
    *
    * \sa displayName
    */
-  void setDisplayName(const QString &displayName);
+  void setDisplayName(const QString& displayName);
 
   /*!
    * Reads \a game from the database using \a entry.
    *
    * \note \a game must be allocated by the caller and must not be NULL.
    */
-  Status game(const PgnGameEntry *entry, PgnGame *game);
+  Status game(const PgnGameEntry* entry, PgnGame* game);
 
-private:
-  QList<const PgnGameEntry *> m_entries;
+ private:
+  QList<const PgnGameEntry*> m_entries;
   QDateTime m_lastModified;
   QString m_fileName;
   QString m_displayName;
 };
 
-#endif // PGN_DATABASE_H
+#endif  // PGN_DATABASE_H

@@ -1,18 +1,19 @@
-#include <QtTest/QtTest>
 #include <openingbook.h>
 #include <tournamentplayer.h>
 
+#include <QtTest/QtTest>
+
 class MockOpeningBook : public OpeningBook {
-protected:
-  virtual Entry readEntry(QDataStream &in, quint64 *key) const {
+ protected:
+  virtual Entry readEntry(QDataStream& in, quint64* key) const {
     Q_UNUSED(in);
     Q_UNUSED(key);
 
     Entry entry;
     return entry;
   }
-  virtual void writeEntry(const Map::const_iterator &it,
-                          QDataStream &out) const {
+  virtual void writeEntry(const Map::const_iterator& it,
+                          QDataStream& out) const {
     Q_UNUSED(it);
     Q_UNUSED(out);
   }
@@ -20,13 +21,13 @@ protected:
 };
 
 class MockPlayerBuilder : public PlayerBuilder {
-public:
-  MockPlayerBuilder(const QString &name) : PlayerBuilder(name) {}
+ public:
+  MockPlayerBuilder(const QString& name) : PlayerBuilder(name) {}
 
   virtual bool isHuman() const { return false; }
 
-  virtual ChessPlayer *create(QObject *receiver, const char *method,
-                              QObject *parent, QString *error) const {
+  virtual ChessPlayer* create(QObject* receiver, const char* method,
+                              QObject* parent, QString* error) const {
     Q_UNUSED(receiver);
     Q_UNUSED(method);
     Q_UNUSED(parent);
@@ -39,21 +40,21 @@ public:
 class tst_TournamentPlayer : public QObject {
   Q_OBJECT
 
-public:
+ public:
   tst_TournamentPlayer();
 
-private slots:
+ private slots:
   void initialValues();
   void setName();
   void addScore();
 
   void cleanupTestCase();
 
-private:
+ private:
   TimeControl m_tc;
-  PlayerBuilder *m_builder;
-  OpeningBook *m_book;
-  TournamentPlayer *m_player;
+  PlayerBuilder* m_builder;
+  OpeningBook* m_book;
+  TournamentPlayer* m_player;
 };
 
 tst_TournamentPlayer::tst_TournamentPlayer() {

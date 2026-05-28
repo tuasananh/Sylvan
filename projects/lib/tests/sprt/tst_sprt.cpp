@@ -1,14 +1,15 @@
-#include <QtTest/QtTest>
 #include <sprt.h>
+
+#include <QtTest/QtTest>
 
 class tst_Sprt : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void sprt_data() const;
   void sprt();
 
-private:
+ private:
   bool fuzzyCompare(double val1, double val2);
 };
 
@@ -54,12 +55,9 @@ void tst_Sprt::sprt() {
   Sprt sprt;
   sprt.initialize(elo0, elo1, alpha, beta);
 
-  for (int i = 0; i < wins; i++)
-    sprt.addGameResult(Sprt::Win);
-  for (int i = 0; i < losses; i++)
-    sprt.addGameResult(Sprt::Loss);
-  for (int i = 0; i < draws; i++)
-    sprt.addGameResult(Sprt::Draw);
+  for (int i = 0; i < wins; i++) sprt.addGameResult(Sprt::Win);
+  for (int i = 0; i < losses; i++) sprt.addGameResult(Sprt::Loss);
+  for (int i = 0; i < draws; i++) sprt.addGameResult(Sprt::Draw);
 
   Sprt::Status status = sprt.status();
   QVERIFY(fuzzyCompare(status.llr, llr));

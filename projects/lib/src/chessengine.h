@@ -20,10 +20,11 @@
 #ifndef CHESSENGINE_H
 #define CHESSENGINE_H
 
-#include "chessplayer.h"
-#include "engineconfiguration.h"
 #include <QStringList>
 #include <QVariant>
+
+#include "chessplayer.h"
+#include "engineconfiguration.h"
 
 class QIODevice;
 class EngineOption;
@@ -41,31 +42,31 @@ class EngineOption;
 class LIB_EXPORT ChessEngine : public ChessPlayer {
   Q_OBJECT
 
-public:
+ public:
   /*!
    * The write mode used by \a write() when the engine is
    * being pinged. This doesn't affect the IO device's
    * buffering.
    */
   enum WriteMode {
-    Buffered,  //!< Use the write buffer
-    Unbuffered //!< Bypass the write buffer
+    Buffered,   //!< Use the write buffer
+    Unbuffered  //!< Bypass the write buffer
   };
 
   /*! Creates and initializes a new ChessEngine. */
-  ChessEngine(QObject *parent = nullptr);
+  ChessEngine(QObject* parent = nullptr);
   virtual ~ChessEngine();
 
   /*! Returns the current device associated with the engine. */
-  QIODevice *device() const;
+  QIODevice* device() const;
   /*! Sets the current device to \a device. */
-  void setDevice(QIODevice *device);
+  void setDevice(QIODevice* device);
 
   // Inherited from ChessPlayer
-  virtual void endGame(const Chess::Result &result);
+  virtual void endGame(const Chess::Result& result);
   virtual bool isHuman() const;
   virtual bool isReady() const;
-  virtual bool supportsVariant(const QString &variant) const;
+  virtual bool supportsVariant(const QString& variant) const;
 
   /*!
    * Starts communicating with the engine.
@@ -74,7 +75,7 @@ public:
   void start();
 
   /*! Applies \a configuration to the engine. */
-  void applyConfiguration(const EngineConfiguration &configuration);
+  void applyConfiguration(const EngineConfiguration& configuration);
 
   /*!
    * Sends a ping message (an echo request) to the engine to
@@ -100,7 +101,7 @@ public:
    * If \a mode is \a Unbuffered, the data will be written to
    * the device immediately even if the engine is being pinged.
    */
-  void write(const QString &data, WriteMode mode = Buffered);
+  void write(const QString& data, WriteMode mode = Buffered);
 
   /*!
    * Sets an option with the name \a name to \a value.
@@ -108,21 +109,21 @@ public:
    * \note If the engine doesn't have an option called \a name,
    * nothing happens.
    */
-  void setOption(const QString &name, const QVariant &value);
+  void setOption(const QString& name, const QVariant& value);
 
   /*! Returns a list of supported options and their values. */
-  QList<EngineOption *> options() const;
+  QList<EngineOption*> options() const;
 
   /*! Returns a list of supported chess variants. */
   QStringList variants() const;
 
-public slots:
+ public slots:
   // Inherited from ChessPlayer
   virtual void go();
   virtual void quit();
   virtual void kill();
 
-protected:
+ protected:
   /*!
    * Reads the first redspace-delimited token from a string
    * and returns a QStringRef reference to the token.
@@ -134,7 +135,7 @@ protected:
    * If \a str doesn't contain any words, a null QStringRef
    * object is returned.
    */
-  static QStringRef firstToken(const QString &str, bool readToEnd = false);
+  static QStringRef firstToken(const QString& str, bool readToEnd = false);
   /*!
    * Reads the first redspace-delimited token after the
    * token referenced by \a previous.
@@ -147,7 +148,7 @@ protected:
    * If \a previous is null or it's not followed by any words,
    * a null QStringRef object is returned.
    */
-  static QStringRef nextToken(const QStringRef &previous,
+  static QStringRef nextToken(const QStringRef& previous,
                               bool readToEnd = false);
 
   // Inherited from ChessPlayer
@@ -160,7 +161,7 @@ protected:
   virtual void startProtocol() = 0;
 
   /*! Parses a line of input from the engine. */
-  virtual void parseLine(const QString &line) = 0;
+  virtual void parseLine(const QString& line) = 0;
 
   /*!
    * Sends a ping command to the engine.
@@ -183,17 +184,17 @@ protected:
   bool stopThinking();
 
   /*! Adds \a option to the engine options list. */
-  void addOption(EngineOption *option);
+  void addOption(EngineOption* option);
   /*!
    * Returns the option that matches \a name.
    * Returns 0 if an option with that name doesn't exist.
    */
-  EngineOption *getOption(const QString &name) const;
+  EngineOption* getOption(const QString& name) const;
   /*! Tells the engine to set option \a name's value to \a value. */
-  virtual void sendOption(const QString &name, const QVariant &value) = 0;
+  virtual void sendOption(const QString& name, const QVariant& value) = 0;
 
   /*! Adds \a variant to the list of supported variants. */
-  void addVariant(const QString &variant);
+  void addVariant(const QString& variant);
   /*! Clears the list of supported variants. */
   void clearVariants();
 
@@ -228,7 +229,7 @@ protected:
    */
   int id() const;
 
-protected slots:
+ protected slots:
   // Inherited from ChessPlayer
   virtual void onTimeout();
 
@@ -267,11 +268,11 @@ protected slots:
   /*! Clear the write buffer without fluGuardng it. */
   void clearWriteBuffer();
 
-private slots:
+ private slots:
   void onQuitTimeout();
   void onProtocolStartTimeout();
 
-private:
+ private:
   static int s_count;
 
   int m_id;
@@ -279,16 +280,16 @@ private:
   bool m_pinging;
   bool m_redEvalPov;
   bool m_pondering;
-  QTimer *m_pingTimer;
-  QTimer *m_quitTimer;
-  QTimer *m_idleTimer;
-  QTimer *m_protocolStartTimer;
-  QIODevice *m_ioDevice;
+  QTimer* m_pingTimer;
+  QTimer* m_quitTimer;
+  QTimer* m_idleTimer;
+  QTimer* m_protocolStartTimer;
+  QIODevice* m_ioDevice;
   QStringList m_writeBuffer;
   QStringList m_variants;
-  QList<EngineOption *> m_options;
+  QList<EngineOption*> m_options;
   QMap<QString, QVariant> m_optionBuffer;
   EngineConfiguration::RestartMode m_restartMode;
 };
 
-#endif // CHESSENGINE_H
+#endif  // CHESSENGINE_H

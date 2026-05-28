@@ -22,66 +22,63 @@
 
 #include "board/board.h"
 #include "board/boardfactory.h"
-#include "timecontrol.h"
-
 #include "enginebuttonoption.h"
 #include "enginecheckoption.h"
 #include "enginecombooption.h"
 #include "enginespinoption.h"
 #include "enginetextoption.h"
+#include "timecontrol.h"
 
 namespace {
 
 QString variantFromUcci(QString str, bool ucciPrefix = true) {
   if (ucciPrefix) {
-    if (!str.startsWith("UCCI_"))
-      return QString();
+    if (!str.startsWith("UCCI_")) return QString();
     str = str.mid(4);
   }
-  if (str.isEmpty())
-    return QString();
+  if (str.isEmpty()) return QString();
 
   str = str.toLower();
-  if (str == "chess960")
-    str = "fischerandom";
+  if (str == "chess960") str = "fischerandom";
 
-  if (!Chess::BoardFactory::variants().contains(str))
-    return QString();
+  if (!Chess::BoardFactory::variants().contains(str)) return QString();
   return str;
 }
 
-QString variantToUcci(const QString &str, bool ucciPrefix = true) {
-  if (str.isEmpty() || str == "standard")
-    return QString();
+QString variantToUcci(const QString& str, bool ucciPrefix = true) {
+  if (str.isEmpty() || str == "standard") return QString();
 
-  if (str == "fischerandom")
-    return ucciPrefix ? "UCCI_Chess960" : "chess960";
-  if (!ucciPrefix)
-    return str;
-  if (str == "caparandom")
-    return "UCCI_CapaRandom";
+  if (str == "fischerandom") return ucciPrefix ? "UCCI_Chess960" : "chess960";
+  if (!ucciPrefix) return str;
+  if (str == "caparandom") return "UCCI_CapaRandom";
 
   QString tmp = QString("UCCI_%1").arg(str);
   tmp[4] = tmp.at(4).toUpper();
   return tmp;
 }
 
-QStringRef joinTokens(const QVarLengthArray<QStringRef> &tokens) {
+QStringRef joinTokens(const QVarLengthArray<QStringRef>& tokens) {
   Q_ASSERT(!tokens.isEmpty());
 
-  const QStringRef &last = tokens[tokens.size() - 1];
+  const QStringRef& last = tokens[tokens.size() - 1];
   int start = tokens[0].position();
   int end = last.position() + last.size();
 
   return QStringRef(last.string(), start, end - start);
 }
 
-} // namespace
+}  // namespace
 
-UcciEngine::UcciEngine(QObject *parent)
-    : ChessEngine(parent), m_useDirectPv(false), m_sendOpponentsName(false),
-      m_canPonder(false), m_ponderState(NotPondering), m_movesPondered(0),
-      m_ponderHits(0), m_ignoreThinking(false), m_rePing(false) {
+UcciEngine::UcciEngine(QObject* parent)
+    : ChessEngine(parent),
+      m_useDirectPv(false),
+      m_sendOpponentsName(false),
+      m_canPonder(false),
+      m_ponderState(NotPondering),
+      m_movesPondered(0),
+      m_ponderHits(0),
+      m_ignoreThinking(false),
+      m_rePing(false) {
   addVariant("standard");
   setName("UcciEngine");
 }
@@ -94,13 +91,11 @@ void UcciEngine::startProtocol() {
 QString UcciEngine::positionString(bool position) {
   QString str("");
 
-  if (position)
-    str += QString("position ");
+  if (position) str += QString("position ");
 
   str += QString("fen ") + m_startFen;
 
-  if (!m_moveStrings.isEmpty())
-    str += QString(" moves") + m_moveStrings;
+  if (!m_moveStrings.isEmpty()) str += QString(" moves") + m_moveStrings;
 
   return str;
 }
@@ -129,8 +124,7 @@ void UcciEngine::startGame() {
 
   write("newgame");
 
-  if (m_canPonder)
-    sendOption("ponder", pondering());
+  if (m_canPonder) sendOption("ponder", pondering());
 
   if (m_sendOpponentsName) {
     QString opType = opponent()->isHuman() ? "human" : "computer";
@@ -141,23 +135,20 @@ void UcciEngine::startGame() {
   sendPosition();
 }
 
-void UcciEngine::endGame(const Chess::Result &result) {
+void UcciEngine::endGame(const Chess::Result& result) {
   m_ignoreThinking = true;
-  if (stopThinking())
-    ping(false);
+  if (stopThinking()) ping(false);
   ChessEngine::endGame(result);
 }
 
-void UcciEngine::makeMove(const Chess::Move &move) {
+void UcciEngine::makeMove(const Chess::Move& move) {
   if (!m_ponderMove.isNull()) {
     m_movesPondered++;
     bool gotPonderHit = (move == m_ponderMove);
-    if (gotPonderHit)
-      m_ponderHits++;
+    if (gotPonderHit) m_ponderHits++;
 
     if (pondering()) {
-      if (gotPonderHit)
-        m_ponderState = PonderHit;
+      if (gotPonderHit) m_ponderState = PonderHit;
 
       m_ponderMove = Chess::Move();
       m_ponderMoveSan.clear();
@@ -165,8 +156,7 @@ void UcciEngine::makeMove(const Chess::Move &move) {
         m_moveStrings.truncate(m_moveStrings.lastIndexOf(' '));
         if (isReady()) {
           m_ignoreThinking = true;
-          if (stopThinking())
-            ping(false);
+          if (stopThinking()) ping(false);
         } else {
           // Cancel sending the "go ponder" message
           clearWriteBuffer();
@@ -189,9 +179,8 @@ void UcciEngine::makeMove(const Chess::Move &move) {
   }
 }
 
-void UcciEngine::makeBookMove(const Chess::Move &move) {
-  if (stopThinking())
-    ping(false);
+void UcciEngine::makeBookMove(const Chess::Move& move) {
+  if (stopThinking()) ping(false);
   clearPonderState();
 
   ChessEngine::makeBookMove(move);
@@ -204,9 +193,9 @@ void UcciEngine::startThinking() {
     return;
   }
 
-  const TimeControl *redTc = nullptr;
-  const TimeControl *blackTc = nullptr;
-  const TimeControl *myTc = timeControl();
+  const TimeControl* redTc = nullptr;
+  const TimeControl* blackTc = nullptr;
+  const TimeControl* myTc = timeControl();
   if (side() == Chess::Side::Red) {
     redTc = myTc;
     blackTc = opponent()->timeControl();
@@ -223,8 +212,7 @@ void UcciEngine::startThinking() {
   } else
     m_ponderState = NotPondering;
   if (myTc->isInfinite()) {
-    if (myTc->plyLimit() == 0 && myTc->nodeLimit() == 0)
-      command += " infinite";
+    if (myTc->plyLimit() == 0 && myTc->nodeLimit() == 0) command += " infinite";
   } else if (myTc->timePerMove() > 0)
     command += QString(" movetime %1").arg(myTc->timeLeft());
   else {
@@ -246,8 +234,7 @@ void UcciEngine::startThinking() {
 }
 
 void UcciEngine::startPondering() {
-  if (!pondering() || m_ponderMove.isNull())
-    return;
+  if (!pondering() || m_ponderMove.isNull()) return;
 
   m_moveStrings +=
       " " + board()->moveString(m_ponderMove, Chess::Board::LongAlgebraic);
@@ -275,10 +262,10 @@ bool UcciEngine::sendPing() {
 
 void UcciEngine::sendQuit() { write("quit"); }
 
-QStringRef UcciEngine::parseUcciTokens(const QStringRef &first,
-                                       const QString *types, int typeCount,
-                                       QVarLengthArray<QStringRef> &tokens,
-                                       int &type) {
+QStringRef UcciEngine::parseUcciTokens(const QStringRef& first,
+                                       const QString* types, int typeCount,
+                                       QVarLengthArray<QStringRef>& tokens,
+                                       int& type) {
   QStringRef token(first);
   type = -1;
   tokens.clear();
@@ -287,22 +274,20 @@ QStringRef UcciEngine::parseUcciTokens(const QStringRef &first,
     bool newType = false;
     for (int i = 0; i < typeCount; i++) {
       if (token == types[i]) {
-        if (type != -1)
-          return token;
+        if (type != -1) return token;
         type = i;
         newType = true;
         break;
       }
     }
-    if (!newType && type != -1)
-      tokens.append(token);
+    if (!newType && type != -1) tokens.append(token);
   } while (!(token = nextToken(token)).isNull());
 
   return token;
 }
 
-void UcciEngine::parseInfo(const QVarLengthArray<QStringRef> &tokens, int type,
-                           MoveEvaluation *eval) {
+void UcciEngine::parseInfo(const QVarLengthArray<QStringRef>& tokens, int type,
+                           MoveEvaluation* eval) {
   enum Keyword {
     InfoDepth,
     InfoSelDepth,
@@ -322,67 +307,65 @@ void UcciEngine::parseInfo(const QVarLengthArray<QStringRef> &tokens, int type,
     InfoCurrLine
   };
 
-  if (tokens.isEmpty())
-    return;
+  if (tokens.isEmpty()) return;
 
   switch (type) {
-  case InfoDepth:
-    eval->setDepth(tokens[0].toString().toInt());
-    break;
-  case InfoSelDepth:
-    eval->setSelectiveDepth(tokens[0].toString().toInt());
-    break;
-  case InfoTime:
-    eval->setTime(tokens[0].toString().toInt());
-    break;
-  case InfoNodes:
-    eval->setNodeCount(tokens[0].toString().toULongLong());
-    break;
-  case InfoMultiPv:
-    eval->setPvNumber(tokens[0].toString().toInt());
-    break;
-  case InfoPv:
-    eval->setPv(m_useDirectPv ? directPv(tokens) : sanPv(tokens));
-    break;
-  case InfoScore: {
-    int score = 0;
-    // for (int i = 1; i < tokens.size(); i++)
-    //{
-    int i = 1;
-    if (tokens[i - 1] == "cp")
-      score = tokens[i].toString().toInt();
-    else if (tokens[i - 1] == "mate") {
-      score = tokens[i].toString().toInt();
-      if (score > 0)
-        score = eval->MATE_SCORE + 1 - score * 2;
-      else if (score < 0)
-        score = -eval->MATE_SCORE - score * 2;
-    } else if (tokens[i - 1] == "lowerbound" || tokens[i - 1] == "upperbound")
-      return;
-    else {
-      score = tokens[i - 1].toString().toInt();
-    }
-    // i++;
-    // }
-    if (redEvalPov() && side() == Chess::Side::Black)
-      score = -score;
-    eval->setScore(score);
-  } break;
-  case InfoNps:
-    eval->setNps(tokens[0].toString().toULongLong());
-    break;
-  case InfoTbHits:
-    eval->setTbHits(tokens[0].toString().toULongLong());
-    break;
-  case InfoHashFull:
-    eval->setHashUsage(tokens[0].toString().toInt());
-    break;
-  default:
-    break;
+    case InfoDepth:
+      eval->setDepth(tokens[0].toString().toInt());
+      break;
+    case InfoSelDepth:
+      eval->setSelectiveDepth(tokens[0].toString().toInt());
+      break;
+    case InfoTime:
+      eval->setTime(tokens[0].toString().toInt());
+      break;
+    case InfoNodes:
+      eval->setNodeCount(tokens[0].toString().toULongLong());
+      break;
+    case InfoMultiPv:
+      eval->setPvNumber(tokens[0].toString().toInt());
+      break;
+    case InfoPv:
+      eval->setPv(m_useDirectPv ? directPv(tokens) : sanPv(tokens));
+      break;
+    case InfoScore: {
+      int score = 0;
+      // for (int i = 1; i < tokens.size(); i++)
+      //{
+      int i = 1;
+      if (tokens[i - 1] == "cp")
+        score = tokens[i].toString().toInt();
+      else if (tokens[i - 1] == "mate") {
+        score = tokens[i].toString().toInt();
+        if (score > 0)
+          score = eval->MATE_SCORE + 1 - score * 2;
+        else if (score < 0)
+          score = -eval->MATE_SCORE - score * 2;
+      } else if (tokens[i - 1] == "lowerbound" || tokens[i - 1] == "upperbound")
+        return;
+      else {
+        score = tokens[i - 1].toString().toInt();
+      }
+      // i++;
+      // }
+      if (redEvalPov() && side() == Chess::Side::Black) score = -score;
+      eval->setScore(score);
+    } break;
+    case InfoNps:
+      eval->setNps(tokens[0].toString().toULongLong());
+      break;
+    case InfoTbHits:
+      eval->setTbHits(tokens[0].toString().toULongLong());
+      break;
+    case InfoHashFull:
+      eval->setHashUsage(tokens[0].toString().toInt());
+      break;
+    default:
+      break;
   }
 }
 
-void UcciEngine::parseInfo(const QStringRef &line) {
+void UcciEngine::parseInfo(const QStringRef& line) {
   static const QString types[] = {
       "depth",   "seldepth", "time",           "nodes",    "score", "pv",
       "multipv", "currmove", "currmovenumber", "hashfull", "nps",   "tbhits",
@@ -395,18 +378,15 @@ void UcciEngine::parseInfo(const QStringRef &line) {
 
   // The "string" info is not supported and it can't be parsed
   // like other info lines.
-  if (token == "string")
-    return;
+  if (token == "string") return;
 
   while (!token.isNull()) {
     token = parseUcciTokens(token, types, 16, tokens, type);
     parseInfo(tokens, type, &eval);
   }
-  if (eval.isEmpty())
-    return;
+  if (eval.isEmpty()) return;
 
-  if (!m_ponderMove.isNull())
-    eval.setPonderMove(m_ponderMoveSan);
+  if (!m_ponderMove.isNull()) eval.setPonderMove(m_ponderMoveSan);
   if (m_movesPondered)
     eval.setPonderhitRate((m_ponderHits * 1000) / m_movesPondered);
 
@@ -422,7 +402,7 @@ void UcciEngine::parseInfo(const QStringRef &line) {
     emit thinking(eval);
 }
 
-EngineOption *UcciEngine::parseOption(const QStringRef &line) {
+EngineOption* UcciEngine::parseOption(const QStringRef& line) {
   enum Keyword {
     OptionName,
     OptionType,
@@ -447,34 +427,32 @@ EngineOption *UcciEngine::parseOption(const QStringRef &line) {
 
   while (!token.isNull()) {
     token = parseUcciTokens(token, types, 6, tokens, keyword);
-    if (tokens.isEmpty() || keyword == -1)
-      continue;
+    if (tokens.isEmpty() || keyword == -1) continue;
 
     QString str(joinTokens(tokens).toString());
 
     switch (keyword) {
-    case OptionName:
-      name = str;
-      break;
-    case OptionType:
-      type = str;
-      break;
-    case OptionDefault:
-      value = str;
-      break;
-    case OptionMin:
-      min = str.toInt();
-      break;
-    case OptionMax:
-      max = str.toInt();
-      break;
-    case OptionVar:
-      choices << str;
-      break;
+      case OptionName:
+        name = str;
+        break;
+      case OptionType:
+        type = str;
+        break;
+      case OptionDefault:
+        value = str;
+        break;
+      case OptionMin:
+        min = str.toInt();
+        break;
+      case OptionMax:
+        max = str.toInt();
+        break;
+      case OptionVar:
+        choices << str;
+        break;
     }
   }
-  if (name.isEmpty())
-    return nullptr;
+  if (name.isEmpty()) return nullptr;
 
   if (type == "button")
     return new EngineButtonOption(name);
@@ -496,12 +474,11 @@ EngineOption *UcciEngine::parseOption(const QStringRef &line) {
   return nullptr;
 }
 
-void UcciEngine::parseLine(const QString &line) {
+void UcciEngine::parseLine(const QString& line) {
   const QStringRef command(firstToken(line));
 
   if (command == "info") {
-    if (m_ignoreThinking)
-      return;
+    if (m_ignoreThinking) return;
     parseInfo(command);
   } else if (command == "bestmove") {
     bool wasPondering = isPondering();
@@ -510,8 +487,7 @@ void UcciEngine::parseLine(const QString &line) {
       m_ignoreThinking = false;
       if (!m_bmBuffer.isEmpty()) {
         const auto buf = m_bmBuffer;
-        for (const auto &l : buf)
-          write(l, Unbuffered);
+        for (const auto& l : buf) write(l, Unbuffered);
         m_bmBuffer.clear();
       } else
         pong();
@@ -572,7 +548,7 @@ void UcciEngine::parseLine(const QString &line) {
       write("register later");
     }
   } else if (command == "option") {
-    EngineOption *option = parseOption(command);
+    EngineOption* option = parseOption(command);
     QString variant;
 
     if (option == nullptr || !option->isValid())
@@ -599,8 +575,8 @@ void UcciEngine::parseLine(const QString &line) {
   }
 }
 
-void UcciEngine::addVariantsFromOption(const EngineOption *option) {
-  const auto combo = dynamic_cast<const EngineComboOption *>(option);
+void UcciEngine::addVariantsFromOption(const EngineOption* option) {
+  const auto combo = dynamic_cast<const EngineComboOption*>(option);
   if (!combo) {
     qWarning("Option %s from %s is not a combo option",
              qUtf8Printable(option->name()), qUtf8Printable(name()));
@@ -608,15 +584,14 @@ void UcciEngine::addVariantsFromOption(const EngineOption *option) {
   }
 
   const auto choices = combo->choices();
-  for (const auto &choice : choices) {
+  for (const auto& choice : choices) {
     QString variant = variantFromUcci(choice, false);
-    if (!variant.isEmpty())
-      addVariant(variant);
+    if (!variant.isEmpty()) addVariant(variant);
   }
   m_comboVariants = choices;
 }
 
-void UcciEngine::setVariant(const QString &variant) {
+void UcciEngine::setVariant(const QString& variant) {
   QString uciVariant(variantToUcci(variant));
   if (uciVariant != m_variantOption && !m_variantOption.isEmpty())
     sendOption(m_variantOption, false);
@@ -626,12 +601,11 @@ void UcciEngine::setVariant(const QString &variant) {
     sendOption("UCI_Variant", variantToUcci(variant, false));
   } else {
     m_variantOption = uciVariant;
-    if (!uciVariant.isEmpty())
-      sendOption(uciVariant, true);
+    if (!uciVariant.isEmpty()) sendOption(uciVariant, true);
   }
 }
 
-void UcciEngine::setPonderMove(const QString &moveString) {
+void UcciEngine::setPonderMove(const QString& moveString) {
   // Stockfish sends "(none)" and Komodo sends "0000"
   // when it responds to "ponderhit".
   if (moveString == "(none)" || moveString == "0000") {
@@ -640,7 +614,7 @@ void UcciEngine::setPonderMove(const QString &moveString) {
     return;
   }
 
-  Chess::Board *board = this->board();
+  Chess::Board* board = this->board();
 
   m_ponderMove = board->moveFromString(moveString);
   if (m_ponderMove.isNull()) {
@@ -650,8 +624,7 @@ void UcciEngine::setPonderMove(const QString &moveString) {
   } else {
     // Ignore game ending ponder moves
     board->makeMove(m_ponderMove);
-    if (!board->result().isNone())
-      m_ponderMove = Chess::Move();
+    if (!board->result().isNone()) m_ponderMove = Chess::Move();
     board->undoMove();
 
     if (!m_ponderMove.isNull())
@@ -659,7 +632,7 @@ void UcciEngine::setPonderMove(const QString &moveString) {
   }
 }
 
-QString UcciEngine::directPv(const QVarLengthArray<QStringRef> &tokens) {
+QString UcciEngine::directPv(const QVarLengthArray<QStringRef>& tokens) {
   QString pv;
   for (auto token : tokens) {
     pv += " ";
@@ -668,8 +641,8 @@ QString UcciEngine::directPv(const QVarLengthArray<QStringRef> &tokens) {
   return pv;
 }
 
-QString UcciEngine::sanPv(const QVarLengthArray<QStringRef> &tokens) {
-  Chess::Board *board = this->board();
+QString UcciEngine::sanPv(const QVarLengthArray<QStringRef>& tokens) {
+  Chess::Board* board = this->board();
   QString pv;
   int movesMade = 0;
 
@@ -687,20 +660,18 @@ QString UcciEngine::sanPv(const QVarLengthArray<QStringRef> &tokens) {
       qWarning("PV: %s %s", qUtf8Printable(pv), qUtf8Printable(tokenString));
       break;
     }
-    if (!pv.isEmpty())
-      pv += " ";
+    if (!pv.isEmpty()) pv += " ";
     pv += board->moveString(move, Chess::Board::Standard);
     board->makeMove(move);
     movesMade++;
   }
 
-  for (int i = 0; i < movesMade; i++)
-    board->undoMove();
+  for (int i = 0; i < movesMade; i++) board->undoMove();
 
   return pv;
 }
 
-void UcciEngine::sendOption(const QString &name, const QVariant &value) {
+void UcciEngine::sendOption(const QString& name, const QVariant& value) {
   if (!value.isNull())
     write(QString("setoption %1 %2").arg(name, value.toString()));
   else

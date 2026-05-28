@@ -20,8 +20,9 @@
 #ifndef PGNGAMEENTRY_H
 #define PGNGAMEENTRY_H
 
-#include "board/result.h"
 #include <QDate>
+
+#include "board/result.h"
 
 class PgnStream;
 class PgnGameFilter;
@@ -39,17 +40,17 @@ class QDataStream;
  * \sa PgnGame, PgnStream
  */
 class LIB_EXPORT PgnGameEntry {
-public:
+ public:
   /*! A PGN tag's type. */
   enum TagType {
-    EventTag,  //!< The name of the tournament or match event
-    SiteTag,   //!< The location of the event
-    DateTag,   //!< The starting date of the game
-    RoundTag,  //!< The playing round ordinal of the game
-    RedTag,    //!< The player of the red pieces
-    BlackTag,  //!< The player of the black pieces
-    ResultTag, //!< The result of the game
-    VariantTag //!< The chess variant of the game
+    EventTag,   //!< The name of the tournament or match event
+    SiteTag,    //!< The location of the event
+    DateTag,    //!< The starting date of the game
+    RoundTag,   //!< The playing round ordinal of the game
+    RedTag,     //!< The player of the red pieces
+    BlackTag,   //!< The player of the black pieces
+    ResultTag,  //!< The result of the game
+    VariantTag  //!< The chess variant of the game
   };
 
   /*! Creates a new empty PgnGameEntry object. */
@@ -61,24 +62,24 @@ public:
    * Reads an entry from a PGN stream.
    * Returns true if successful; otherwise returns false.
    */
-  bool read(PgnStream &in);
+  bool read(PgnStream& in);
 
   /*!
    * Reads an entry from data stream.
    * Returns true if successful; otherwise returns false.
    */
-  bool read(QDataStream &in);
+  bool read(QDataStream& in);
 
   /*!
    * Writes an entry to data stream.
    */
-  void write(QDataStream &out) const;
+  void write(QDataStream& out) const;
 
   /*!
    * Returns true if the PGN tags match \a filter.
    * The matching is case insensitive.
    */
-  bool match(const PgnGameFilter &filter) const;
+  bool match(const PgnGameFilter& filter) const;
 
   /*! Returns the stream position where the game begins. */
   qint64 pos() const;
@@ -88,8 +89,8 @@ public:
   /*! Returns the tag value corresponding to \a type. */
   QString tagValue(TagType type) const;
 
-private:
-  void addTag(const QByteArray &tagValue);
+ private:
+  void addTag(const QByteArray& tagValue);
 
   QByteArray m_data;
 
@@ -98,13 +99,13 @@ private:
 };
 
 /*! Reads a PGN game entry from a PGN stream. */
-extern LIB_EXPORT PgnStream &operator>>(PgnStream &in, PgnGameEntry &entry);
+extern LIB_EXPORT PgnStream& operator>>(PgnStream& in, PgnGameEntry& entry);
 
 /*! Reads a PGN game entry from a data stream. */
-extern LIB_EXPORT QDataStream &operator>>(QDataStream &in, PgnGameEntry &entry);
+extern LIB_EXPORT QDataStream& operator>>(QDataStream& in, PgnGameEntry& entry);
 
 /*! Writes a PGN game entry to a data stream. */
-extern LIB_EXPORT QDataStream &operator<<(QDataStream &out,
-                                          const PgnGameEntry &entry);
+extern LIB_EXPORT QDataStream& operator<<(QDataStream& out,
+                                          const PgnGameEntry& entry);
 
-#endif // PGNGAMEENTRY_H
+#endif  // PGNGAMEENTRY_H

@@ -16,27 +16,25 @@
 */
 
 #include "chessgame.h"
-#include "board/board.h"
-#include "chessplayer.h"
-#include "openingbook.h"
+
 #include <QThread>
 #include <QTimer>
 
+#include "board/board.h"
+#include "chessplayer.h"
+#include "openingbook.h"
+
 namespace {
 
-QString evalString(const MoveEvaluation &eval) {
-  if (eval.isBookEval())
-    return "book";
-  if (eval.isEmpty())
-    return QString();
+QString evalString(const MoveEvaluation& eval) {
+  if (eval.isBookEval()) return "book";
+  if (eval.isEmpty()) return QString();
 
   QString str = eval.scoreText();
-  if (eval.depth() > 0)
-    str += "/" + QString::number(eval.depth()) + " ";
+  if (eval.depth() > 0) str += "/" + QString::number(eval.depth()) + " ";
 
   int t = eval.time();
-  if (t == 0)
-    return str + "0s";
+  if (t == 0) return str + "0s";
 
   int precision = 0;
   if (t < 100)
@@ -50,12 +48,19 @@ QString evalString(const MoveEvaluation &eval) {
   return str;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-ChessGame::ChessGame(Chess::Board *board, PgnGame *pgn, QObject *parent)
-    : QObject(parent), m_board(board), m_startDelay(0), m_finished(false),
-      m_gameInProgress(false), m_paused(false), m_pgnInitialized(false),
-      m_bookOwnerGuardp(false), m_boardShouldBeFlipped(false), m_pgn(pgn) {
+ChessGame::ChessGame(Chess::Board* board, PgnGame* pgn, QObject* parent)
+    : QObject(parent),
+      m_board(board),
+      m_startDelay(0),
+      m_finished(false),
+      m_gameInProgress(false),
+      m_paused(false),
+      m_pgnInitialized(false),
+      m_bookOwnerGuardp(false),
+      m_boardShouldBeFlipped(false),
+      m_pgn(pgn) {
   Q_ASSERT(pgn != nullptr);
 
   for (int i = 0; i < 2; i++) {
@@ -70,14 +75,13 @@ ChessGame::~ChessGame() {
   if (m_bookOwnerGuardp) {
     bool same = (m_book[0] == m_book[1]);
     delete m_book[0];
-    if (!same)
-      delete m_book[1];
+    if (!same) delete m_book[1];
   }
 }
 
 QString ChessGame::errorString() const { return m_error; }
 
-ChessPlayer *ChessGame::player(Chess::Side side) const {
+ChessPlayer* ChessGame::player(Chess::Side side) const {
   Q_ASSERT(!side.isNull());
   return m_player[side];
 }
@@ -90,33 +94,30 @@ void ChessGame::setBoardShouldBeFlipped(bool flip) {
   m_boardShouldBeFlipped = flip;
 }
 
-PgnGame *ChessGame::pgn() const { return m_pgn; }
+PgnGame* ChessGame::pgn() const { return m_pgn; }
 
-Chess::Board *ChessGame::board() const { return m_board; }
+Chess::Board* ChessGame::board() const { return m_board; }
 
 QString ChessGame::startingFen() const { return m_startingFen; }
 
-const QVector<Chess::Move> &ChessGame::moves() const { return m_moves; }
+const QVector<Chess::Move>& ChessGame::moves() const { return m_moves; }
 
-const QMap<int, int> &ChessGame::scores() const { return m_scores; }
+const QMap<int, int>& ChessGame::scores() const { return m_scores; }
 
 Chess::Result ChessGame::result() const { return m_result; }
 
-ChessPlayer *ChessGame::playerToMove() const {
-  if (m_board->sideToMove().isNull())
-    return nullptr;
+ChessPlayer* ChessGame::playerToMove() const {
+  if (m_board->sideToMove().isNull()) return nullptr;
   return m_player[m_board->sideToMove()];
 }
 
-ChessPlayer *ChessGame::playerToWait() const {
-  if (m_board->sideToMove().isNull())
-    return nullptr;
+ChessPlayer* ChessGame::playerToWait() const {
+  if (m_board->sideToMove().isNull()) return nullptr;
   return m_player[m_board->sideToMove().opposite()];
 }
 
 void ChessGame::stop(bool emitMoveChanged) {
-  if (m_finished)
-    return;
+  if (m_finished) return;
 
   m_finished = true;
   emit humanEnabled(false);
@@ -130,7 +131,7 @@ void ChessGame::stop(bool emitMoveChanged) {
 
   initializePgn();
   m_gameInProgress = false;
-  const QVector<PgnGame::MoveData> &moves(m_pgn->moves());
+  const QVector<PgnGame::MoveData>& moves(m_pgn->moves());
   int plies = moves.size();
 
   m_pgn->setTag("PlyCount", QString::number(plies));
@@ -141,7 +142,7 @@ void ChessGame::stop(bool emitMoveChanged) {
   m_pgn->setResultDescription(m_result.description());
 
   if (emitMoveChanged && plies > 1) {
-    const PgnGame::MoveData &md(moves.at(plies - 1));
+    const PgnGame::MoveData& md(moves.at(plies - 1));
     emit moveChanged(plies - 1, md.move, md.moveString, md.comment);
   }
 
@@ -156,8 +157,7 @@ void ChessGame::stop(bool emitMoveChanged) {
 void ChessGame::finish() {
   disconnect(this, SIGNAL(playersReady()), this, SLOT(finish()));
   for (int i = 0; i < 2; i++) {
-    if (m_player[i] != nullptr)
-      m_player[i]->disconnect(this);
+    if (m_player[i] != nullptr) m_player[i]->disconnect(this);
   }
 
   emit finished(this, m_result);
@@ -165,14 +165,13 @@ void ChessGame::finish() {
 
 void ChessGame::kill() {
   for (int i = 0; i < 2; i++) {
-    if (m_player[i] != nullptr)
-      m_player[i]->kill();
+    if (m_player[i] != nullptr) m_player[i]->kill();
   }
 
   stop();
 }
 
-void ChessGame::addPgnMove(const Chess::Move &move, const QString &comment) {
+void ChessGame::addPgnMove(const Chess::Move& move, const QString& comment) {
   PgnGame::MoveData md;
   md.key = m_board->key();
   md.move = m_board->genericMove(move);
@@ -186,16 +185,15 @@ void ChessGame::emitLastMove() {
   int ply = m_moves.size() - 1;
   if (m_scores.contains(ply)) {
     int score = m_scores[ply];
-    if (score != MoveEvaluation::NULL_SCORE)
-      emit scoreChanged(ply, score);
+    if (score != MoveEvaluation::NULL_SCORE) emit scoreChanged(ply, score);
   }
 
-  const auto &md = m_pgn->moves().last();
+  const auto& md = m_pgn->moves().last();
   emit moveMade(md.move, md.moveString, md.comment);
 }
 
-void ChessGame::onMoveMade(const Chess::Move &move) {
-  ChessPlayer *sender = qobject_cast<ChessPlayer *>(QObject::sender());
+void ChessGame::onMoveMade(const Chess::Move& move) {
+  ChessPlayer* sender = qobject_cast<ChessPlayer*>(QObject::sender());
   Q_ASSERT(sender != nullptr);
 
   Q_ASSERT(m_gameInProgress);
@@ -219,15 +217,14 @@ void ChessGame::onMoveMade(const Chess::Move &move) {
   m_board->makeMove(move);
   m_result = m_board->result();
   if (m_result.isNone()) {
-    if (m_board->reversibleMoveCount() == 0)
-      m_adjudicator.resetDrawMoveCount();
+    if (m_board->reversibleMoveCount() == 0) m_adjudicator.resetDrawMoveCount();
 
     m_adjudicator.addEval(m_board, sender->evaluation());
     m_result = m_adjudicator.result();
   }
   m_board->undoMove();
 
-  ChessPlayer *player = playerToWait();
+  ChessPlayer* player = playerToWait();
   player->makeMove(move);
   m_board->makeMove(move);
 
@@ -241,8 +238,7 @@ void ChessGame::onMoveMade(const Chess::Move &move) {
 }
 
 void ChessGame::startTurn() {
-  if (m_paused)
-    return;
+  if (m_paused) return;
 
   Chess::Side side(m_board->sideToMove());
   Q_ASSERT(!side.isNull());
@@ -271,37 +267,33 @@ void ChessGame::PlayerMakeBookMove(Chess::Move move) {
   }
 }
 
-void ChessGame::onAdjudication(const Chess::Result &result) {
-  if (m_finished || result.type() != Chess::Result::Adjudication)
-    return;
+void ChessGame::onAdjudication(const Chess::Result& result) {
+  if (m_finished || result.type() != Chess::Result::Adjudication) return;
 
   m_result = result;
 
   stop();
 }
 
-void ChessGame::onResignation(const Chess::Result &result) {
-  if (m_finished || result.type() != Chess::Result::Resignation)
-    return;
+void ChessGame::onResignation(const Chess::Result& result) {
+  if (m_finished || result.type() != Chess::Result::Resignation) return;
 
   m_result = result;
 
   stop();
 }
 
-void ChessGame::onResultClaim(const Chess::Result &result) {
-  if (m_finished)
-    return;
+void ChessGame::onResultClaim(const Chess::Result& result) {
+  if (m_finished) return;
 
-  ChessPlayer *sender = qobject_cast<ChessPlayer *>(QObject::sender());
+  ChessPlayer* sender = qobject_cast<ChessPlayer*>(QObject::sender());
   Q_ASSERT(sender != nullptr);
 
   if (result.type() == Chess::Result::Disconnection) {
     // The engine may not be properly started so we have to
     // figure out the player's side this way
     Chess::Side side(Chess::Side::Red);
-    if (m_player[side] != sender)
-      side = Chess::Side::Black;
+    if (m_player[side] != sender) side = Chess::Side::Black;
     m_result = Chess::Result(result.type(), side.opposite());
   } else if (!m_gameInProgress && result.winner().isNull()) {
     qWarning("Unexpected result claim from %s: %s",
@@ -328,10 +320,9 @@ Chess::Move ChessGame::bookMove(Chess::Side side) {
   // QVector<quint64> keys;
   // bookGetNextPosKeys(keys);
 
-  Chess::GenericMove bookMove; // = m_book[side]->move(m_board->key());
+  Chess::GenericMove bookMove;  // = m_book[side]->move(m_board->key());
   Chess::Move move = m_board->moveFromGenericMove(bookMove);
-  if (move.isNull())
-    return Chess::Move();
+  if (move.isNull()) return Chess::Move();
 
   if (!m_board->isLegalMove(move)) {
     qWarning(
@@ -340,21 +331,20 @@ Chess::Move ChessGame::bookMove(Chess::Side side) {
     return Chess::Move();
   }
 
-  if (m_board->isRepetition(move))
-    return Chess::Move();
+  if (m_board->isRepetition(move)) return Chess::Move();
 
   return move;
 }
 
-void ChessGame::setError(const QString &message) { m_error = message; }
+void ChessGame::setError(const QString& message) { m_error = message; }
 
-void ChessGame::setPlayer(Chess::Side side, ChessPlayer *player) {
+void ChessGame::setPlayer(Chess::Side side, ChessPlayer* player) {
   Q_ASSERT(!side.isNull());
   Q_ASSERT(player != nullptr);
   m_player[side] = player;
 }
 
-void ChessGame::setStartingFen(const QString &fen) {
+void ChessGame::setStartingFen(const QString& fen) {
   Q_ASSERT(!m_gameInProgress);
 
   QStringList stFList = fen.split("moves");
@@ -382,35 +372,30 @@ void ChessGame::setStartingFen(const QString &fen) {
   return;
 }
 
-void ChessGame::setTimeControl(const TimeControl &timeControl,
+void ChessGame::setTimeControl(const TimeControl& timeControl,
                                Chess::Side side) {
-  if (side != Chess::Side::Red)
-    m_timeControl[Chess::Side::Black] = timeControl;
-  if (side != Chess::Side::Black)
-    m_timeControl[Chess::Side::Red] = timeControl;
+  if (side != Chess::Side::Red) m_timeControl[Chess::Side::Black] = timeControl;
+  if (side != Chess::Side::Black) m_timeControl[Chess::Side::Red] = timeControl;
 }
 
-void ChessGame::setMoves(const QVector<Chess::Move> &moves) {
+void ChessGame::setMoves(const QVector<Chess::Move>& moves) {
   Q_ASSERT(!m_gameInProgress);
   m_scores.clear();
   m_moves = moves;
 }
 
-bool ChessGame::setMoves(const PgnGame &pgn) {
+bool ChessGame::setMoves(const PgnGame& pgn) {
   setStartingFen(pgn.startingFenString());
-  if (!resetBoard())
-    return false;
+  if (!resetBoard()) return false;
   m_scores.clear();
   m_moves.clear();
 
-  for (const PgnGame::MoveData &md : pgn.moves()) {
+  for (const PgnGame::MoveData& md : pgn.moves()) {
     Chess::Move move(m_board->moveFromGenericMove(md.move));
-    if (!m_board->isLegalMove(move))
-      return false;
+    if (!m_board->isLegalMove(move)) return false;
 
     m_board->makeMove(move);
-    if (!m_board->result().isNone())
-      return true;
+    if (!m_board->result().isNone()) return true;
 
     m_moves.append(move);
   }
@@ -418,7 +403,7 @@ bool ChessGame::setMoves(const PgnGame &pgn) {
   return true;
 }
 
-void ChessGame::setOpeningBook(const OpeningBook *book, Chess::Side side,
+void ChessGame::setOpeningBook(const OpeningBook* book, Chess::Side side,
                                int depth) {
   Q_ASSERT(!m_gameInProgress);
 
@@ -431,7 +416,7 @@ void ChessGame::setOpeningBook(const OpeningBook *book, Chess::Side side,
   }
 }
 
-void ChessGame::setAdjudicator(const GameAdjudicator &adjudicator) {
+void ChessGame::setAdjudicator(const GameAdjudicator& adjudicator) {
   m_adjudicator = adjudicator;
 }
 
@@ -439,27 +424,23 @@ void ChessGame::generateOpening() {
   if (m_book[Chess::Side::Red] == nullptr ||
       m_book[Chess::Side::Black] == nullptr)
     return;
-  if (!resetBoard())
-    return;
+  if (!resetBoard()) return;
 
   // First play moves that are already in the opening
-  for (const Chess::Move &move : qAsConst(m_moves)) {
+  for (const Chess::Move& move : qAsConst(m_moves)) {
     Q_ASSERT(m_board->isLegalMove(move));
 
     m_board->makeMove(move);
-    if (!m_board->result().isNone())
-      return;
+    if (!m_board->result().isNone()) return;
   }
 
   // Then play the opening book moves
   while (true) {
     Chess::Move move = bookMove(m_board->sideToMove());
-    if (move.isNull())
-      break;
+    if (move.isNull()) break;
 
     m_board->makeMove(move);
-    if (!m_board->result().isNone())
-      break;
+    if (!m_board->result().isNone()) break;
 
     m_moves.append(move);
   }
@@ -482,16 +463,14 @@ void ChessGame::pauseThread() {
 }
 
 void ChessGame::lockThread() {
-  if (QThread::currentThread() == thread())
-    return;
+  if (QThread::currentThread() == thread()) return;
 
   QMetaObject::invokeMethod(this, "pauseThread", Qt::QueuedConnection);
   m_pauseSem.acquire();
 }
 
 void ChessGame::unlockThread() {
-  if (QThread::currentThread() == thread())
-    return;
+  if (QThread::currentThread() == thread()) return;
 
   m_resumeSem.release();
 }
@@ -500,8 +479,7 @@ void ChessGame::emitLastMovePub() { this->emitLastMove(); };
 
 bool ChessGame::resetBoard() {
   QString fen(m_startingFen);
-  if (fen.isEmpty())
-    fen = m_board->defaultFenString();
+  if (fen.isEmpty()) fen = m_board->defaultFenString();
 
   if (!m_board->setFenString(fen)) {
     qWarning("Invalid FEN string: %s", qUtf8Printable(fen));
@@ -516,7 +494,7 @@ bool ChessGame::resetBoard() {
 }
 
 void ChessGame::onPlayerReady() {
-  ChessPlayer *sender = qobject_cast<ChessPlayer *>(QObject::sender());
+  ChessPlayer* sender = qobject_cast<ChessPlayer*>(QObject::sender());
   Q_ASSERT(sender != nullptr);
 
   disconnect(sender, SIGNAL(ready()), this, SLOT(onPlayerReady()));
@@ -535,7 +513,7 @@ void ChessGame::syncPlayers() {
   bool ready = true;
 
   for (int i = 0; i < 2; i++) {
-    ChessPlayer *player = m_player[i];
+    ChessPlayer* player = m_player[i];
     Q_ASSERT(player != nullptr);
 
     if (!player->isReady() && player->state() != ChessPlayer::Disconnected) {
@@ -544,8 +522,7 @@ void ChessGame::syncPlayers() {
       connect(player, SIGNAL(disconnected()), this, SLOT(onPlayerReady()));
     }
   }
-  if (ready)
-    emit playersReady();
+  if (ready) emit playersReady();
 }
 
 void ChessGame::start() {
@@ -575,16 +552,14 @@ void ChessGame::start() {
 void ChessGame::pause() { m_paused = true; }
 
 void ChessGame::resume() {
-  if (!m_paused)
-    return;
+  if (!m_paused) return;
   m_paused = false;
 
   QMetaObject::invokeMethod(this, "startTurn", Qt::QueuedConnection);
 }
 
 void ChessGame::initializePgn() {
-  if (m_pgnInitialized)
-    return;
+  if (m_pgnInitialized) return;
   m_pgnInitialized = true;
 
   m_pgn->setVariant(m_board->variant());
@@ -606,12 +581,11 @@ void ChessGame::initializePgn() {
 
 void ChessGame::startGame() {
   disconnect(this, SIGNAL(playersReady()), this, SLOT(startGame()));
-  if (m_finished)
-    return;
+  if (m_finished) return;
 
   m_gameInProgress = true;
   for (int i = 0; i < 2; i++) {
-    ChessPlayer *player = m_player[i];
+    ChessPlayer* player = m_player[i];
     Q_ASSERT(player != nullptr);
     Q_ASSERT(player->isReady());
 

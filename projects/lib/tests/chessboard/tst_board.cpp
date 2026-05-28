@@ -1,15 +1,16 @@
-#include <QtConcurrentRun>
-#include <QtTest/QtTest>
 #include <board/board.h>
 #include <board/boardfactory.h>
+
+#include <QtConcurrentRun>
+#include <QtTest/QtTest>
 
 class tst_Board : public QObject {
   Q_OBJECT
 
-public:
+ public:
   tst_Board();
 
-private slots:
+ private slots:
   void zobristKeys_data() const;
   void zobristKeys();
 
@@ -24,16 +25,16 @@ private slots:
 
   void cleanupTestCase();
 
-private:
-  void setVariant(const QString &variant);
-  Chess::Board *m_board;
+ private:
+  void setVariant(const QString& variant);
+  Chess::Board* m_board;
 };
 
 tst_Board::tst_Board() : m_board(0) {}
 
 void tst_Board::cleanupTestCase() { delete m_board; }
 
-void tst_Board::setVariant(const QString &variant) {
+void tst_Board::setVariant(const QString& variant) {
   if (m_board == 0 || m_board->variant() != variant) {
     delete m_board;
     m_board = Chess::BoardFactory::create(variant);
@@ -41,11 +42,10 @@ void tst_Board::setVariant(const QString &variant) {
   QVERIFY(m_board != 0);
 }
 
-static quint64 perftVal(Chess::Board *board, int depth) {
+static quint64 perftVal(Chess::Board* board, int depth) {
   quint64 nodeCount = 0;
   QVector<Chess::Move> moves(board->legalMoves());
-  if (depth == 1 || moves.size() == 0)
-    return moves.size();
+  if (depth == 1 || moves.size() == 0) return moves.size();
 
   QVector<Chess::Move>::const_iterator it;
   for (it = moves.begin(); it != moves.end(); ++it) {
@@ -57,9 +57,9 @@ static quint64 perftVal(Chess::Board *board, int depth) {
   return nodeCount;
 }
 
-static quint64 perftRoot(const Chess::Board *board, const Chess::Move &move,
+static quint64 perftRoot(const Chess::Board* board, const Chess::Move& move,
                          int depth) {
-  Chess::Board *tmp = board->copy();
+  Chess::Board* tmp = board->copy();
   Q_ASSERT(tmp != 0);
   tmp->makeMove(move);
 
@@ -68,17 +68,16 @@ static quint64 perftRoot(const Chess::Board *board, const Chess::Move &move,
   return val;
 }
 
-static quint64 smpPerft(Chess::Board *board, int depth) {
+static quint64 smpPerft(Chess::Board* board, int depth) {
   const auto moves = board->legalMoves();
-  if (depth <= 1)
-    return moves.size();
+  if (depth <= 1) return moves.size();
 
   QVector<QFuture<quint64>> futures;
-  for (const auto &move : moves)
+  for (const auto& move : moves)
     futures << QtConcurrent::run(perftRoot, board, move, depth);
 
   quint64 nodeCount = 0;
-  for (const QFuture<quint64> &future : qAsConst(futures))
+  for (const QFuture<quint64>& future : qAsConst(futures))
     nodeCount += future.result();
 
   return nodeCount;
@@ -572,7 +571,7 @@ void tst_Board::moveStrings() {
   QVERIFY(m_board->setFenString(startfen));
 
   const auto moveList = moves.split(' ', QString::SkipEmptyParts);
-  for (const auto &moveStr : moveList) {
+  for (const auto& moveStr : moveList) {
     Chess::Move move = m_board->moveFromString(moveStr);
     QVERIFY(m_board->isLegalMove(move));
     m_board->makeMove(move);
@@ -580,8 +579,7 @@ void tst_Board::moveStrings() {
   QCOMPARE(m_board->fenString(), endfen);
 
   if (!moveList.isEmpty()) {
-    for (int i = 0; i < moveList.size(); i++)
-      m_board->undoMove();
+    for (int i = 0; i < moveList.size(); i++) m_board->undoMove();
     QCOMPARE(m_board->fenString(), startfen);
   } else
     QCOMPARE(m_board->fenString(), endfen);
@@ -945,16 +943,16 @@ void tst_Board::perft_data() const {
   variant = "atomic";
   QTest::newRow("atomic startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 3 plies: 8902, 4 plies: 197326, 5 plies: 4865037, 6 plies:
-           // 118951457
+      << 5  // 3 plies: 8902, 4 plies: 197326, 5 plies: 4865037, 6 plies:
+            // 118951457
       << Q_UINT64_C(4865037);
   QTest::newRow("atomic pos1")
       << variant << "8/8/8/8/8/8/3k4/rR4K1 w Q - 0 1"
-      << 5 // 3 plies: 1797, 4 plies: 27928, 5 plies: 453449, 6 plies: 7667595
+      << 5  // 3 plies: 1797, 4 plies: 27928, 5 plies: 453449, 6 plies: 7667595
       << Q_UINT64_C(453449);
   QTest::newRow("atomic pos2")
       << variant << "r4b1r/2kb1N2/p2Bpnp1/8/2Pp3p/1P1PPP2/P5PP/R3K2R b KQ -"
-      << 2 // 1 ply: 4, 2 plies: 148
+      << 2  // 1 ply: 4, 2 plies: 148
       << Q_UINT64_C(148);
 
   variant = "crazyhouse";
@@ -970,24 +968,24 @@ void tst_Board::perft_data() const {
   QTest::newRow("loop startpos")
       << variant
       << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[-] w KQkq - 0 1"
-      << 5 // 4 plies: 197281, 5 plies: 4888832, 6 plies: 120812942
+      << 5  // 4 plies: 197281, 5 plies: 4888832, 6 plies: 120812942
       << Q_UINT64_C(4888832);
   QTest::newRow("loop2")
       << variant
       << "5R2/2p1Nb2/2B4k/6p1/8/P3PP2/1PPqR3/3R1BKn[QBNPPPPrrrnppp] b - - 1 1"
-      << 3 // 1 ply:157, 2 plies: 31983, 3 plies: 4144334
+      << 3  // 1 ply:157, 2 plies: 31983, 3 plies: 4144334
       << Q_UINT64_C(4144334);
 
   variant = "chessgi";
   QTest::newRow("chessgi startpos")
       << variant
       << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[-] w KQkq - 0 1"
-      << 5 // 4 plies: 197281, 5 plies: 4889167, 6 plies: 120835923
+      << 5  // 4 plies: 197281, 5 plies: 4889167, 6 plies: 120835923
       << Q_UINT64_C(4889167);
   QTest::newRow("chessgi2")
       << variant
       << "5Rp1/2p1Nb2/2B4k/6p1/8/P3PP2/1PPqR3/3R1BKn[QBNPPPPrrrnpp] b - - 1 48"
-      << 3 // 1 ply:162, 2 plies: 33032, 3 plies: 4493963
+      << 3  // 1 ply:162, 2 plies: 33032, 3 plies: 4493963
       << Q_UINT64_C(4493963);
   // TBD sjaakii (/wo dbl steps from first rank) 1 ply:161, 2 plies: 32816, 3
   // plies: 4434101
@@ -995,76 +993,76 @@ void tst_Board::perft_data() const {
   variant = "berolina";
   QTest::newRow("berolina startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 882717, 5 plies: 29119802, 6 plies: 947730871
+      << 4  // 4 plies: 882717, 5 plies: 29119802, 6 plies: 947730871
       << Q_UINT64_C(882717);
   QTest::newRow("berolina1")
       << variant << "3k1r2/1pp3p1/3P2p1/PR4p1/6p1/2P2Pn1/b3r1BP/3KN3 b - - 1 26"
-      << 4 // 4 plies: 909365, 5 plies: 37601709
+      << 4  // 4 plies: 909365, 5 plies: 37601709
       << Q_UINT64_C(909365);
 
   variant = "racingkings";
   QTest::newRow("racingkings startpos")
       << variant << "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"
-      << 4 // 4 plies: 296242, 5 plies: 9472927, 6 plies: 298712641
+      << 4  // 4 plies: 296242, 5 plies: 9472927, 6 plies: 298712641
       << Q_UINT64_C(296242);
 
   variant = "horde";
   QTest::newRow("horde v2 startpos") << variant
                                      << "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/"
                                         "PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
-                                     << 6 // 5 plies: 265223, 6 plies: 5396554
+                                     << 6  // 5 plies: 265223, 6 plies: 5396554
                                      << Q_UINT64_C(5396554);
   QTest::newRow("horde dunsany startpos")
       << variant
       << "rnbqkbnr/pppppppp/8/8/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP b kq - 0 1"
-      << 5 // 5 plies: 775839, 6 plies: 59231536
+      << 5  // 5 plies: 775839, 6 plies: 59231536
       << Q_UINT64_C(775839);
   QTest::newRow("horde3") << variant
                           << "rnbqkbnr/6p1/2p1Pp1P/P1PPPP2/Pp4PP/1p2PPPP/"
                              "1P2PPPP/PP1nPPPP b kq a3 0 18"
-                          << 5 // 4 plies: 197287, 5 plies: 6429490
+                          << 5  // 4 plies: 197287, 5 plies: 6429490
                           << Q_UINT64_C(6429490);
 
   variant = "andernach";
   QTest::newRow("andernach startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 197410, 5 plies: 4870137, 6 plies: 119527044
+      << 5  // 4 plies: 197410, 5 plies: 4870137, 6 plies: 119527044
       << Q_UINT64_C(4870137);
   QTest::newRow("andernach pos1")
       << variant
       << "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3"
-      << 4 // 4 plies: 523348, 5 plies: 16330793
+      << 4  // 4 plies: 523348, 5 plies: 16330793
       << Q_UINT64_C(523348);
 
   variant = "checkless";
   QTest::newRow("checkless startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 196772, 5 plies: 4835050, 6 plies: 118060698
+      << 5  // 4 plies: 196772, 5 plies: 4835050, 6 plies: 118060698
       << Q_UINT64_C(4835050);
 
   variant = "embassy";
   QTest::newRow("embassy startpos")
       << variant
       << "rnbqkcabnr/pppppppppp/10/10/10/10/PPPPPPPPPP/RNBQKCABNR w KQkq - 0 1"
-      << 4 // 4 plies: 809539, 5 plies: 28937546, 6 plies: 1023746640
+      << 4  // 4 plies: 809539, 5 plies: 28937546, 6 plies: 1023746640
       << Q_UINT64_C(809539);
 
   variant = "coregal";
   QTest::newRow("coregal startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 195896, 5 plies: 4756867, 6 plies: 114110257
+      << 5  // 4 plies: 195896, 5 plies: 4756867, 6 plies: 114110257
       << Q_UINT64_C(4756867);
 
   variant = "extinction";
   QTest::newRow("extinction startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 197742, 5 plies: 4897256, 6 plies: 120921506
+      << 5  // 4 plies: 197742, 5 plies: 4897256, 6 plies: 120921506
       << Q_UINT64_C(4897256);
 
   variant = "grid";
   QTest::newRow("grid startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 173165, 5 plies: 3814913, 6 plies: 83288561
+      << 5  // 4 plies: 173165, 5 plies: 3814913, 6 plies: 83288561
       << Q_UINT64_C(3814913);
   QTest::newRow("grid pos2")
       << variant
@@ -1077,45 +1075,45 @@ void tst_Board::perft_data() const {
       << Q_UINT64_C(1477948);
   QTest::newRow("grid pos5")
       << variant << "r1bqkbnr/pppppppp/n7/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq -"
-      << 5 // 3 plies: 8768, 4 plies: 177309, 5 plies: 4069318
+      << 5  // 3 plies: 8768, 4 plies: 177309, 5 plies: 4069318
       << Q_UINT64_C(4069318);
 
   variant = "displacedgrid";
   QTest::newRow("displacedgrid startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 31057, 5 plies: 537400, 6 plies: 9222549
+      << 5  // 4 plies: 31057, 5 plies: 537400, 6 plies: 9222549
       << Q_UINT64_C(537400);
 
   variant = "slippedgrid";
   QTest::newRow("slippedgrid startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 176529, 5 plies: 3953321, 6 plies: 87774558
+      << 5  // 4 plies: 176529, 5 plies: 3953321, 6 plies: 87774558
       << Q_UINT64_C(3953321);
 
   variant = "gridolina";
   QTest::newRow("gridolina startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 798011, 5 plies: 24033022, 6 plies: 712513491
+      << 4  // 4 plies: 798011, 5 plies: 24033022, 6 plies: 712513491
       << Q_UINT64_C(798011);
 
   variant = "janus";
   QTest::newRow("janus startpos")
       << variant
       << "rjnbkqbnjr/pppppppppp/10/10/10/10/PPPPPPPPPP/RJNBKQBNJR w KQkq - 0 1"
-      << 4 // 4 plies: 772074, 5 plies: 26869186, 6 plies: 923380321
+      << 4  // 4 plies: 772074, 5 plies: 26869186, 6 plies: 923380321
       << Q_UINT64_C(772074);
 
   variant = "knightmate";
   QTest::newRow("knightmate startpos")
       << variant << "rmbqkbmr/pppppppp/8/8/8/8/PPPPPPPP/RMBQKBMR w KQkq - 0 1"
-      << 5 // 4 plies: 139774, 5 plies: 3249033, 6 plies: 74568983
+      << 5  // 4 plies: 139774, 5 plies: 3249033, 6 plies: 74568983
       << Q_UINT64_C(3249033);
 
   variant = "chancellor";
   QTest::newRow("chancellor startpos")
       << variant
       << "rnbqkcnbr/ppppppppp/9/9/9/9/9/PPPPPPPPP/RNBQKCNBR w KQkq - 0 1"
-      << 4 // 4 plies: 436656, 5 plies: 13466196, 6 plies: 412625522
+      << 4  // 4 plies: 436656, 5 plies: 13466196, 6 plies: 412625522
       << Q_UINT64_C(436656);
   QTest::newRow("chancellor promotion")
       << variant << "4k4/1P7/K8/9/9/9/9/9/9 w - - 0 1" << 2 << Q_UINT64_C(37);
@@ -1124,7 +1122,7 @@ void tst_Board::perft_data() const {
   QTest::newRow("modern startpos")
       << variant
       << "rnbqkmbnr/ppppppppp/9/9/9/9/9/PPPPPPPPP/RNBMKQBNR w KQkq - 0 1"
-      << 4 // 4 plies: 433729, 5 plies: 13403293, 6 plies: 411178941
+      << 4  // 4 plies: 433729, 5 plies: 13403293, 6 plies: 411178941
       << Q_UINT64_C(433729);
   QTest::newRow("modern promotion")
       << variant << "4k4/1P7/K8/9/9/9/9/9/9 w - - 0 1" << 2 << Q_UINT64_C(39);
@@ -1133,93 +1131,93 @@ void tst_Board::perft_data() const {
   QTest::newRow("pocketknight startpos")
       << variant
       << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[Nn] w KQkq - 0 1"
-      << 4 // 4 plies: 3071267, 5 plies: 99614985, 6 plies: 3228439195
+      << 4  // 4 plies: 3071267, 5 plies: 99614985, 6 plies: 3228439195
       << Q_UINT64_C(3071267);
 
   variant = "gryphon";
   QTest::newRow("gryphon startpos")
       << variant << "rnbq1bnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQ1BNR w - - 0 1"
-      << 5 // 4 plies: 280477, 5 plies: 6778804, 6 plies: 162243917
+      << 5  // 4 plies: 280477, 5 plies: 6778804, 6 plies: 162243917
       << Q_UINT64_C(6778804);
   QTest::newRow("gryphon middlegame")
       << variant << "r2q2nr/p5pp/1n2rn2/2nB4/5N2/R2R2q1/P2P3P/R2Q3R w - - 0 1"
-      << 4 // 2 plies: 982, 3 plies: 27370, 4 plies: 1014040
+      << 4  // 2 plies: 982, 3 plies: 27370, 4 plies: 1014040
       << Q_UINT64_C(1014040);
 
   variant = "circulargryphon";
   QTest::newRow("circulargryphon startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
-      << 5 // 4 plies: 243435, 5 plies: 5766940, 6 plies: 134596721
+      << 5  // 4 plies: 243435, 5 plies: 5766940, 6 plies: 134596721
       << Q_UINT64_C(5766940);
 
   variant = "simplifiedgryphon";
   QTest::newRow("simplifiedgryphon startpos")
       << variant << "4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1"
-      << 5 // 4 plies: 92350, 5 plies: 1993716, 6 plies: 42279298
+      << 5  // 4 plies: 92350, 5 plies: 1993716, 6 plies: 42279298
       << Q_UINT64_C(1993716);
 
   variant = "losers";
   QTest::newRow("losers startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 152955, 5 plies: 2723795, 6 plies: 46038682, 7 plies:
-           // 757349642
+      << 5  // 4 plies: 152955, 5 plies: 2723795, 6 plies: 46038682, 7 plies:
+            // 757349642
       << Q_UINT64_C(2723795);
 
   variant = "antichess";
   QTest::newRow("antichess startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
-      << 5 // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162, 7 plies:
-           // 762010688
+      << 5  // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162, 7 plies:
+            // 762010688
       << Q_UINT64_C(2732672);
 
   variant = "giveaway";
 
   QTest::newRow("giveaway startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162, 7 plies:
-           // 762096669
+      << 5  // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162, 7 plies:
+            // 762096669
       << Q_UINT64_C(2732672);
 
   variant = "suicide";
 
   QTest::newRow("suicide startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
-      << 5 // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162
+      << 5  // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46264162
       << Q_UINT64_C(2732672);
   QTest::newRow("suicide endgame1")
       << variant << "8/2b5/8/3B4/8/8/2P5/8 b - - 0 1"
-      << 5 // 5 plies: 116051, 6 plies: 1218696
+      << 5  // 5 plies: 116051, 6 plies: 1218696
       << Q_UINT64_C(116051);
   QTest::newRow("suicide endgame2")
       << variant << "8/1kKP4/8/8/8/8/8/6n1 b - - 0 1"
-      << 3 // 3 plies: 5, 4 plies: 0
+      << 3  // 3 plies: 5, 4 plies: 0
       << Q_UINT64_C(5);
   QTest::newRow("suicide endgame3")
-      << variant << "8/k1KP4/8/8/8/8/8/6n1 b - - 0 1" << 7 // 7 plies: 2891980
+      << variant << "8/k1KP4/8/8/8/8/8/6n1 b - - 0 1" << 7  // 7 plies: 2891980
       << Q_UINT64_C(2891980);
 
   variant = "codrus";
 
   QTest::newRow("codrus startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46263517, 7 plies:
-           // 762067389
+      << 4  // 4 plies: 153299, 5 plies: 2732672, 6 plies: 46263517, 7 plies:
+            // 762067389
       << Q_UINT64_C(153299);
   QTest::newRow("codrus endgame1")
       << variant << "5bnr/2pp2pp/P4k2/R3Q1P1/8/2N1K3/1P1PP1PP/2B2BNR w - - 1 15"
-      << 4 // 1 ply: 3, 2 plies: 1, 3 plies: 2, 4 plies: 19
+      << 4  // 1 ply: 3, 2 plies: 1, 3 plies: 2, 4 plies: 19
       << Q_UINT64_C(19);
 
   variant = "threekings";
   QTest::newRow("threekings startpos")
       << variant << "knbqkbnk/pppppppp/8/8/8/8/PPPPPPPP/KNBQKBNK w - - 0 1"
-      << 5 // 4 plies: 199514, 5 plies: 4971357, 6 plies: 123493813
+      << 5  // 4 plies: 199514, 5 plies: 4971357, 6 plies: 123493813
       << Q_UINT64_C(4971357);
 
   variant = "shatranj";
   QTest::newRow("shatranj startpos")
       << variant << "rnbkqbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w - - 0 1"
-      << 5 // 4 plies: 68122, 5 plies: 1164248, 6 plies: 19864709
+      << 5  // 4 plies: 68122, 5 plies: 1164248, 6 plies: 19864709
       << Q_UINT64_C(1164248);
 
   variant = "courier";
@@ -1227,71 +1225,71 @@ void tst_Board::perft_data() const {
       << variant
       << "rnebmkfwbenr/pppppppppppp/12/12/12/12/PPPPPPPPPPPP/RNEBMKFWBENR w - "
          "- 0 1"
-      << 5 // 4 plies: 180571, 5 plies: 4139349, 6 plies: 94789147
+      << 5  // 4 plies: 180571, 5 plies: 4139349, 6 plies: 94789147
       << Q_UINT64_C(4139349);
   QTest::newRow("courier traditional")
       << variant
       << "rnebmk1wbenr/1ppppp1pppp1/6f5/p5p4p/P5P4P/6F5/1PPPPP1PPPP1/"
          "RNEBMK1WBENR w - - 0 1"
-      << 4 // 4 plies: 500337, 5 plies: 14144849, 6 plies: 400324148
+      << 4  // 4 plies: 500337, 5 plies: 14144849, 6 plies: 400324148
       << Q_UINT64_C(500337);
 
   variant = "makruk";
   QTest::newRow("makruk startpos")
       << variant << "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - 0 0 1"
-      << 5 // 4 plies: 273026, 5 plies: 6223994, 6 plies: 142078049
+      << 5  // 4 plies: 273026, 5 plies: 6223994, 6 plies: 142078049
       << Q_UINT64_C(6223994);
 
   variant = "cambodian";
   QTest::newRow("cambodian startpos")
       << variant << "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w DEde 0 0 1"
-      << 4 // 4 plies: 361793, 5 plies: 8601434, 6 plies: 204755574
+      << 4  // 4 plies: 361793, 5 plies: 8601434, 6 plies: 204755574
       << Q_UINT64_C(361793);
   QTest::newRow("cambodian check1")
       << variant
       << "r1s1ks1r/3nm3/pppNpppp/3n4/5P2/PPPPPNPP/8/R1SKMS1R b DEe 0 0 5"
-      << 2 // 1 ply: 2, 2 plies: 72 (sjaakii-1.4.1 dito)
+      << 2  // 1 ply: 2, 2 plies: 72 (sjaakii-1.4.1 dito)
       << Q_UINT64_C(72);
 
   variant = "asean";
   QTest::newRow("asean startpos")
       << variant << "rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w - - 0 1"
-      << 5 // 4 plies: 273026, 5 plies: 6223994, 6 plies: 142078057
+      << 5  // 4 plies: 273026, 5 plies: 6223994, 6 plies: 142078057
       << Q_UINT64_C(6223994);
 
   variant = "sittuyin";
   QTest::newRow("sittuyin startpos")
       << variant
       << "8/8/4pppp/pppp4/4PPPP/PPPP4/8/8[KFRRSSNNkfrrssnn] w - 0 0 1"
-      << 3 // 1 ply: 88, 2 plies: 7744, 3 plies: 580096, 4 plies: 43454464
+      << 3  // 1 ply: 88, 2 plies: 7744, 3 plies: 580096, 4 plies: 43454464
       << Q_UINT64_C(580096);
   QTest::newRow("sittuyin midgame")
       << variant << "8/8/6R1/s3r3/P5R1/1KP3p1/1F2kr2/8[-] b - 0 0 72"
-      << 4 // 1 ply: 35, 2 plies: 825, 3 plies: 26791, 4 plies: 657824
+      << 4  // 1 ply: 35, 2 plies: 825, 3 plies: 26791, 4 plies: 657824
       << Q_UINT64_C(657824);
   QTest::newRow("sittuyin promotion1")
       << variant << "8/8/S2P1k2/8/8/8/8/4K3[-] w - - 0 9"
-      << 1 // 1 ply: 12, 2 plies: 86
+      << 1  // 1 ply: 12, 2 plies: 86
       << Q_UINT64_C(12);
   QTest::newRow("sittuyin promotion2")
       << variant << "8/8/R2P1k2/8/8/8/8/4K3[-] w - - 0 9"
-      << 1 // 1 ply: 16, 2 plies: 105
+      << 1  // 1 ply: 16, 2 plies: 105
       << Q_UINT64_C(16);
 
   variant = "ai-wok";
   QTest::newRow("ai-wok startpos")
       << variant << "rnsaksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKASNR w 0 1"
-      << 4 // 3 plies: 18102, 4 plies: 485045, 5 plies: 13275068
+      << 4  // 3 plies: 18102, 4 plies: 485045, 5 plies: 13275068
       << Q_UINT64_C(485045);
   QTest::newRow("ai-wok endgame")
       << variant << "8/8/8/2sp2k1/7p/3P4/6K1/7r w - - 0 1"
-      << 5 // 4 plies: 6855, 5 plies: 30055, 6 plies: 631293
+      << 5  // 4 plies: 6855, 5 plies: 30055, 6 plies: 631293
       << Q_UINT64_C(30055);
 
   variant = "jesonmor";
   QTest::newRow("jeson mor startpos")
       << variant << "nnnnnnnnn/9/9/9/9/9/9/9/NNNNNNNNN w - - 0 1"
-      << 4 // 3 plies: 27960, 4 plies: 868624, 5 plies: 27756588/27882796
+      << 4  // 3 plies: 27960, 4 plies: 868624, 5 plies: 27756588/27882796
       << Q_UINT64_C(868624);
 
   variant = "twokings";
@@ -1305,7 +1303,7 @@ void tst_Board::perft_data() const {
       << 5 << Q_UINT64_C(4629168);
   QTest::newRow("twokings endgame1")
       << variant << "8/8/p1k5/1p1r1K1p/1P5P/P1K5/8/8 b - - 0 121"
-      << 4 // 3 plies:3076, 4 plies: 36828
+      << 4  // 3 plies:3076, 4 plies: 36828
       << Q_UINT64_C(36828);
 
   variant = "twokingssymmetric";
@@ -1323,11 +1321,11 @@ void tst_Board::perft_data() const {
       << variant
       << "r8r/1nbqkcabn1/pppppppppp/10/10/10/10/PPPPPPPPPP/1NBQKCABN1/R8R w - "
          "- 0 1"
-      << 3 // 3plies: 259514, 4 plies: 15921643, 5 plies: 959883584
+      << 3  // 3plies: 259514, 4 plies: 15921643, 5 plies: 959883584
       << Q_UINT64_C(259514);
   QTest::newRow("grand endgame1")
       << variant << "10/4k5/6P3/10/10/10/10/10/1p2K5/10 w - - 0 1"
-      << 3 // 1 ply: 15, 2 plies: 165, 3 plies: 2446
+      << 3  // 1 ply: 15, 2 plies: 165, 3 plies: 2446
       << Q_UINT64_C(2446);
 
   variant = "seirawan";
@@ -1335,71 +1333,71 @@ void tst_Board::perft_data() const {
       << variant
       << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[EHeh] w BCDFGbcdfgKQkq - "
          "0 1"
-      << 4 // 4 plies: 782599, 5 plies: 27639803, 6 plies: 967587141 (sjaakii:
-           // 967584909)
+      << 4  // 4 plies: 782599, 5 plies: 27639803, 6 plies: 967587141 (sjaakii:
+            // 967584909)
       << Q_UINT64_C(782599);
 
   variant = "losalamos";
   QTest::newRow("losalamos startpos")
       << variant << "rnqknr/pppppp/6/6/PPPPPP/RNQKNR w - - 0 1"
-      << 5 // 4 plies: 14332, 5 plies: 191846, 6 plies: 2549164
+      << 5  // 4 plies: 14332, 5 plies: 191846, 6 plies: 2549164
       << Q_UINT64_C(191846);
   QTest::newRow("losalamos promotion")
       << variant << "6/2P3/6/1K1k2/6/6 w - - 0 1"
-      << 5 // 4 plies: 3117, 5 plies: 39171, 6 plies: 187431
+      << 5  // 4 plies: 3117, 5 plies: 39171, 6 plies: 187431
       << Q_UINT64_C(39171);
 
   variant = "almost";
   QTest::newRow("almost startpos")
       << variant << "rnbckbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBCKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 290522, 5 plies: 7812388, 6 plies: 208096934
+      << 4  // 4 plies: 290522, 5 plies: 7812388, 6 plies: 208096934
       << Q_UINT64_C(290522);
   QTest::newRow("almost promotion")
       << variant << "8/KP2k3/8/8/8/8/8/8 w - - 0 1"
-      << 5 // 4 plies: 3036, 5 plies: 41476
+      << 5  // 4 plies: 3036, 5 plies: 41476
       << Q_UINT64_C(41476);
 
   variant = "amazon";
   QTest::newRow("amazon startpos")
       << variant << "rnbakbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBAKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 318185, 5 plies: 9319911, 6 plies: 268050499
+      << 4  // 4 plies: 318185, 5 plies: 9319911, 6 plies: 268050499
       << Q_UINT64_C(318185);
   QTest::newRow("amazon promotion")
       << variant << "8/KP2k3/8/8/8/8/8/8 w - - 0 1"
-      << 5 // 4 plies: 2885, 5 plies: 41738
+      << 5  // 4 plies: 2885, 5 plies: 41738
       << Q_UINT64_C(41738);
 
   variant = "chigorin";
   QTest::newRow("chigorin startpos")
       << variant << "rbbqkbbr/pppppppp/8/8/8/8/PPPPPPPP/RNNCKNNR w KQkq - 0 1"
-      << 4 // 4 plies: 229973, 5 plies: 6624527, 6 plies: 156383743
+      << 4  // 4 plies: 229973, 5 plies: 6624527, 6 plies: 156383743
       << Q_UINT64_C(229973);
   QTest::newRow("chigorin promotion")
       << variant << "8/KP6/8/4k3/8/8/6p1/8 w - - 0 1"
-      << 5 // 4 plies: 8133, 5 plies: 104326
+      << 5  // 4 plies: 8133, 5 plies: 104326
       << Q_UINT64_C(104326);
 
   variant = "hoppelpoppel";
   QTest::newRow("hoppelpoppel startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 5 // 4 plies: 202459, 5 plies: 5056643, 6 plies: 125120759
+      << 5  // 4 plies: 202459, 5 plies: 5056643, 6 plies: 125120759
       << Q_UINT64_C(5056643);
 
   variant = "newzealand";
   QTest::newRow("newzealand startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 200310, 5 plies: 4987426, 6 plies: 123099631
+      << 4  // 4 plies: 200310, 5 plies: 4987426, 6 plies: 123099631
       << Q_UINT64_C(200310);
 
   variant = "placement";
   QTest::newRow("placement startpos")
       << variant << "8/pppppppp/8/8/8/8/PPPPPPPP/8[KQRRBBNNkqrrbbnn] w - - 0 1"
-      << 4 // 3 plies: 50560, 4 plies: 1597696, 5 plies: 38587392
+      << 4  // 3 plies: 50560, 4 plies: 1597696, 5 plies: 38587392
       << Q_UINT64_C(1597696);
   QTest::newRow("placement2")
       << variant
       << "1n1r1q2/pppppppp/8/8/8/8/PPPPPPPP/1N1B1R1N[KQRBkrbbn] b - - 0 4"
-      << 5 // 5 plies: 145152, 6 plies:580608, 7,8,9 plies: 1658880
+      << 5  // 5 plies: 145152, 6 plies:580608, 7,8,9 plies: 1658880
       << Q_UINT64_C(145152);
 
   variant = "gustav3";
@@ -1407,19 +1405,19 @@ void tst_Board::perft_data() const {
       << variant
       << "arnbqkbnra/*pppppppp*/*8*/*8*/*8*/*8*/*PPPPPPPP*/ARNBQKBNRA w KQkq - "
          "0 1"
-      << 4 // 4 plies: 331659, 5 plies: 9988369, 6 plies: 294561801
+      << 4  // 4 plies: 331659, 5 plies: 9988369, 6 plies: 294561801
       << Q_UINT64_C(331659);
 
   variant = "rifle";
   QTest::newRow("rifle startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 197326, 5 plies: 4866988, 6 plies: 119235709
+      << 4  // 4 plies: 197326, 5 plies: 4866988, 6 plies: 119235709
       << Q_UINT64_C(197326);
 
   variant = "shoot";
   QTest::newRow("shoot startpos")
       << variant << "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-      << 4 // 4 plies: 153023, 5 plies: 2735167, 6 plies: 46678307
+      << 4  // 4 plies: 153023, 5 plies: 2735167, 6 plies: 46678307
       << Q_UINT64_C(153023);
 }
 

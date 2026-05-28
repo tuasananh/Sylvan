@@ -18,12 +18,14 @@
 */
 
 #include "enginemanager.h"
-#include <QFile>
-#include <QTextStream>
+
 #include <jsonparser.h>
 #include <jsonserializer.h>
 
-EngineManager::EngineManager(QObject *parent) : QObject(parent) {}
+#include <QFile>
+#include <QTextStream>
+
+EngineManager::EngineManager(QObject* parent) : QObject(parent) {}
 
 EngineManager::~EngineManager() {}
 
@@ -33,14 +35,14 @@ EngineConfiguration EngineManager::engineAt(int index) const {
   return m_engines.at(index);
 }
 
-void EngineManager::addEngine(const EngineConfiguration &engine) {
+void EngineManager::addEngine(const EngineConfiguration& engine) {
   m_engines << engine;
 
   emit engineAdded(m_engines.size() - 1);
 }
 
 void EngineManager::updateEngineAt(int index,
-                                   const EngineConfiguration &engine) {
+                                   const EngineConfiguration& engine) {
   m_engines[index] = engine;
 
   emit engineUpdated(index);
@@ -54,27 +56,24 @@ void EngineManager::removeEngineAt(int index) {
 
 QList<EngineConfiguration> EngineManager::engines() const { return m_engines; }
 
-void EngineManager::setEngines(const QList<EngineConfiguration> &engines) {
+void EngineManager::setEngines(const QList<EngineConfiguration>& engines) {
   m_engines = engines;
 
   emit enginesReset();
 }
 
-bool EngineManager::supportsVariant(const QString &variant) const {
-  if (m_engines.isEmpty())
-    return false;
+bool EngineManager::supportsVariant(const QString& variant) const {
+  if (m_engines.isEmpty()) return false;
 
-  for (const auto &config : qAsConst(m_engines)) {
-    if (!config.supportsVariant(variant))
-      return false;
+  for (const auto& config : qAsConst(m_engines)) {
+    if (!config.supportsVariant(variant)) return false;
   }
 
   return true;
 }
 
-void EngineManager::loadEngines(const QString &fileName) {
-  if (!QFile::exists(fileName))
-    return;
+void EngineManager::loadEngines(const QString& fileName) {
+  if (!QFile::exists(fileName)) return;
 
   QFile input(fileName);
   if (!input.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -93,17 +92,16 @@ void EngineManager::loadEngines(const QString &fileName) {
                  QString("bad engine configuration file line %1 in %2: %3")
                      .arg(parser.errorLineNumber())
                      .arg(fileName)
-                     .arg(parser.errorString()))); // clazy:exclude=qstring-arg
+                     .arg(parser.errorString())));  // clazy:exclude=qstring-arg
     return;
   }
 
-  for (const QVariant &engine : engines)
-    addEngine(EngineConfiguration(engine));
+  for (const QVariant& engine : engines) addEngine(EngineConfiguration(engine));
 }
 
-void EngineManager::saveEngines(const QString &fileName) {
+void EngineManager::saveEngines(const QString& fileName) {
   QVariantList engines;
-  for (const EngineConfiguration &config : qAsConst(m_engines))
+  for (const EngineConfiguration& config : qAsConst(m_engines))
     engines << config.toVariant();
 
   QFile output(fileName);
@@ -120,7 +118,7 @@ void EngineManager::saveEngines(const QString &fileName) {
 
 QSet<QString> EngineManager::engineNames() const {
   QSet<QString> names;
-  for (const EngineConfiguration &engine : qAsConst(m_engines))
+  for (const EngineConfiguration& engine : qAsConst(m_engines))
     names.insert(engine.name());
 
   return names;

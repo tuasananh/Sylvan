@@ -20,27 +20,28 @@
 #ifndef ENGINEBUILDER_H
 #define ENGINEBUILDER_H
 
+#include <QCoreApplication>
+
 #include "engineconfiguration.h"
 #include "playerbuilder.h"
-#include <QCoreApplication>
 
 /*! \brief A class for constructing local chess engines. */
 class LIB_EXPORT EngineBuilder : public PlayerBuilder {
   Q_DECLARE_TR_FUNCTIONS(EngineBuilder)
 
-public:
+ public:
   /*! Creates a new EngineBuilder. */
-  EngineBuilder(const EngineConfiguration &config);
+  EngineBuilder(const EngineConfiguration& config);
 
   // Inherited from PlayerBuilder
   virtual bool isHuman() const;
-  virtual ChessPlayer *create(QObject *receiver, const char *method,
-                              QObject *parent, QString *error) const;
+  virtual ChessPlayer* create(QObject* receiver, const char* method,
+                              QObject* parent, QString* error) const;
 
-private:
-  void setError(QString *error, const QString &message) const;
+ private:
+  void setError(QString* error, const QString& message) const;
 
   EngineConfiguration m_config;
 };
 
-#endif // ENGINEBUILDER_H
+#endif  // ENGINEBUILDER_H

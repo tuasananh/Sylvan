@@ -17,13 +17,13 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "pathlineedit.h"
+
 #include <QFileDialog>
 #include <QResizeEvent>
 #include <QToolButton>
 
-#include "pathlineedit.h"
-
-PathLineEdit::PathLineEdit(PathType pathType, QWidget *parent)
+PathLineEdit::PathLineEdit(PathType pathType, QWidget* parent)
     : QLineEdit(parent), m_pathType(pathType) {
   m_browseBtn = new QToolButton(this);
   m_browseBtn->setText("...");
@@ -38,11 +38,11 @@ PathLineEdit::PathLineEdit(PathType pathType, QWidget *parent)
 
 PathLineEdit::~PathLineEdit() {}
 
-void PathLineEdit::setDefaultDirectory(const QString &dir) {
+void PathLineEdit::setDefaultDirectory(const QString& dir) {
   m_defaultDir.setPath(dir);
 }
 
-void PathLineEdit::resizeEvent(QResizeEvent *event) {
+void PathLineEdit::resizeEvent(QResizeEvent* event) {
   int height = event->size().height();
 
   // Place the browse button to the right
@@ -51,16 +51,14 @@ void PathLineEdit::resizeEvent(QResizeEvent *event) {
   m_browseBtn->move(width() - height, 0);
 }
 
-void PathLineEdit::setPath(const QString &path) {
+void PathLineEdit::setPath(const QString& path) {
   QString finalPath(path);
   if (!path.isEmpty() && m_defaultDir.exists()) {
     QString tmp = m_defaultDir.relativeFilePath(path);
-    if (!tmp.startsWith(".."))
-      finalPath = tmp;
+    if (!tmp.startsWith("..")) finalPath = tmp;
   }
 
-  if (!finalPath.isEmpty())
-    setText(finalPath);
+  if (!finalPath.isEmpty()) setText(finalPath);
 }
 
 void PathLineEdit::browse() {
@@ -77,8 +75,7 @@ void PathLineEdit::browse() {
     dlg->setOption(QFileDialog::ShowDirsOnly);
   }
 
-  if (m_defaultDir.exists())
-    dlg->setDirectory(m_defaultDir);
+  if (m_defaultDir.exists()) dlg->setDirectory(m_defaultDir);
 
   dlg->setWindowModality(Qt::WindowModal);
   dlg->open();

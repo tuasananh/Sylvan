@@ -17,15 +17,15 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtConcurrentFilter>
+#include "pgngameentrymodel.h"
 
 #include <pgngameentry.h>
 
-#include "pgngameentrymodel.h"
+#include <QtConcurrentFilter>
 
 struct EntryContains {
-  EntryContains(const QList<const PgnGameEntry *> &entries,
-                const PgnGameFilter &filter)
+  EntryContains(const QList<const PgnGameEntry*>& entries,
+                const PgnGameFilter& filter)
       : m_entries(entries), m_filter(filter) {}
 
   typedef bool result_type;
@@ -34,17 +34,17 @@ struct EntryContains {
     return m_entries.at(index)->match(m_filter);
   }
 
-  const QList<const PgnGameEntry *> &m_entries;
+  const QList<const PgnGameEntry*>& m_entries;
   PgnGameFilter m_filter;
 };
 
-PgnGameEntryModel::PgnGameEntryModel(QObject *parent)
+PgnGameEntryModel::PgnGameEntryModel(QObject* parent)
     : QAbstractItemModel(parent), m_entryCount(0) {
   connect(&m_watcher, SIGNAL(resultsReadyAt(int, int)), this,
           SLOT(onResultsReady()));
 }
 
-const PgnGameEntry *PgnGameEntryModel::entryAt(int row) const {
+const PgnGameEntry* PgnGameEntryModel::entryAt(int row) const {
   return m_entries.at(m_filtered.resultAt(row));
 }
 
@@ -54,7 +54,7 @@ int PgnGameEntryModel::sourceIndex(int row) const {
 
 int PgnGameEntryModel::entryCount() const { return m_filtered.resultCount(); }
 
-void PgnGameEntryModel::setEntries(const QList<const PgnGameEntry *> &entries) {
+void PgnGameEntryModel::setEntries(const QList<const PgnGameEntry*>& entries) {
   m_watcher.cancel();
   m_watcher.waitForFinished();
 
@@ -62,19 +62,17 @@ void PgnGameEntryModel::setEntries(const QList<const PgnGameEntry *> &entries) {
 
   if (entries.size() > m_indexes.size()) {
     m_indexes.reserve(entries.size());
-    for (int i = m_indexes.size(); i < entries.size(); i++)
-      m_indexes.append(i);
+    for (int i = m_indexes.size(); i < entries.size(); i++) m_indexes.append(i);
   }
 
   applyFilter(m_filter);
 }
 
 void PgnGameEntryModel::onResultsReady() {
-  if (m_entryCount < 1024)
-    fetchMore(QModelIndex());
+  if (m_entryCount < 1024) fetchMore(QModelIndex());
 }
 
-void PgnGameEntryModel::applyFilter(const PgnGameFilter &filter) {
+void PgnGameEntryModel::applyFilter(const PgnGameFilter& filter) {
   beginResetModel();
   m_entryCount = 0;
 
@@ -86,7 +84,7 @@ void PgnGameEntryModel::applyFilter(const PgnGameFilter &filter) {
   endResetModel();
 }
 
-void PgnGameEntryModel::setFilter(const PgnGameFilter &filter) {
+void PgnGameEntryModel::setFilter(const PgnGameFilter& filter) {
   m_watcher.cancel();
   m_watcher.waitForFinished();
 
@@ -95,36 +93,32 @@ void PgnGameEntryModel::setFilter(const PgnGameFilter &filter) {
 }
 
 QModelIndex PgnGameEntryModel::index(int row, int column,
-                                     const QModelIndex &parent) const {
-  if (!hasIndex(row, column, parent))
-    return QModelIndex();
+                                     const QModelIndex& parent) const {
+  if (!hasIndex(row, column, parent)) return QModelIndex();
 
   return createIndex(row, column);
 }
 
-QModelIndex PgnGameEntryModel::parent(const QModelIndex &index) const {
+QModelIndex PgnGameEntryModel::parent(const QModelIndex& index) const {
   Q_UNUSED(index);
 
   return QModelIndex();
 }
 
-int PgnGameEntryModel::rowCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnGameEntryModel::rowCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return qMin(m_entryCount, m_filtered.resultCount());
 }
 
-int PgnGameEntryModel::columnCount(const QModelIndex &parent) const {
-  if (parent.isValid())
-    return 0;
+int PgnGameEntryModel::columnCount(const QModelIndex& parent) const {
+  if (parent.isValid()) return 0;
 
   return 7;
 }
 
-QVariant PgnGameEntryModel::data(const QModelIndex &index, int role) const {
-  if (!index.isValid())
-    return QVariant();
+QVariant PgnGameEntryModel::data(const QModelIndex& index, int role) const {
+  if (!index.isValid()) return QVariant();
 
   if (index.row() >= m_filtered.resultCount() || index.row() < 0)
     return QVariant();
@@ -141,41 +135,40 @@ QVariant PgnGameEntryModel::headerData(int section, Qt::Orientation orientation,
                                        int role) const {
   if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
     switch (section) {
-    case 0:
-      return tr("Event");
-    case 1:
-      return tr("Site");
-    case 2:
-      return tr("Date");
-    case 3:
-      return tr("Round");
-    case 4:
-      return tr("Red");
-    case 5:
-      return tr("Black");
-    case 6:
-      return tr("Result");
-    default:
-      return QVariant();
+      case 0:
+        return tr("Event");
+      case 1:
+        return tr("Site");
+      case 2:
+        return tr("Date");
+      case 3:
+        return tr("Round");
+      case 4:
+        return tr("Red");
+      case 5:
+        return tr("Black");
+      case 6:
+        return tr("Result");
+      default:
+        return QVariant();
     }
   }
 
   return QVariant();
 }
 
-bool PgnGameEntryModel::canFetchMore(const QModelIndex &parent) const {
+bool PgnGameEntryModel::canFetchMore(const QModelIndex& parent) const {
   Q_UNUSED(parent);
 
   return m_entryCount < m_filtered.resultCount();
 }
 
-void PgnGameEntryModel::fetchMore(const QModelIndex &parent) {
+void PgnGameEntryModel::fetchMore(const QModelIndex& parent) {
   Q_UNUSED(parent);
 
   int remainder = m_filtered.resultCount() - m_entryCount;
   int entriesToFetch = qMin(1024, remainder);
-  if (entriesToFetch <= 0)
-    return;
+  if (entriesToFetch <= 0) return;
 
   beginInsertRows(QModelIndex(), m_entryCount,
                   m_entryCount + entriesToFetch - 1);

@@ -19,28 +19,32 @@
 
 #include "tournamentplayer.h"
 
-TournamentPlayer::TournamentPlayer(PlayerBuilder *builder,
-                                   const TimeControl &timeControl,
-                                   const OpeningBook *book, int bookDepth)
-    : m_builder(builder), m_timeControl(timeControl), m_book(book),
-      m_bookDepth(bookDepth), m_wins(0), m_draws(0), m_losses(0) {
+TournamentPlayer::TournamentPlayer(PlayerBuilder* builder,
+                                   const TimeControl& timeControl,
+                                   const OpeningBook* book, int bookDepth)
+    : m_builder(builder),
+      m_timeControl(timeControl),
+      m_book(book),
+      m_bookDepth(bookDepth),
+      m_wins(0),
+      m_draws(0),
+      m_losses(0) {
   Q_ASSERT(builder != nullptr);
 }
 
-const PlayerBuilder *TournamentPlayer::builder() const { return m_builder; }
+const PlayerBuilder* TournamentPlayer::builder() const { return m_builder; }
 
 QString TournamentPlayer::name() const { return m_builder->name(); }
 
-void TournamentPlayer::setName(const QString &name) {
-  if (m_builder)
-    m_builder->setName(name);
+void TournamentPlayer::setName(const QString& name) {
+  if (m_builder) m_builder->setName(name);
 }
 
-const TimeControl &TournamentPlayer::timeControl() const {
+const TimeControl& TournamentPlayer::timeControl() const {
   return m_timeControl;
 }
 
-const OpeningBook *TournamentPlayer::book() const { return m_book; }
+const OpeningBook* TournamentPlayer::book() const { return m_book; }
 
 int TournamentPlayer::bookDepth() const { return m_bookDepth; }
 
@@ -54,18 +58,18 @@ int TournamentPlayer::score() const { return m_wins * 2 + m_draws; }
 
 void TournamentPlayer::addScore(int score) {
   switch (score) {
-  case 0:
-    m_losses++;
-    break;
-  case 1:
-    m_draws++;
-    break;
-  case 2:
-    m_wins++;
-    break;
-  default:
-    Q_UNREACHABLE();
-    break;
+    case 0:
+      m_losses++;
+      break;
+    case 1:
+      m_draws++;
+      break;
+    case 2:
+      m_wins++;
+      break;
+    default:
+      Q_UNREACHABLE();
+      break;
   }
 }
 

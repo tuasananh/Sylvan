@@ -20,8 +20,9 @@
 #ifndef ENGINE_MANAGER_H
 #define ENGINE_MANAGER_H
 
-#include "engineconfiguration.h"
 #include <QSet>
+
+#include "engineconfiguration.h"
 
 /*!
  * \brief Manages chess engines and their configurations.
@@ -31,9 +32,9 @@
 class LIB_EXPORT EngineManager : public QObject {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new EngineManager. */
-  EngineManager(QObject *parent = nullptr);
+  EngineManager(QObject* parent = nullptr);
   virtual ~EngineManager();
 
   /*! Returns the number of available engines. */
@@ -42,30 +43,30 @@ public:
   EngineConfiguration engineAt(int index) const;
 
   /*! Adds \a engine to the list of available engines. */
-  void addEngine(const EngineConfiguration &engine);
+  void addEngine(const EngineConfiguration& engine);
   /*! Updates the engine at \a index with \a engine. */
-  void updateEngineAt(int index, const EngineConfiguration &engine);
+  void updateEngineAt(int index, const EngineConfiguration& engine);
   /*! Removes the engine at \a index. */
   void removeEngineAt(int index);
 
   /*! Returns the available engines. */
   QList<EngineConfiguration> engines() const;
   /*! Sets the available engines to \a engines. */
-  void setEngines(const QList<EngineConfiguration> &engines);
+  void setEngines(const QList<EngineConfiguration>& engines);
 
   /*!
    * Returns true if \a variant is supported by all engines;
    * otherwise returns false.
    */
-  bool supportsVariant(const QString &variant) const;
+  bool supportsVariant(const QString& variant) const;
 
-  void loadEngines(const QString &fileName);
-  void saveEngines(const QString &fileName);
+  void loadEngines(const QString& fileName);
+  void saveEngines(const QString& fileName);
 
   /*! Returns the names of all configured engines. */
   QSet<QString> engineNames() const;
 
-signals:
+ signals:
   /*!
    * Emitted when all previously queried engine information is now
    * invalid and has to be queried again.
@@ -82,8 +83,8 @@ signals:
   /*! Emitted when an engine is updated at \a index. */
   void engineUpdated(int index);
 
-private:
+ private:
   QList<EngineConfiguration> m_engines;
 };
 
-#endif // ENGINE_MANAGER_H
+#endif  // ENGINE_MANAGER_H

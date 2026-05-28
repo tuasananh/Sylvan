@@ -26,7 +26,7 @@
  * \brief A fullmove number token in a PGN game.
  */
 class MoveNumberToken : public PgnToken {
-public:
+ public:
   /*!
    * Creates a new MoveNumberToken at \a ply for a game started
    * by \a startingSide.
@@ -36,13 +36,13 @@ public:
   // Inherited from PgnToken
   virtual QString toString() const;
 
-protected:
+ protected:
   // Inherited from PgnToken
-  virtual void vInsert(QTextCursor &cursor);
+  virtual void vInsert(QTextCursor& cursor);
 
-private:
+ private:
   int m_ply;
   int m_startingSide;
 };
 
-#endif // MOVENUMBERTOKEN_H
+#endif  // MOVENUMBERTOKEN_H

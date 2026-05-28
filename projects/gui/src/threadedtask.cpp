@@ -16,11 +16,14 @@
 */
 
 #include "threadedtask.h"
+
 #include <QProgressDialog>
 
-ThreadedTask::ThreadedTask(const QString &title, const QString &labelText,
-                           int minimum, int maximum, QWidget *parent)
-    : QThread(parent), m_cancel(false), m_statusMessage(labelText),
+ThreadedTask::ThreadedTask(const QString& title, const QString& labelText,
+                           int minimum, int maximum, QWidget* parent)
+    : QThread(parent),
+      m_cancel(false),
+      m_statusMessage(labelText),
       m_taskStart(QTime::currentTime()) {
   m_dlg =
       new QProgressDialog(tr("%1 - Undefined time remaining").arg(labelText),
@@ -61,22 +64,18 @@ void ThreadedTask::updateProgress(int value) {
   m_dlg->setValue(value);
 }
 
-void ThreadedTask::setStatusMessage(const QString &msg) {
+void ThreadedTask::setStatusMessage(const QString& msg) {
   m_statusMessage = msg;
 }
 
 QString ThreadedTask::humaniseTime(int sec) const {
-  if (sec <= 5)
-    return QString(tr("About 5 seconds"));
+  if (sec <= 5) return QString(tr("About 5 seconds"));
 
-  if (sec <= 10)
-    return QString(tr("About 10 seconds"));
+  if (sec <= 10) return QString(tr("About 10 seconds"));
 
-  if (sec <= 60)
-    return QString(tr("Less than a minute"));
+  if (sec <= 60) return QString(tr("Less than a minute"));
 
-  if (sec <= 120)
-    return QString(tr("About a minute"));
+  if (sec <= 120) return QString(tr("About a minute"));
 
   return QString(tr("About %1 minutes").arg(sec / 60));
 }

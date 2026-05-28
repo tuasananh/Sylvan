@@ -34,34 +34,34 @@ class GameDatabaseManager;
 class PgnDatabaseModel : public QAbstractItemModel {
   Q_OBJECT
 
-public:
+ public:
   /*!
    * Constructs a PGN database model with the give \a parent and
    * \a gameDatabaseManager.
    */
-  PgnDatabaseModel(GameDatabaseManager *gameDatabaseManager,
-                   QObject *parent = nullptr);
+  PgnDatabaseModel(GameDatabaseManager* gameDatabaseManager,
+                   QObject* parent = nullptr);
 
   // Inherited from QAbstractItemModel
   virtual QModelIndex index(int row, int column,
-                            const QModelIndex &parent = QModelIndex()) const;
-  virtual QModelIndex parent(const QModelIndex &index) const;
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual QVariant data(const QModelIndex &index, int role) const;
+                            const QModelIndex& parent = QModelIndex()) const;
+  virtual QModelIndex parent(const QModelIndex& index) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex& index, int role) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-  virtual bool setData(const QModelIndex &index, const QVariant &value,
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value,
                        int role = Qt::EditRole);
 
-private slots:
+ private slots:
   void onDatabaseAdded(int index);
   void onDatabaseAboutToBeRemoved(int index);
   void onDatabasesReset();
 
-private:
-  GameDatabaseManager *m_gameDatabaseManager;
+ private:
+  GameDatabaseManager* m_gameDatabaseManager;
 };
 
-#endif // PGN_DATABASE_MODEL_H
+#endif  // PGN_DATABASE_MODEL_H

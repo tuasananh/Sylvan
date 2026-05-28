@@ -45,9 +45,9 @@ class GenericMove;
 class MoveList : public QWidget {
   Q_OBJECT
 
-public:
+ public:
   /*! Constructs a move list with the given \a parent. */
-  MoveList(QWidget *parent = nullptr);
+  MoveList(QWidget* parent = nullptr);
 
   /*!
    * Associates \a game and \a pgn with this document.
@@ -55,9 +55,9 @@ public:
    * Either \a game or \a pgn must not be NULL.
    * If \a pgn is NULL, then the PGN data is retrieved from \a game.
    */
-  void setGame(ChessGame *game, PgnGame *pgn = nullptr);
+  void setGame(ChessGame* game, PgnGame* pgn = nullptr);
 
-public slots:
+ public slots:
   /*!
    * Highlights move \a moveNum.
    *
@@ -66,10 +66,10 @@ public slots:
    */
   bool selectMove(int moveNum);
   /*! Updates the move at \a ply */
-  void setMove(int ply, const Chess::GenericMove &move,
-               const QString &sanString, const QString &comment);
+  void setMove(int ply, const Chess::GenericMove& move,
+               const QString& sanString, const QString& comment);
 
-signals:
+ signals:
   /*!
    * Emitted when the user selects move \a num.
    *
@@ -78,29 +78,29 @@ signals:
    */
   void moveClicked(int num, bool keyLeft);
   /*! Emitted when the user clicks comment \a num. */
-  void commentClicked(int num, const QString &comment);
+  void commentClicked(int num, const QString& comment);
 
-protected:
+ protected:
   // Reimplemented from QWidget
-  virtual bool eventFilter(QObject *obj, QEvent *event);
+  virtual bool eventFilter(QObject* obj, QEvent* event);
 
-private slots:
-  void onMoveMade(const Chess::GenericMove &move, const QString &sanString,
-                  const QString &comment);
-  void onLinkClicked(const QUrl &url);
+ private slots:
+  void onMoveMade(const Chess::GenericMove& move, const QString& sanString,
+                  const QString& comment);
+  void onLinkClicked(const QUrl& url);
   void selectChosenMove();
 
-private:
+ private:
   struct Move {
     MoveNumberToken number;
     MoveToken move;
     MoveCommentToken comment;
   };
 
-  void insertMove(int ply, const QString &san, const QString &comment,
+  void insertMove(int ply, const QString& san, const QString& comment,
                   QTextCursor cursor = QTextCursor());
 
-  QTextBrowser *m_moveList;
+  QTextBrowser* m_moveList;
   QPointer<ChessGame> m_game;
   QList<Move> m_moves;
   int m_moveCount;
@@ -108,7 +108,7 @@ private:
   int m_selectedMove;
   int m_moveToBeSelected;
   QTextCharFormat m_defaultTextFormat;
-  QTimer *m_selectionTimer;
+  QTimer* m_selectionTimer;
 };
 
-#endif // MOVE_LIST_H
+#endif  // MOVE_LIST_H

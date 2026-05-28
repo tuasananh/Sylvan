@@ -1,10 +1,11 @@
-#include <QtTest/QtTest>
 #include <mersenne.h>
+
+#include <QtTest/QtTest>
 
 class tst_Mersenne : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void numbers_data();
   void numbers();
 };

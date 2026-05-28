@@ -28,7 +28,7 @@
  * \brief A text or HTML token in a PGN game.
  */
 class PgnToken {
-public:
+ public:
   /*! Creates a new PgnToken. */
   PgnToken();
   /*! Destroys the PgnToken. */
@@ -47,24 +47,24 @@ public:
    * Inserts the token into the document.
    * This method calls the subclass' \a vInsert() method.
    */
-  void insert(QTextCursor &cursor);
+  void insert(QTextCursor& cursor);
   /*! Selects the token with \a cursor. */
-  void select(QTextCursor &cursor);
+  void select(QTextCursor& cursor);
   /*! Moves the token's begin and end positions by \a diff. */
   void move(int diff);
   /*! Merges the token's character format with \a format. */
-  void mergeCharFormat(QTextCursor &cursor, const QTextCharFormat &format);
+  void mergeCharFormat(QTextCursor& cursor, const QTextCharFormat& format);
 
-protected:
+ protected:
   /*!
    * Subclasses must implement this function to insert the
    * token into the document using \a cursor.
    */
-  virtual void vInsert(QTextCursor &cursor) = 0;
+  virtual void vInsert(QTextCursor& cursor) = 0;
 
-private:
+ private:
   int m_begin;
   int m_end;
 };
 
-#endif // PGNTOKEN_H
+#endif  // PGNTOKEN_H

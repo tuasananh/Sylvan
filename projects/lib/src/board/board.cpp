@@ -18,12 +18,14 @@
 */
 
 #include "board.h"
-#include "zobrist.h"
+
 #include <QStringList>
+
+#include "zobrist.h"
 
 namespace Chess {
 
-QDebug operator<<(QDebug dbg, const Board *board) {
+QDebug operator<<(QDebug dbg, const Board* board) {
   QString str = "FEN: " + board->fenString() + '\n';
   str += Board::tr("Zobrist key") + ": 0x" +
          QString::number(board->m_key, 16).toUpper() + '\n';
@@ -48,9 +50,14 @@ QDebug operator<<(QDebug dbg, const Board *board) {
   return dbg.space();
 }
 
-Board::Board(Zobrist *zobrist)
-    : m_initialized(false), m_width(0), m_height(0), m_side(Side::Red),
-      m_startingSide(Side::Red), m_key(0), m_zobrist(zobrist),
+Board::Board(Zobrist* zobrist)
+    : m_initialized(false),
+      m_width(0),
+      m_height(0),
+      m_side(Side::Red),
+      m_startingSide(Side::Red),
+      m_key(0),
+      m_zobrist(zobrist),
       m_sharedZobrist(zobrist) {
   Q_ASSERT(zobrist != nullptr);
 
@@ -65,15 +72,13 @@ QList<Piece> Board::reservePieceTypes() const { return QList<Piece>(); }
 
 Side Board::upperCaseSide() const { return Side::Red; }
 
-Piece Board::pieceAt(const Square &square) const {
-  if (!isValidSquare(square))
-    return Piece::WallPiece;
+Piece Board::pieceAt(const Square& square) const {
+  if (!isValidSquare(square)) return Piece::WallPiece;
   return pieceAt(squareIndex(square));
 }
 
 void Board::initialize() {
-  if (m_initialized)
-    return;
+  if (m_initialized) return;
 
   m_initialized = true;
   m_width = width();
@@ -85,12 +90,11 @@ void Board::initialize() {
   m_zobrist->initialize((m_width + 2) * (m_height + 4), m_pieceData.size());
 }
 
-void Board::setPieceType(int type, const QString &name, const QString &symbol,
-                         const QString &gsymbol) {
-  if (type >= m_pieceData.size())
-    m_pieceData.resize(type + 1);
+void Board::setPieceType(int type, const QString& name, const QString& symbol,
+                         const QString& gsymbol) {
+  if (type >= m_pieceData.size()) m_pieceData.resize(type + 1);
 
-  const QString &graphicalSymbol = gsymbol.isEmpty() ? symbol : gsymbol;
+  const QString& graphicalSymbol = gsymbol.isEmpty() ? symbol : gsymbol;
 
   PieceData data = {name, symbol.toUpper(), graphicalSymbol.toUpper()};
   m_pieceData[type] = data;
@@ -98,17 +102,14 @@ void Board::setPieceType(int type, const QString &name, const QString &symbol,
 
 QString Board::pieceSymbol(Piece piece) const {
   int type = piece.type();
-  if (type <= 0 || type >= m_pieceData.size())
-    return QString();
+  if (type <= 0 || type >= m_pieceData.size()) return QString();
 
-  if (piece.side() == upperCaseSide())
-    return m_pieceData[type].symbol;
+  if (piece.side() == upperCaseSide()) return m_pieceData[type].symbol;
   return m_pieceData[type].symbol.toLower();
 }
 
-Piece Board::pieceFromSymbol(const QString &pieceSymbol) const {
-  if (pieceSymbol.isEmpty())
-    return Piece::NoPiece;
+Piece Board::pieceFromSymbol(const QString& pieceSymbol) const {
+  if (pieceSymbol.isEmpty()) return Piece::NoPiece;
 
   int code = Piece::NoPiece;
   QString symbol = pieceSymbol.toUpper();
@@ -119,28 +120,23 @@ Piece Board::pieceFromSymbol(const QString &pieceSymbol) const {
       break;
     }
   }
-  if (code == Piece::NoPiece)
-    return code;
+  if (code == Piece::NoPiece) return code;
 
   Side side(upperCaseSide());
-  if (pieceSymbol == symbol)
-    return Piece(side, code);
+  if (pieceSymbol == symbol) return Piece(side, code);
   return Piece(side.opposite(), code);
 }
 
 QString Board::pieceString(int pieceType) const {
-  if (pieceType <= 0 || pieceType >= m_pieceData.size())
-    return QString();
+  if (pieceType <= 0 || pieceType >= m_pieceData.size()) return QString();
   return m_pieceData[pieceType].name;
 }
 
 QString Board::representation(Piece piece) const {
   int type = piece.type();
-  if (type <= 0 || type >= m_pieceData.size())
-    return QString();
+  if (type <= 0 || type >= m_pieceData.size()) return QString();
 
-  if (piece.side() == upperCaseSide())
-    return m_pieceData[type].representation;
+  if (piece.side() == upperCaseSide()) return m_pieceData[type].representation;
   return m_pieceData[type].representation.toLower();
 }
 
@@ -153,33 +149,28 @@ Square Board::chessSquare(int index) const {
   return Square(file, rank);
 }
 
-int Board::squareIndex(const Square &square) const {
-  if (!isValidSquare(square))
-    return 0;
+int Board::squareIndex(const Square& square) const {
+  if (!isValidSquare(square)) return 0;
 
   int rank = (m_height - 1) - square.rank();
   return (rank + 2) * (m_width + 2) + 1 + square.file();
 }
 
-bool Board::isValidSquare(const Chess::Square &square) const {
+bool Board::isValidSquare(const Chess::Square& square) const {
   if (!square.isValid() || square.file() >= m_width ||
       square.rank() >= m_height)
     return false;
   return true;
 }
 
-bool Board::isInFort(const Square &square) const {
+bool Board::isInFort(const Square& square) const {
   int f = square.file();
   int r = square.rank();
 
-  if (f < 3)
-    return false;
-  if (f > 5)
-    return false;
-  if (r > 6)
-    return true;
-  if (r < 3)
-    return true;
+  if (f < 3) return false;
+  if (f > 5) return false;
+  if (r > 6) return true;
+  if (r < 3) return true;
   return false;
 }
 
@@ -187,9 +178,8 @@ QString Board::squareString(int index) const {
   return squareString(chessSquare(index));
 }
 
-QString Board::squareString(const Square &square) const {
-  if (!square.isValid())
-    return QString();
+QString Board::squareString(const Square& square) const {
+  if (!square.isValid()) return QString();
 
   QString str;
 
@@ -199,9 +189,8 @@ QString Board::squareString(const Square &square) const {
   return str;
 }
 
-Square Board::chessSquare(const QString &str) const {
-  if (str.length() < 2)
-    return Square();
+Square Board::chessSquare(const QString& str) const {
+  if (str.length() < 2) return Square();
 
   bool ok = false;
   int file = 0;
@@ -210,16 +199,15 @@ Square Board::chessSquare(const QString &str) const {
   file = str.at(0).toLatin1() - 'a';
   rank = str.midRef(1).toInt(&ok);
 
-  if (!ok)
-    return Square();
+  if (!ok) return Square();
   return Square(file, rank);
 }
 
-int Board::squareIndex(const QString &str) const {
+int Board::squareIndex(const QString& str) const {
   return squareIndex(chessSquare(str));
 }
 
-QString Board::lanMoveString(const Move &move) {
+QString Board::lanMoveString(const Move& move) {
   QString str;
 
   str += squareString(move.sourceSquare());
@@ -228,25 +216,22 @@ QString Board::lanMoveString(const Move &move) {
   return str;
 }
 
-QString Board::moveString(const Move &move, MoveNotation notation) {
-  if (notation == Standard)
-    return standardMoveString(move);
+QString Board::moveString(const Move& move, MoveNotation notation) {
+  if (notation == Standard) return standardMoveString(move);
   return lanMoveString(move);
 }
 
-Move Board::moveFromEnglishString(const QString &istr) {
+Move Board::moveFromEnglishString(const QString& istr) {
   QString str(istr);
   str.remove(QRegExp("[x=+#!?]"));
   int len = str.length();
 
-  if (len < 4)
-    return Move();
+  if (len < 4) return Move();
 
   for (int i = 2; i < len - 1; i++) {
     Square sourceSq(chessSquare(str.mid(0, i)));
     Square targetSq(chessSquare(str.mid(i, len - i)));
-    if (!isValidSquare(sourceSq) || !isValidSquare(targetSq))
-      continue;
+    if (!isValidSquare(sourceSq) || !isValidSquare(targetSq)) continue;
     int source = squareIndex(sourceSq);
     int target = squareIndex(targetSq);
 
@@ -256,22 +241,21 @@ Move Board::moveFromEnglishString(const QString &istr) {
   return Move();
 }
 
-Move Board::moveFromString(const QString &str) {
+Move Board::moveFromString(const QString& str) {
   Move move;
   move = moveFromEnglishString(str);
-  if (!isLegalMove(move))
-    return Move();
+  if (!isLegalMove(move)) return Move();
   return move;
 }
 
-Move Board::moveFromGenericMove(const GenericMove &move) const {
+Move Board::moveFromGenericMove(const GenericMove& move) const {
   int source = squareIndex(move.sourceSquare());
   int target = squareIndex(move.targetSquare());
 
   return Move(source, target);
 }
 
-GenericMove Board::genericMove(const Move &move) const {
+GenericMove Board::genericMove(const Move& move) const {
   int source = move.sourceSquare();
   int target = move.targetSquare();
 
@@ -284,8 +268,7 @@ QStringList Board::pieceList(Side side) const {
     for (int rank = 0; rank < width(); rank++) {
       Square sq = Chess::Square(file, rank);
       const Piece piece = pieceAt(sq);
-      if (piece.side() != side)
-        continue;
+      if (piece.side() != side) continue;
 
       QString s = pieceSymbol(piece).toUpper();
       s.append(squareString(sq));
@@ -302,13 +285,11 @@ QString Board::fenString(FenNotation notation) const {
   for (int y = 0; y < m_height; y++) {
     int nempty = 0;
     i++;
-    if (y > 0)
-      fen += '/';
+    if (y > 0) fen += '/';
     for (int x = 0; x < m_width; x++) {
       Piece pc = m_squares[i];
 
-      if (pc.isEmpty())
-        nempty++;
+      if (pc.isEmpty()) nempty++;
 
       // Add the number of empty successive squares
       // to the FEN string.
@@ -333,27 +314,24 @@ QString Board::fenString(FenNotation notation) const {
   return fen + vFenString(notation);
 }
 
-bool Board::setFenString(const QString &fen) {
+bool Board::setFenString(const QString& fen) {
   QStringList strList = fen.split(' ');
-  if (strList.isEmpty())
-    return false;
+  if (strList.isEmpty()) return false;
 
   QStringList::iterator token = strList.begin();
-  if (token->length() < m_height * 2)
-    return false;
+  if (token->length() < m_height * 2) return false;
 
   initialize();
 
   int square = 0;
   int nempty = 0;
-  int rankEndSquare = 0; // Last square of the previous rank
+  int rankEndSquare = 0;  // Last square of the previous rank
   int maxsymlen = 1;
   int boardSize = m_width * m_height;
   int k = (m_width + 2) * 2 + 1;
   QString pieceStr;
 
-  for (int i = 0; i < m_squares.size(); i++)
-    m_squares[i] = Piece::WallPiece;
+  for (int i = 0; i < m_squares.size(); i++) m_squares[i] = Piece::WallPiece;
   m_key = 0;
 
   for (int i = 0; i < token->length(); i++) {
@@ -361,13 +339,11 @@ bool Board::setFenString(const QString &fen) {
 
     // Move to the next rank
     if (c == '/') {
-      if (!pieceStr.isEmpty())
-        return false;
+      if (!pieceStr.isEmpty()) return false;
 
       // Reject the FEN string if the rank didn't
       // have exactly 'm_width' squares.
-      if (square - rankEndSquare != m_width)
-        return false;
+      if (square - rankEndSquare != m_width) return false;
       rankEndSquare = square;
       k += 2;
       continue;
@@ -375,8 +351,7 @@ bool Board::setFenString(const QString &fen) {
 
     // Wall square
     if (c == '*' && variantHasWallSquares()) {
-      if (!pieceStr.isEmpty())
-        return false;
+      if (!pieceStr.isEmpty()) return false;
       square++;
       k++;
       continue;
@@ -384,8 +359,7 @@ bool Board::setFenString(const QString &fen) {
 
     // Add empty squares
     if (c.isDigit()) {
-      if (!pieceStr.isEmpty())
-        return false;
+      if (!pieceStr.isEmpty()) return false;
 
       if (i < (token->length() - 1) && token->at(i + 1).isDigit()) {
         nempty = token->midRef(i, 2).toInt();
@@ -393,8 +367,7 @@ bool Board::setFenString(const QString &fen) {
       } else
         nempty = c.digitValue();
 
-      if (nempty > m_width || square + nempty > boardSize)
-        return false;
+      if (nempty > m_width || square + nempty > boardSize) return false;
       for (int j = 0; j < nempty; j++) {
         square++;
         setSquare(k++, Piece::NoPiece);
@@ -402,8 +375,7 @@ bool Board::setFenString(const QString &fen) {
       continue;
     }
 
-    if (square >= boardSize)
-      return false;
+    if (square >= boardSize) return false;
 
     // Read ahead for multi-character symbols
     for (int l = qMin(maxsymlen, token->length() - i); l > 0; l--) {
@@ -420,49 +392,41 @@ bool Board::setFenString(const QString &fen) {
     }
 
     // Left over: unknown symbols
-    if (!pieceStr.isEmpty())
-      return false;
+    if (!pieceStr.isEmpty()) return false;
   }
 
   // The board must have exactly 'boardSize' squares and each rank
   // must have exactly 'm_width' squares.
-  if (square != boardSize || square - rankEndSquare != m_width)
-    return false;
+  if (square != boardSize || square - rankEndSquare != m_width) return false;
 
   // Side to move
-  if (++token == strList.end())
-    return false;
+  if (++token == strList.end()) return false;
 
   m_side = Side(*token);
   m_startingSide = m_side;
 
-  if (m_side.isNull())
-    return false;
+  if (m_side.isNull()) return false;
 
   m_moveHistory.clear();
   m_startingFen = fen.split("moves")[0];
 
   // Let subclasses handle the rest of the FEN string
-  if (token != strList.end())
-    ++token;
+  if (token != strList.end()) ++token;
 
   strList.erase(strList.begin(), token);
 
-  if (!vSetFenString(strList))
-    return false;
+  if (!vSetFenString(strList)) return false;
 
-  if (m_side == Side::Red)
-    xorKey(m_zobrist->side());
+  if (m_side == Side::Red) xorKey(m_zobrist->side());
 
-  if (!isLegalPosition())
-    return false;
+  if (!isLegalPosition()) return false;
 
   return true;
 }
 
 void Board::reset() { setFenString(defaultFenString()); }
 
-void Board::makeMove(const Move &move, BoardTransition *transition) {
+void Board::makeMove(const Move& move, BoardTransition* transition) {
   Q_ASSERT(!m_side.isNull());
   Q_ASSERT(!move.isNull());
 
@@ -486,7 +450,7 @@ void Board::undoMove() {
   m_moveHistory.pop_back();
 }
 
-void Board::generateMoves(QVarLengthArray<Move> &moves, int pieceType) const {
+void Board::generateMoves(QVarLengthArray<Move>& moves, int pieceType) const {
   Q_ASSERT(!m_side.isNull());
 
   // Cut the wall squares (the ones with a value of WallPiece) off
@@ -504,13 +468,12 @@ void Board::generateMoves(QVarLengthArray<Move> &moves, int pieceType) const {
 }
 
 void Board::generateHoppingMoves(int sourceSquare,
-                                 const QVarLengthArray<int> &offsets,
-                                 QVarLengthArray<Move> &moves) const {
+                                 const QVarLengthArray<int>& offsets,
+                                 QVarLengthArray<Move>& moves) const {
   Side opSide = sideToMove().opposite();
   for (int i = 0; i < offsets.size(); i++) {
     int targetSquare = sourceSquare + offsets[i];
-    if (!isValidSquare(chessSquare(targetSquare)))
-      continue;
+    if (!isValidSquare(chessSquare(targetSquare))) continue;
     Piece capture = pieceAt(targetSquare);
     if (capture.isEmpty() || capture.side() == opSide)
       moves.append(Move(sourceSquare, targetSquare));
@@ -518,8 +481,8 @@ void Board::generateHoppingMoves(int sourceSquare,
 }
 
 void Board::generateCheMoves(int sourceSquare,
-                             const QVarLengthArray<int> &offsets,
-                             QVarLengthArray<Move> &moves) const {
+                             const QVarLengthArray<int>& offsets,
+                             QVarLengthArray<Move>& moves) const {
   Side side = sideToMove();
   for (int i = 0; i < offsets.size(); i++) {
     int offset = offsets[i];
@@ -528,42 +491,37 @@ void Board::generateCheMoves(int sourceSquare,
     while (!(capture = pieceAt(targetSquare)).isWall() &&
            capture.side() != side) {
       moves.append(Move(sourceSquare, targetSquare));
-      if (!capture.isEmpty())
-        break;
+      if (!capture.isEmpty()) break;
       targetSquare += offset;
     }
   }
 }
 
-bool Board::moveExists(const Move &move) const {
+bool Board::moveExists(const Move& move) const {
   Q_ASSERT(!move.isNull());
 
   int source = move.sourceSquare();
   QVarLengthArray<Move> moves;
   Piece piece = m_squares[source];
 
-  if (piece.side() != m_side)
-    return false;
+  if (piece.side() != m_side) return false;
   generateMovesForPiece(moves, piece.type(), source);
 
   for (int i = 0; i < moves.size(); i++)
-    if (moves[i] == move)
-      return true;
+    if (moves[i] == move) return true;
 
   return false;
 }
 
-int Board::captureType(const Move &move) const {
+int Board::captureType(const Move& move) const {
   Q_ASSERT(!move.isNull());
 
   Piece piece(m_squares[move.targetSquare()]);
-  if (piece.side() == m_side.opposite())
-    return piece.type();
+  if (piece.side() == m_side.opposite()) return piece.type();
   return Piece::NoPiece;
 }
 
 bool Board::vIsBan() {
-
   bool isBan = false;
 
   int n = 0;
@@ -573,29 +531,24 @@ bool Board::vIsBan() {
   quint64 last_key = m_key;
 
   for (int i = plyCount() - 1; i >= 0; i--) {
-    if (!inCheck(sideToMove()))
-      moCheck[1 & n] = 0;
+    if (!inCheck(sideToMove())) moCheck[1 & n] = 0;
 
     undoMove();
 
-    if (m_key == last_key)
-      break;
-    if ((moCheck[0] + moCheck[1] + moCap[0] + moCap[1]) == 0)
-      return false;
+    if (m_key == last_key) break;
+    if ((moCheck[0] + moCheck[1] + moCap[0] + moCap[1]) == 0) return false;
 
     n++;
   }
 
   n--;
-  if ((moCheck[1] + moCheck[0]) == 2)
-    return false;
-  if (moCheck[1 & n])
-    return true;
+  if ((moCheck[1] + moCheck[0]) == 2) return false;
+  if (moCheck[1 & n]) return true;
 
   return isBan;
 }
 
-bool Board::vIsLegalMove(const Move &move) {
+bool Board::vIsLegalMove(const Move& move) {
   Q_ASSERT(!move.isNull());
 
   int repeatCount = 0;
@@ -610,7 +563,7 @@ bool Board::vIsLegalMove(const Move &move) {
 
     // Repeat twice to determine if it was a foul
     if (repeatCount >= 2) {
-      Board *newB = this->copy();
+      Board* newB = this->copy();
       isBan = newB->vIsBan();
       delete newB;
     }
@@ -618,31 +571,28 @@ bool Board::vIsLegalMove(const Move &move) {
 
   undoMove();
 
-  if (isBan)
-    return false;
+  if (isBan) return false;
 
   return isLegal;
 }
 
-bool Board::isLegalMove(const Move &move) {
+bool Board::isLegalMove(const Move& move) {
   return !move.isNull() && moveExists(move) && vIsLegalMove(move);
 }
 
 int Board::repeatCount() const {
-  if (plyCount() < 4)
-    return 0;
+  if (plyCount() < 4) return 0;
 
   int repeatCount = 0;
   for (int i = plyCount() - 1; i >= 0; i--)
-    if (m_moveHistory.at(i).key == m_key)
-      repeatCount++;
+    if (m_moveHistory.at(i).key == m_key) repeatCount++;
 
   return repeatCount;
 }
 
 int Board::reversibleMoveCount() const { return -1; }
 
-bool Board::isRepetition(const Chess::Move &move) {
+bool Board::isRepetition(const Chess::Move& move) {
   Q_ASSERT(!move.isNull());
 
   makeMove(move);
@@ -658,8 +608,7 @@ bool Board::canMove() {
   generateMoves(moves);
 
   for (int i = 0; i < moves.size(); i++)
-    if (vIsLegalMove(moves[i]))
-      return true;
+    if (vIsLegalMove(moves[i])) return true;
 
   return false;
 }
@@ -672,16 +621,15 @@ QVector<Move> Board::legalMoves() {
   legalMoves.reserve(moves.size());
 
   for (int i = moves.size() - 1; i >= 0; i--)
-    if (vIsLegalMove(moves[i]))
-      legalMoves << moves[i];
+    if (vIsLegalMove(moves[i])) legalMoves << moves[i];
 
   return legalMoves;
 }
 
-Result Board::tablebaseResult(unsigned int *dtm) const {
+Result Board::tablebaseResult(unsigned int* dtm) const {
   Q_UNUSED(dtm);
 
   return Result();
 }
 
-} // namespace Chess
+}  // namespace Chess

@@ -25,11 +25,11 @@
 class EngineOption;
 
 class LIB_EXPORT EngineOptionFactory {
-public:
-  static EngineOption *create(const QVariantMap &map);
+ public:
+  static EngineOption* create(const QVariantMap& map);
 
-private:
+ private:
   EngineOptionFactory();
 };
 
-#endif // ENGINE_OPTION_FACTORY_H
+#endif  // ENGINE_OPTION_FACTORY_H

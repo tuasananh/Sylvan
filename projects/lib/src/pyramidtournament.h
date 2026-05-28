@@ -31,22 +31,22 @@
 class LIB_EXPORT PyramidTournament : public Tournament {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new Pyramid tournament. */
-  explicit PyramidTournament(GameManager *gameManager,
-                             QObject *parent = nullptr);
+  explicit PyramidTournament(GameManager* gameManager,
+                             QObject* parent = nullptr);
   // Inherited from Tournament
   virtual QString type() const;
 
-protected:
+ protected:
   // Inherited from Tournament
   virtual void initializePairing();
   virtual int gamesPerCycle() const;
-  virtual TournamentPair *nextPair(int gameNumber);
+  virtual TournamentPair* nextPair(int gameNumber);
 
-private:
+ private:
   int m_pairNumber;
   int m_currentPlayer;
 };
 
-#endif // PYRAMIDTOURNAMENT_H
+#endif  // PYRAMIDTOURNAMENT_H

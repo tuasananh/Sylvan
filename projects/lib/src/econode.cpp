@@ -1,50 +1,47 @@
 
+#include <econode.h>
+#include <pgnstream.h>
+
 #include <QDataStream>
 #include <QFile>
 #include <QMutex>
 #include <QStringList>
-
-#include <econode.h>
-#include <pgnstream.h>
 
 #include "pgngame.h"
 
 namespace {
 
 QStringList s_openings;
-EcoNode *s_root = nullptr;
+EcoNode* s_root = nullptr;
 
 class EcoDeleter {
-public:
+ public:
   ~EcoDeleter() { delete s_root; }
 };
 EcoDeleter s_ecoDeleter;
 
-int ecoFromString(const QString &ecoString) {
-  if (ecoString.length() < 2)
-    return -1;
+int ecoFromString(const QString& ecoString) {
+  if (ecoString.length() < 2) return -1;
   int hundreds = ecoString.at(0).toUpper().toLatin1() - 'A';
 
   bool ok = false;
   int tens = ecoString.right(ecoString.length() - 1).toInt(&ok);
-  if (!ok)
-    return -1;
+  if (!ok) return -1;
 
   return hundreds * 100 + tens;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-QDataStream &operator<<(QDataStream &out, const EcoNode *node) {
-  if (!node)
-    return out;
+QDataStream& operator<<(QDataStream& out, const EcoNode* node) {
+  if (!node) return out;
   out << node->m_ecoCode << node->m_opening << node->m_variation
       << node->m_children;
 
   return out;
 }
 
-QDataStream &operator>>(QDataStream &in, EcoNode *&node) {
+QDataStream& operator>>(QDataStream& in, EcoNode*& node) {
   node = new EcoNode;
 
   in >> node->m_ecoCode >> node->m_opening >> node->m_variation >>
@@ -55,8 +52,7 @@ QDataStream &operator>>(QDataStream &in, EcoNode *&node) {
 
 void EcoNode::initialize() {
   static QMutex mutex;
-  if (s_root)
-    return;
+  if (s_root) return;
 
   mutex.lock();
   if (!s_root) {
@@ -74,9 +70,8 @@ void EcoNode::initialize() {
   mutex.unlock();
 }
 
-void EcoNode::initialize(PgnStream &in) {
-  if (s_root)
-    return;
+void EcoNode::initialize(PgnStream& in) {
+  if (s_root) return;
 
   if (!in.isOpen()) {
     qWarning("The pgn stream is not open");
@@ -84,23 +79,22 @@ void EcoNode::initialize(PgnStream &in) {
   }
 
   s_root = new EcoNode;
-  EcoNode *current = s_root;
+  EcoNode* current = s_root;
   QMap<QString, int> tmpOpenings;
 
   PgnGame game;
   while (game.read(in, INT_MAX - 1, false)) {
     current = s_root;
-    for (const PgnGame::MoveData &move : game.moves()) {
+    for (const PgnGame::MoveData& move : game.moves()) {
       QString san = move.moveString;
-      EcoNode *node = current->child(san);
+      EcoNode* node = current->child(san);
       if (node == nullptr) {
         node = new EcoNode;
         current->addChild(san, node);
       }
       current = node;
     }
-    if (current == s_root)
-      continue;
+    if (current == s_root) continue;
 
     current->m_ecoCode = ecoFromString(game.tagValue("ECO"));
 
@@ -119,34 +113,29 @@ void EcoNode::initialize(PgnStream &in) {
   }
 }
 
-const EcoNode *EcoNode::root() {
-  if (!s_root)
-    initialize();
+const EcoNode* EcoNode::root() {
+  if (!s_root) initialize();
   return s_root;
 }
 
-const EcoNode *EcoNode::find(const QVector<PgnGame::MoveData> &moves) {
-  if (!s_root)
-    return nullptr;
+const EcoNode* EcoNode::find(const QVector<PgnGame::MoveData>& moves) {
+  if (!s_root) return nullptr;
 
-  EcoNode *current = s_root;
-  EcoNode *valid = nullptr;
+  EcoNode* current = s_root;
+  EcoNode* valid = nullptr;
 
-  for (const PgnGame::MoveData &move : moves) {
-    EcoNode *node = current->child(move.moveString);
-    if (node == nullptr)
-      return valid;
-    if (!node->opening().isEmpty())
-      valid = node;
+  for (const PgnGame::MoveData& move : moves) {
+    EcoNode* node = current->child(move.moveString);
+    if (node == nullptr) return valid;
+    if (!node->opening().isEmpty()) valid = node;
     current = node;
   }
 
   return nullptr;
 }
 
-void EcoNode::write(const QString &fileName) {
-  if (!s_root)
-    return;
+void EcoNode::write(const QString& fileName) {
+  if (!s_root) return;
 
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly)) {
@@ -166,8 +155,7 @@ EcoNode::~EcoNode() { qDeleteAll(m_children); }
 bool EcoNode::isLeaf() const { return m_ecoCode != -1; }
 
 QString EcoNode::ecoCode() const {
-  if (m_ecoCode == -1)
-    return QString();
+  if (m_ecoCode == -1) return QString();
 
   QChar segment('A' + m_ecoCode / 100);
   return segment + QString("%1").arg(m_ecoCode % 100, 2, 10, QChar('0'));
@@ -179,10 +167,10 @@ QString EcoNode::opening() const {
 
 QString EcoNode::variation() const { return m_variation; }
 
-EcoNode *EcoNode::child(const QString &sanMove) const {
+EcoNode* EcoNode::child(const QString& sanMove) const {
   return m_children.value(sanMove);
 }
 
-void EcoNode::addChild(const QString &sanMove, EcoNode *child) {
+void EcoNode::addChild(const QString& sanMove, EcoNode* child) {
   m_children[sanMove] = child;
 }

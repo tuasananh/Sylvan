@@ -26,27 +26,27 @@
 class TileLayout : public QLayout {
   Q_OBJECT
 
-public:
-  explicit TileLayout(QWidget *parent = nullptr);
+ public:
+  explicit TileLayout(QWidget* parent = nullptr);
   virtual ~TileLayout();
 
   // Inherited from QLayout
-  void addItem(QLayoutItem *item);
+  void addItem(QLayoutItem* item);
   Qt::Orientations expandingDirections() const;
   int count() const;
-  QLayoutItem *itemAt(int index) const;
+  QLayoutItem* itemAt(int index) const;
   QSize minimumSize() const;
-  void setGeometry(const QRect &rect);
+  void setGeometry(const QRect& rect);
   QSize sizeHint() const;
-  QLayoutItem *takeAt(int index);
+  QLayoutItem* takeAt(int index);
 
-private:
+ private:
   int horizontalSpacing() const;
   int verticalSpacing() const;
-  void doLayout(const QRect &rect) const;
+  void doLayout(const QRect& rect) const;
   int smartSpacing(QStyle::PixelMetric pm) const;
 
-  QList<QLayoutItem *> m_items;
+  QList<QLayoutItem*> m_items;
 };
 
-#endif // TILELAYOUT_H
+#endif  // TILELAYOUT_H

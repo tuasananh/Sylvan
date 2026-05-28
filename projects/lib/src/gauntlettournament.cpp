@@ -18,33 +18,32 @@
 */
 
 #include "gauntlettournament.h"
-#include "chessgame.h"
+
 #include <algorithm>
 
-GauntletTournament::GauntletTournament(GameManager *gameManager,
-                                       QObject *parent)
+#include "chessgame.h"
+
+GauntletTournament::GauntletTournament(GameManager* gameManager,
+                                       QObject* parent)
     : Tournament(gameManager, parent), m_opponent(-1) {}
 
 QString GauntletTournament::type() const { return "gauntlet"; }
 
-void GauntletTournament::onGameAboutToStart(ChessGame *game,
-                                            const PlayerBuilder *red,
-                                            const PlayerBuilder *black) {
+void GauntletTournament::onGameAboutToStart(ChessGame* game,
+                                            const PlayerBuilder* red,
+                                            const PlayerBuilder* black) {
   Q_UNUSED(black);
   const int blackIndex = playerIndex(game, Chess::Side::Black);
-  if (!red->isHuman() && blackIndex == 0)
-    game->setBoardShouldBeFlipped(true);
+  if (!red->isHuman() && blackIndex == 0) game->setBoardShouldBeFlipped(true);
 }
 
 void GauntletTournament::initializePairing() { m_opponent = 1; }
 
 int GauntletTournament::gamesPerCycle() const { return playerCount() - 1; }
 
-TournamentPair *GauntletTournament::nextPair(int gameNumber) {
-  if (gameNumber >= finalGameCount())
-    return nullptr;
-  if (gameNumber % gamesPerEncounter() != 0)
-    return currentPair();
+TournamentPair* GauntletTournament::nextPair(int gameNumber) {
+  if (gameNumber >= finalGameCount()) return nullptr;
+  if (gameNumber % gamesPerEncounter() != 0) return currentPair();
 
   if (m_opponent >= playerCount()) {
     m_opponent = 1;

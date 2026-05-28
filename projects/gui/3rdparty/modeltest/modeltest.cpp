@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "modeltest.h"
+
 #include <QtGui/QtGui>
 #include <QtTest/QtTest>
 
@@ -49,34 +50,32 @@ Q_DECLARE_METATYPE(QModelIndex)
     Connect to all of the models signals.  Whenever anything happens recheck
    everything.
 */
-ModelTest::ModelTest(QAbstractItemModel *_model, QObject *parent)
+ModelTest::ModelTest(QAbstractItemModel* _model, QObject* parent)
     : QObject(parent), model(_model), fetchingMore(false) {
-  if (!model)
-    qFatal("%s: model must not be null", Q_FUNC_INFO);
+  if (!model) qFatal("%s: model must not be null", Q_FUNC_INFO);
 
-  connect(model,
-          SIGNAL(columnsAboutToBeInserted(const QModelIndex &, int, int)), this,
-          SLOT(runAllTests()));
-  connect(model, SIGNAL(columnsAboutToBeRemoved(const QModelIndex &, int, int)),
+  connect(model, SIGNAL(columnsAboutToBeInserted(const QModelIndex&, int, int)),
           this, SLOT(runAllTests()));
-  connect(model, SIGNAL(columnsInserted(const QModelIndex &, int, int)), this,
+  connect(model, SIGNAL(columnsAboutToBeRemoved(const QModelIndex&, int, int)),
+          this, SLOT(runAllTests()));
+  connect(model, SIGNAL(columnsInserted(const QModelIndex&, int, int)), this,
           SLOT(runAllTests()));
-  connect(model, SIGNAL(columnsRemoved(const QModelIndex &, int, int)), this,
+  connect(model, SIGNAL(columnsRemoved(const QModelIndex&, int, int)), this,
           SLOT(runAllTests()));
-  connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+  connect(model, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
           this, SLOT(runAllTests()));
   connect(model, SIGNAL(headerDataChanged(Qt::Orientation, int, int)), this,
           SLOT(runAllTests()));
   connect(model, SIGNAL(layoutAboutToBeChanged()), this, SLOT(runAllTests()));
   connect(model, SIGNAL(layoutChanged()), this, SLOT(runAllTests()));
   connect(model, SIGNAL(modelReset()), this, SLOT(runAllTests()));
-  connect(model, SIGNAL(rowsAboutToBeInserted(const QModelIndex &, int, int)),
+  connect(model, SIGNAL(rowsAboutToBeInserted(const QModelIndex&, int, int)),
           this, SLOT(runAllTests()));
-  connect(model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),
+  connect(model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
           this, SLOT(runAllTests()));
-  connect(model, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this,
+  connect(model, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this,
           SLOT(runAllTests()));
-  connect(model, SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this,
+  connect(model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this,
           SLOT(runAllTests()));
 
   // Special checks for inserting/removing
@@ -84,21 +83,20 @@ ModelTest::ModelTest(QAbstractItemModel *_model, QObject *parent)
           SLOT(layoutAboutToBeChanged()));
   connect(model, SIGNAL(layoutChanged()), this, SLOT(layoutChanged()));
 
-  connect(model, SIGNAL(rowsAboutToBeInserted(const QModelIndex &, int, int)),
-          this, SLOT(rowsAboutToBeInserted(const QModelIndex &, int, int)));
-  connect(model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),
-          this, SLOT(rowsAboutToBeRemoved(const QModelIndex &, int, int)));
-  connect(model, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this,
-          SLOT(rowsInserted(const QModelIndex &, int, int)));
-  connect(model, SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this,
-          SLOT(rowsRemoved(const QModelIndex &, int, int)));
+  connect(model, SIGNAL(rowsAboutToBeInserted(const QModelIndex&, int, int)),
+          this, SLOT(rowsAboutToBeInserted(const QModelIndex&, int, int)));
+  connect(model, SIGNAL(rowsAboutToBeRemoved(const QModelIndex&, int, int)),
+          this, SLOT(rowsAboutToBeRemoved(const QModelIndex&, int, int)));
+  connect(model, SIGNAL(rowsInserted(const QModelIndex&, int, int)), this,
+          SLOT(rowsInserted(const QModelIndex&, int, int)));
+  connect(model, SIGNAL(rowsRemoved(const QModelIndex&, int, int)), this,
+          SLOT(rowsRemoved(const QModelIndex&, int, int)));
 
   runAllTests();
 }
 
 void ModelTest::runAllTests() {
-  if (fetchingMore)
-    return;
+  if (fetchingMore) return;
   nonDestructiveBasicTest();
   rowCount();
   columnCount();
@@ -155,16 +153,14 @@ void ModelTest::rowCount() {
   QModelIndex topIndex = model->index(0, 0, QModelIndex());
   int rows = model->rowCount(topIndex);
   QVERIFY(rows >= 0);
-  if (rows > 0)
-    QVERIFY(model->hasChildren(topIndex));
+  if (rows > 0) QVERIFY(model->hasChildren(topIndex));
 
   QModelIndex secondLevelIndex = model->index(0, 0, topIndex);
-  if (secondLevelIndex.isValid()) { // not the top level
+  if (secondLevelIndex.isValid()) {  // not the top level
     // Check a row count where parent is valid
     rows = model->rowCount(secondLevelIndex);
     QVERIFY(rows >= 0);
-    if (rows > 0)
-      QVERIFY(model->hasChildren(secondLevelIndex));
+    if (rows > 0) QVERIFY(model->hasChildren(secondLevelIndex));
   }
 
   // The models rowCount() is tested more extensively in checkChildren(),
@@ -182,8 +178,7 @@ void ModelTest::columnCount() {
 
   // Check a column count where parent is valid
   QModelIndex childIndex = model->index(0, 0, topIndex);
-  if (childIndex.isValid())
-    QVERIFY(model->columnCount(childIndex) >= 0);
+  if (childIndex.isValid()) QVERIFY(model->columnCount(childIndex) >= 0);
 
   // columnCount() is tested more extensively in checkChildren(),
   // but this catches the big mistakes
@@ -206,8 +201,7 @@ void ModelTest::hasIndex() {
   QVERIFY(!model->hasIndex(rows, columns));
   QVERIFY(!model->hasIndex(rows + 1, columns + 1));
 
-  if (rows > 0)
-    QVERIFY(model->hasIndex(0, 0));
+  if (rows > 0) QVERIFY(model->hasIndex(0, 0));
 
   // hasIndex() is tested more extensively in checkChildren(),
   // but this catches the big mistakes
@@ -226,8 +220,7 @@ void ModelTest::index() {
   int rows = model->rowCount();
   int columns = model->columnCount();
 
-  if (rows == 0)
-    return;
+  if (rows == 0) return;
 
   // Catch off by one errors
   QVERIFY(model->index(rows, columns) == QModelIndex());
@@ -251,8 +244,7 @@ void ModelTest::parent() {
   // when asked for the parent of an invalid index.
   QVERIFY(model->parent(QModelIndex()) == QModelIndex());
 
-  if (model->rowCount() == 0)
-    return;
+  if (model->rowCount() == 0) return;
 
   // Column 0                | Column 1    |
   // QModelIndex()           |             |
@@ -300,11 +292,10 @@ void ModelTest::parent() {
    have already found the basic bugs because it is easier to figure out the
    problem in those tests then this one.
  */
-void ModelTest::checkChildren(const QModelIndex &parent, int currentDepth) {
+void ModelTest::checkChildren(const QModelIndex& parent, int currentDepth) {
   // First just try walking back up the tree.
   QModelIndex p = parent;
-  while (p.isValid())
-    p = p.parent();
+  while (p.isValid()) p = p.parent();
 
   // For models that are dynamically populated
   if (model->canFetchMore(parent)) {
@@ -316,14 +307,12 @@ void ModelTest::checkChildren(const QModelIndex &parent, int currentDepth) {
   int rows = model->rowCount(parent);
   int columns = model->columnCount(parent);
 
-  if (rows > 0)
-    QVERIFY(model->hasChildren(parent));
+  if (rows > 0) QVERIFY(model->hasChildren(parent));
 
   // Some further testing against rows(), columns(), and hasChildren()
   QVERIFY(rows >= 0);
   QVERIFY(columns >= 0);
-  if (rows > 0)
-    QVERIFY(model->hasChildren(parent));
+  if (rows > 0) QVERIFY(model->hasChildren(parent));
 
   // qDebug() << "parent:" << model->data(parent).toString() << "rows:" << rows
   // << "columns:" << columns << "parent column:" << parent.column();
@@ -381,8 +370,7 @@ void ModelTest::data() {
   // Invalid index should return an invalid qvariant
   QVERIFY(!model->data(QModelIndex()).isValid());
 
-  if (model->rowCount() == 0)
-    return;
+  if (model->rowCount() == 0) return;
 
   // A valid index should have a valid QVariant data
   QVERIFY(model->index(0, 0).isValid());
@@ -453,7 +441,7 @@ void ModelTest::data() {
 
     \sa rowsInserted()
  */
-void ModelTest::rowsAboutToBeInserted(const QModelIndex &parent, int start,
+void ModelTest::rowsAboutToBeInserted(const QModelIndex& parent, int start,
                                       int end) {
   Q_UNUSED(end);
   // qDebug() << "rowsAboutToBeInserted" << "start=" << start << "end=" << end
@@ -475,7 +463,7 @@ void ModelTest::rowsAboutToBeInserted(const QModelIndex &parent, int start,
 
     \sa rowsAboutToBeInserted()
  */
-void ModelTest::rowsInserted(const QModelIndex &parent, int start, int end) {
+void ModelTest::rowsInserted(const QModelIndex& parent, int start, int end) {
   Changing c = insert.pop();
   QVERIFY(c.parent == parent);
   // qDebug() << "rowsInserted"  << "start=" << start << "end=" << end <<
@@ -521,7 +509,7 @@ void ModelTest::layoutChanged() {
 
     \sa rowsRemoved()
  */
-void ModelTest::rowsAboutToBeRemoved(const QModelIndex &parent, int start,
+void ModelTest::rowsAboutToBeRemoved(const QModelIndex& parent, int start,
                                      int end) {
   // qDebug() << "ratbr" << parent << start << end;
   Changing c;
@@ -537,7 +525,7 @@ void ModelTest::rowsAboutToBeRemoved(const QModelIndex &parent, int start,
 
     \sa rowsAboutToBeRemoved()
  */
-void ModelTest::rowsRemoved(const QModelIndex &parent, int start, int end) {
+void ModelTest::rowsRemoved(const QModelIndex& parent, int start, int end) {
   Changing c = remove.pop();
   QVERIFY(c.parent == parent);
   QVERIFY(c.oldSize - (end - start + 1) == model->rowCount(parent));

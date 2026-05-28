@@ -36,7 +36,7 @@ QList<BoardTransition::Move> BoardTransition::moves() const { return m_moves; }
 
 QList<Square> BoardTransition::squares() const { return m_squares; }
 
-void BoardTransition::addMove(const Square &source, const Square &target) {
+void BoardTransition::addMove(const Square& source, const Square& target) {
   Move move = {source, target};
   m_moves.append(move);
 
@@ -44,9 +44,8 @@ void BoardTransition::addMove(const Square &source, const Square &target) {
   addSquare(target);
 }
 
-void BoardTransition::addSquare(const Square &square) {
-  if (!m_squares.contains(square))
-    m_squares.append(square);
+void BoardTransition::addSquare(const Square& square) {
+  if (!m_squares.contains(square)) m_squares.append(square);
 }
 
-} // namespace Chess
+}  // namespace Chess

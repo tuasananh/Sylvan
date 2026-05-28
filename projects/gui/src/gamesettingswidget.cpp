@@ -17,20 +17,23 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QFileDialog>
-#include <QSettings>
+#include "gamesettingswidget.h"
 
 #include <board/boardfactory.h>
 #include <engineconfiguration.h>
 #include <openingsuite.h>
 #include <polyglotbook.h>
 
-#include "gamesettingswidget.h"
+#include <QFileDialog>
+#include <QSettings>
+
 #include "timecontroldlg.h"
 #include "ui_gamesettingswidget.h"
 
-GameSettingsWidget::GameSettingsWidget(QWidget *parent)
-    : QWidget(parent), ui(new Ui::GameSettingsWidget), m_board(nullptr),
+GameSettingsWidget::GameSettingsWidget(QWidget* parent)
+    : QWidget(parent),
+      ui(new Ui::GameSettingsWidget),
+      m_board(nullptr),
       m_isValid(true) {
   ui->setupUi(this);
 
@@ -88,7 +91,7 @@ GameSettingsWidget::GameSettingsWidget(QWidget *parent)
           [=]() { validateFen(ui->m_fenEdit->text()); });
 
   connect(ui->m_openingSuiteEdit, &QLineEdit::textChanged,
-          [=](const QString &str) {
+          [=](const QString& str) {
             ui->m_openingSuiteDepthSpin->setEnabled(!str.isEmpty());
             ui->m_seqOrderRadio->setEnabled(!str.isEmpty());
             ui->m_randomOrderRadio->setEnabled(!str.isEmpty());
@@ -96,7 +99,7 @@ GameSettingsWidget::GameSettingsWidget(QWidget *parent)
           });
 
   connect(ui->m_polyglotFileEdit, &QLineEdit::textChanged,
-          [=](const QString &str) {
+          [=](const QString& str) {
             ui->m_polyglotDepthSpin->setEnabled(!str.isEmpty());
             ui->m_ramAccessRadio->setEnabled(!str.isEmpty());
             ui->m_diskAccessRadio->setEnabled(!str.isEmpty());
@@ -137,22 +140,19 @@ GameAdjudicator GameSettingsWidget::adjudicator() const {
   return ret;
 }
 
-OpeningSuite *GameSettingsWidget::openingSuite() const {
+OpeningSuite* GameSettingsWidget::openingSuite() const {
   QString fen = ui->m_fenEdit->text();
-  if (!fen.isEmpty())
-    return new OpeningSuite(fen);
+  if (!fen.isEmpty()) return new OpeningSuite(fen);
 
   QString file = ui->m_openingSuiteEdit->text();
-  if (file.isEmpty())
-    return nullptr;
+  if (file.isEmpty()) return nullptr;
 
   OpeningSuite::Format format = OpeningSuite::PgnFormat;
   if (file.endsWith(".epd"), Qt::CaseInsensitive)
     format = OpeningSuite::EpdFormat;
 
   OpeningSuite::Order order = OpeningSuite::SequentialOrder;
-  if (ui->m_randomOrderRadio->isChecked())
-    order = OpeningSuite::RandomOrder;
+  if (ui->m_randomOrderRadio->isChecked()) order = OpeningSuite::RandomOrder;
 
   auto suite = new OpeningSuite(file, format, order, 0);
   if (!suite->initialize()) {
@@ -167,14 +167,12 @@ int GameSettingsWidget::openingSuiteDepth() const {
   return ui->m_openingSuiteDepthSpin->value();
 }
 
-OpeningBook *GameSettingsWidget::openingBook() const {
+OpeningBook* GameSettingsWidget::openingBook() const {
   QString file = ui->m_polyglotFileEdit->text();
-  if (file.isEmpty())
-    return nullptr;
+  if (file.isEmpty()) return nullptr;
 
   auto mode = OpeningBook::BookRandom;
-  if (ui->m_diskAccessRadio->isChecked())
-    mode = OpeningBook::BookBest;
+  if (ui->m_diskAccessRadio->isChecked()) mode = OpeningBook::BookBest;
   /*auto book = new PolyglotBook(mode);
   if (!book->read(file))
   {
@@ -189,7 +187,7 @@ int GameSettingsWidget::bookDepth() const {
   return ui->m_polyglotDepthSpin->value();
 }
 
-void GameSettingsWidget::applyEngineConfiguration(EngineConfiguration *config) {
+void GameSettingsWidget::applyEngineConfiguration(EngineConfiguration* config) {
   Q_ASSERT(config != nullptr);
 
   config->setPondering(pondering());
@@ -200,8 +198,7 @@ void GameSettingsWidget::readSettings() {
 
   bool tbOk = false;
   QString tbPath = s.value("ui/tb_path").toString();
-  if (!tbPath.isEmpty())
-    ui->m_tbCheck->setEnabled(tbOk);
+  if (!tbPath.isEmpty()) ui->m_tbCheck->setEnabled(tbOk);
 
   s.beginGroup("games");
 
@@ -220,8 +217,7 @@ void GameSettingsWidget::readSettings() {
   s.beginGroup("opening_book");
   ui->m_polyglotFileEdit->setText(s.value("file").toString());
   ui->m_polyglotDepthSpin->setValue(s.value("depth", 10).toInt());
-  if (s.value("disk_access").toBool())
-    ui->m_diskAccessRadio->setChecked(true);
+  if (s.value("disk_access").toBool()) ui->m_diskAccessRadio->setChecked(true);
   s.endGroup();
 
   s.beginGroup("draw_adjudication");
@@ -248,7 +244,7 @@ void GameSettingsWidget::readSettings() {
 
 void GameSettingsWidget::enableSettingsUpdates() {
   connect(ui->m_variantCombo, &QComboBox::currentTextChanged,
-          [=](const QString &variant) {
+          [=](const QString& variant) {
             QSettings().setValue("games/variant", variant);
           });
 
@@ -262,11 +258,11 @@ void GameSettingsWidget::enableSettingsUpdates() {
   connect(ui->m_tbCheck, &QCheckBox::toggled,
           [=](bool checked) { QSettings().setValue("games/use_tb", checked); });
 
-  connect(ui->m_fenEdit, &QLineEdit::textChanged, [=](const QString &fen) {
+  connect(ui->m_fenEdit, &QLineEdit::textChanged, [=](const QString& fen) {
     QSettings().setValue("games/opening_suite/fen", fen);
   });
   connect(ui->m_openingSuiteEdit, &QLineEdit::textChanged,
-          [=](const QString &file) {
+          [=](const QString& file) {
             QSettings().setValue("games/opening_suite/file", file);
           });
   connect(ui->m_openingSuiteDepthSpin,
@@ -279,7 +275,7 @@ void GameSettingsWidget::enableSettingsUpdates() {
   });
 
   connect(ui->m_polyglotFileEdit, &QLineEdit::textChanged,
-          [=](const QString &file) {
+          [=](const QString& file) {
             QSettings().setValue("games/opening_book/file", file);
           });
   connect(ui->m_polyglotDepthSpin,
@@ -351,7 +347,7 @@ void GameSettingsWidget::onHumanCountChanged(int count) {
   ui->m_openingBookGroup->setEnabled(count < 2);
 }
 
-void GameSettingsWidget::validateFen(const QString &fen) {
+void GameSettingsWidget::validateFen(const QString& fen) {
   ui->m_openingSuiteEdit->setEnabled(fen.isEmpty());
   ui->m_browseOpeningSuiteBtn->setEnabled(fen.isEmpty());
   ui->m_openingSuiteDepthSpin->setEnabled(fen.isEmpty());

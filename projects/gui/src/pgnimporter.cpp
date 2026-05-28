@@ -17,16 +17,17 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QFile>
-#include <QFileInfo>
+#include "pgnimporter.h"
 
 #include <pgngameentry.h>
 #include <pgnstream.h>
 
-#include "pgndatabase.h"
-#include "pgnimporter.h"
+#include <QFile>
+#include <QFileInfo>
 
-PgnImporter::PgnImporter(const QString &fileName)
+#include "pgndatabase.h"
+
+PgnImporter::PgnImporter(const QString& fileName)
     : Worker(QString("PGN import: %1").arg(fileName)), m_fileName(fileName) {}
 
 QString PgnImporter::fileName() const { return m_fileName; }
@@ -48,10 +49,10 @@ void PgnImporter::work() {
   }
 
   PgnStream pgnStream(&file);
-  QList<const PgnGameEntry *> games;
+  QList<const PgnGameEntry*> games;
 
   for (;;) {
-    PgnGameEntry *game = new PgnGameEntry;
+    PgnGameEntry* game = new PgnGameEntry;
     if (cancelRequested() || !game->read(pgnStream)) {
       delete game;
       break;
@@ -63,7 +64,7 @@ void PgnImporter::work() {
     if (numReadGames % updateInterval == 0)
       emit databaseReadStatus(startTime(), numReadGames, pgnStream.pos());
   }
-  PgnDatabase *db = new PgnDatabase(m_fileName);
+  PgnDatabase* db = new PgnDatabase(m_fileName);
   db->setEntries(games);
   db->setLastModified(fileInfo.lastModified());
 

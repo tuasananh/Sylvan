@@ -10,15 +10,15 @@
 class QThread;
 
 class DatabaseManager {
-public:
-  static QSqlDatabase database(const QString &connectionName = QLatin1String(
+ public:
+  static QSqlDatabase database(const QString& connectionName = QLatin1String(
                                    QSqlDatabase::defaultConnection),
                                const QString dbName = nullptr);
   static void clear();
   static void removeCurrentThread(QString);
   // static QString DBName;
 
-private:
+ private:
   static QMutex s_databaseMutex;
   static QMap<QString, QMap<QString, QSqlDatabase>> s_instances;
 };

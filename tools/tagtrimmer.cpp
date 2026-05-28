@@ -12,7 +12,7 @@
  * Remove the Doxygen-generated "class", "namespace", or whatever prefix
  * from a file name, and make it lowercase.
  */
-static void fixFilename(QDomElement &node, const QString &compoundKind) {
+static void fixFilename(QDomElement& node, const QString& compoundKind) {
   QDomNode child = node.firstChild();
   QString text = child.nodeValue();
   if (text.startsWith(compoundKind)) {
@@ -23,7 +23,7 @@ static void fixFilename(QDomElement &node, const QString &compoundKind) {
 }
 
 /*! Remove duplicate members from the compound. */
-static void trimMembers(QDomElement &compound) {
+static void trimMembers(QDomElement& compound) {
   QDomElement elem;
   for (elem = compound.firstChildElement("member"); !elem.isNull();
        elem = elem.nextSiblingElement("member")) {
@@ -46,7 +46,7 @@ static void trimMembers(QDomElement &compound) {
 }
 
 /*! Remove unneeded nodes from a compound. */
-static void trimCompound(QDomElement &compound) {
+static void trimCompound(QDomElement& compound) {
   QDomElement elem = compound.firstChildElement();
   while (!elem.isNull()) {
     QString name = elem.tagName();
@@ -54,14 +54,12 @@ static void trimCompound(QDomElement &compound) {
       fixFilename(elem, compound.attribute("kind"));
     else if (name == "member" && elem.attribute("kind") == "enumeration") {
       QDomElement tmp(elem.firstChildElement("anchorfile"));
-      if (!tmp.isNull())
-        fixFilename(tmp, compound.attribute("kind"));
+      if (!tmp.isNull()) fixFilename(tmp, compound.attribute("kind"));
 
       // The "arglist" tag is never used in class or
       // namespace compounds.
       tmp = elem.firstChildElement("arglist");
-      if (!tmp.isNull())
-        elem.removeChild(tmp);
+      if (!tmp.isNull()) elem.removeChild(tmp);
     } else if (name != "name") {
       QDomElement old = elem;
       elem = elem.nextSiblingElement();
@@ -75,10 +73,9 @@ static void trimCompound(QDomElement &compound) {
 }
 
 /*! Trim out useless weight from the tagfile. */
-static bool trimDoc(QDomDocument &doc) {
+static bool trimDoc(QDomDocument& doc) {
   QDomElement root = doc.documentElement();
-  if (root.tagName() != "tagfile")
-    return false;
+  if (root.tagName() != "tagfile") return false;
 
   QDomElement compound = root.firstChildElement();
   while (!compound.isNull()) {
@@ -98,7 +95,7 @@ static bool trimDoc(QDomDocument &doc) {
   return true;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   QCoreApplication app(argc, argv);
   QStringList args = app.arguments();
   if (args.size() <= 2) {

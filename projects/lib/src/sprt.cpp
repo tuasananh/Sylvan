@@ -18,6 +18,7 @@
 */
 
 #include "sprt.h"
+
 #include <QtGlobal>
 #include <cmath>
 
@@ -25,30 +26,30 @@ class BayesElo;
 class SprtProbability;
 
 class BayesElo {
-public:
+ public:
   BayesElo(double bayesElo, double drawElo);
-  BayesElo(const SprtProbability &p);
+  BayesElo(const SprtProbability& p);
 
   double bayesElo() const;
   double drawElo() const;
   double scale() const;
 
-private:
+ private:
   double m_bayesElo;
   double m_drawElo;
 };
 
 class SprtProbability {
-public:
+ public:
   SprtProbability(int wins, int losses, int draws);
-  SprtProbability(const BayesElo &b);
+  SprtProbability(const BayesElo& b);
 
   bool isValid() const;
   double pWin() const;
   double pLoss() const;
   double pDraw() const;
 
-private:
+ private:
   double m_pWin;
   double m_pLoss;
   double m_pDraw;
@@ -57,7 +58,7 @@ private:
 BayesElo::BayesElo(double bayesElo, double drawElo)
     : m_bayesElo(bayesElo), m_drawElo(drawElo) {}
 
-BayesElo::BayesElo(const SprtProbability &p) {
+BayesElo::BayesElo(const SprtProbability& p) {
   Q_ASSERT(p.isValid());
 
   m_bayesElo = 200.0 * std::log10(p.pWin() / p.pLoss() * (1.0 - p.pLoss()) /
@@ -85,7 +86,7 @@ SprtProbability::SprtProbability(int wins, int losses, int draws) {
   m_pDraw = 1.0 - m_pWin - m_pLoss;
 }
 
-SprtProbability::SprtProbability(const BayesElo &b) {
+SprtProbability::SprtProbability(const BayesElo& b) {
   m_pWin = 1.0 / (1.0 + std::pow(10.0, (b.drawElo() - b.bayesElo()) / 400.0));
   m_pLoss = 1.0 / (1.0 + std::pow(10.0, (b.drawElo() + b.bayesElo()) / 400.0));
   m_pDraw = 1.0 - m_pWin - m_pLoss;
@@ -103,7 +104,12 @@ double SprtProbability::pLoss() const { return m_pLoss; }
 double SprtProbability::pDraw() const { return m_pDraw; }
 
 Sprt::Sprt()
-    : m_elo0(0), m_elo1(0), m_alpha(0), m_beta(0), m_wins(0), m_losses(0),
+    : m_elo0(0),
+      m_elo1(0),
+      m_alpha(0),
+      m_beta(0),
+      m_wins(0),
+      m_losses(0),
       m_draws(0) {}
 
 bool Sprt::isNull() const {
@@ -120,8 +126,7 @@ void Sprt::initialize(double elo0, double elo1, double alpha, double beta) {
 Sprt::Status Sprt::status() const {
   Status status = {Continue, 0.0, 0.0, 0.0};
 
-  if (m_wins <= 0 || m_losses <= 0 || m_draws <= 0)
-    return status;
+  if (m_wins <= 0 || m_losses <= 0 || m_draws <= 0) return status;
 
   // Estimate draw_elo out of sample
   const SprtProbability p(m_wins, m_losses, m_draws);

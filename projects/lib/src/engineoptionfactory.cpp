@@ -26,7 +26,7 @@
 #include "enginespinoption.h"
 #include "enginetextoption.h"
 
-EngineOption *EngineOptionFactory::create(const QVariantMap &map) {
+EngineOption* EngineOptionFactory::create(const QVariantMap& map) {
   // TODO: use isValid() for each option
 
   const QString name = map["name"].toString();
@@ -41,8 +41,7 @@ EngineOption *EngineOptionFactory::create(const QVariantMap &map) {
   }
 
   // Special case for the button option type: its value is the name
-  if (type == "button")
-    return new EngineButtonOption(name);
+  if (type == "button") return new EngineButtonOption(name);
 
   if (value.type() != QVariant::Bool && value.type() != QVariant::String &&
       value.type() != QVariant::Int) {
@@ -80,8 +79,7 @@ EngineOption *EngineOptionFactory::create(const QVariantMap &map) {
                                  alias);
   } else if (type == "combo") {
     const QStringList choices(map["choices"].toStringList());
-    if (choices.isEmpty())
-      return nullptr;
+    if (choices.isEmpty()) return nullptr;
 
     return new EngineComboOption(name, value.toString(),
                                  defaultValue.toString(), choices, alias);
@@ -90,20 +88,16 @@ EngineOption *EngineOptionFactory::create(const QVariantMap &map) {
     bool ok;
 
     intValue = value.toInt(&ok);
-    if (!ok)
-      return nullptr;
+    if (!ok) return nullptr;
 
     defaultIntValue = defaultValue.toInt(&ok);
-    if (!ok)
-      return nullptr;
+    if (!ok) return nullptr;
 
     minValue = map["min"].toInt(&ok);
-    if (!ok)
-      return nullptr;
+    if (!ok) return nullptr;
 
     maxValue = map["max"].toInt(&ok);
-    if (!ok)
-      return nullptr;
+    if (!ok) return nullptr;
 
     return new EngineSpinOption(name, intValue, defaultIntValue, minValue,
                                 maxValue, alias);

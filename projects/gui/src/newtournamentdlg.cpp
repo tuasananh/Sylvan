@@ -15,10 +15,7 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QFileDialog>
-#include <QSettings>
-#include <algorithm>
-#include <functional>
+#include "newtournamentdlg.h"
 
 #include <board/boardfactory.h>
 #include <enginebuilder.h>
@@ -28,11 +25,15 @@
 #include <tournament.h>
 #include <tournamentfactory.h>
 
+#include <QFileDialog>
+#include <QSettings>
+#include <algorithm>
+#include <functional>
+
 #include "engineconfigproxymodel.h"
 #include "engineconfigurationdlg.h"
 #include "engineconfigurationmodel.h"
 #include "engineselectiondlg.h"
-#include "newtournamentdlg.h"
 #include "timecontroldlg.h"
 #include "ui_newtournamentdlg.h"
 
@@ -40,9 +41,10 @@
 #include <modeltest.h>
 #endif
 
-NewTournamentDialog::NewTournamentDialog(EngineManager *engineManager,
-                                         QWidget *parent)
-    : QDialog(parent), m_srcEngineManager(engineManager),
+NewTournamentDialog::NewTournamentDialog(EngineManager* engineManager,
+                                         QWidget* parent)
+    : QDialog(parent),
+      m_srcEngineManager(engineManager),
       ui(new Ui::NewTournamentDialog) {
   Q_ASSERT(engineManager != nullptr);
   ui->setupUi(this);
@@ -103,8 +105,7 @@ NewTournamentDialog::NewTournamentDialog(EngineManager *engineManager,
 
   ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   connect(ui->m_gameSettings, &GameSettingsWidget::statusChanged, [=](bool ok) {
-    if (ok)
-      ok = canStart();
+    if (ok) ok = canStart();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ok);
   });
 
@@ -115,14 +116,14 @@ NewTournamentDialog::NewTournamentDialog(EngineManager *engineManager,
 
 NewTournamentDialog::~NewTournamentDialog() { delete ui; }
 
-void NewTournamentDialog::addEngineOnDblClick(const QModelIndex &index) {
-  const QListView *listView = ((QListView *)sender());
-  const QModelIndex &idx = m_proxyModel->mapToSource(index);
+void NewTournamentDialog::addEngineOnDblClick(const QModelIndex& index) {
+  const QListView* listView = ((QListView*)sender());
+  const QModelIndex& idx = m_proxyModel->mapToSource(index);
 
   m_addedEnginesManager->addEngine(m_srcEngineManager->engineAt(idx.row()));
   listView->selectionModel()->select(index, QItemSelectionModel::Deselect);
 
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
   button->setEnabled(canStart());
 }
 
@@ -134,14 +135,13 @@ void NewTournamentDialog::addEngine() {
   disconnect(dlg.enginesList(), SIGNAL(doubleClicked(QModelIndex)), this,
              SLOT(addEngineOnDblClick(QModelIndex)));
 
-  if (value != QDialog::Accepted)
-    return;
+  if (value != QDialog::Accepted) return;
 
   const QModelIndexList list(dlg.selection().indexes());
-  for (const QModelIndex &index : list)
+  for (const QModelIndex& index : list)
     m_addedEnginesManager->addEngine(m_srcEngineManager->engineAt(index.row()));
 
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
   button->setEnabled(canStart());
 }
 
@@ -152,20 +152,20 @@ void NewTournamentDialog::removeEngine() {
   // Can't use std::greater because operator> isn't implemented
   // for QModelIndex.
   std::sort(selected.begin(), selected.end(),
-            [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
+            [](const QModelIndex& a, const QModelIndex& b) { return b < a; });
 
-  for (const QModelIndex &index : qAsConst(selected))
+  for (const QModelIndex& index : qAsConst(selected))
     m_addedEnginesManager->removeEngineAt(index.row());
 
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
   button->setEnabled(canStart());
 }
 
-void NewTournamentDialog::configureEngine(const QModelIndex &index) {
+void NewTournamentDialog::configureEngine(const QModelIndex& index) {
   EngineConfigurationDialog dlg(EngineConfigurationDialog::ConfigureEngine);
 
   int row = index.row();
-  const EngineConfiguration &config = m_addedEnginesManager->engineAt(row);
+  const EngineConfiguration& config = m_addedEnginesManager->engineAt(row);
   dlg.applyEngineInformation(config);
 
   QSet<QString> names = m_addedEnginesManager->engineNames();
@@ -175,7 +175,7 @@ void NewTournamentDialog::configureEngine(const QModelIndex &index) {
   if (dlg.exec() == QDialog::Accepted)
     m_addedEnginesManager->updateEngineAt(row, dlg.engineConfiguration());
 
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
   button->setEnabled(canStart());
 }
 
@@ -193,13 +193,11 @@ void NewTournamentDialog::moveEngine(int offset) {
 }
 
 bool NewTournamentDialog::canStart() const {
-  if (!ui->m_gameSettings->isValid())
-    return false;
+  if (!ui->m_gameSettings->isValid()) return false;
 
-  if (m_addedEnginesManager->engineCount() < 2)
-    return false;
+  if (m_addedEnginesManager->engineCount() < 2) return false;
 
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
 
   // check for duplicate configuration names
   if (m_addedEnginesManager->engineNames().count() !=
@@ -213,19 +211,19 @@ bool NewTournamentDialog::canStart() const {
   return m_addedEnginesManager->supportsVariant(variant);
 }
 
-void NewTournamentDialog::onVariantChanged(const QString &variant) {
+void NewTournamentDialog::onVariantChanged(const QString& variant) {
   m_proxyModel->setFilterVariant(variant);
   ui->m_addEngineBtn->setEnabled(m_proxyModel->rowCount() > 0);
 
   m_addedEnginesModel->setChessVariant(variant);
-  QPushButton *button = ui->buttonBox->button(QDialogButtonBox::Ok);
+  QPushButton* button = ui->buttonBox->button(QDialogButtonBox::Ok);
   button->setEnabled(canStart());
 
   onPlayerSelectionChanged(QItemSelection(), QItemSelection());
 }
 
 void NewTournamentDialog::onPlayerSelectionChanged(
-    const QItemSelection &selected, const QItemSelection &deselected) {
+    const QItemSelection& selected, const QItemSelection& deselected) {
   Q_UNUSED(selected);
   Q_UNUSED(deselected);
 
@@ -239,8 +237,8 @@ void NewTournamentDialog::onPlayerSelectionChanged(
       enable && i < m_addedEnginesManager->engineCount() - 1);
 }
 
-Tournament *
-NewTournamentDialog::createTournament(GameManager *gameManager) const {
+Tournament* NewTournamentDialog::createTournament(
+    GameManager* gameManager) const {
   Q_ASSERT(gameManager != nullptr);
   auto ts = ui->m_tournamentSettings;
 
@@ -256,8 +254,7 @@ NewTournamentDialog::createTournament(GameManager *gameManager) const {
 
   tf->setSeedCount(ts->seedCount());
   tf->setGamesPerEncounter(ts->gamesPerEncounter());
-  if (tf->canSetRoundMultiplier())
-    tf->setRoundMultiplier(ts->rounds());
+  if (tf->canSetRoundMultiplier()) tf->setRoundMultiplier(ts->rounds());
   tf->setStartDelay(ts->delayBetweenGames());
 
   tf->setAdjudicator(ui->m_gameSettings->adjudicator());

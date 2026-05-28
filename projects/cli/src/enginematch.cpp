@@ -16,9 +16,7 @@
 */
 
 #include "enginematch.h"
-#include "board/board.h"
-#include "qglobal.h"
-#include <QMultiMap>
+
 #include <chessgame.h>
 #include <chessplayer.h>
 #include <gamemanager.h>
@@ -27,8 +25,15 @@
 #include <sprt.h>
 #include <tournament.h>
 
-EngineMatch::EngineMatch(Tournament *tournament, QObject *parent)
-    : QObject(parent), m_tournament(tournament), m_debug(false),
+#include <QMultiMap>
+
+#include "board/board.h"
+#include "qglobal.h"
+
+EngineMatch::EngineMatch(Tournament* tournament, QObject* parent)
+    : QObject(parent),
+      m_tournament(tournament),
+      m_debug(false),
       m_ratingInterval(0) /*,
        m_bookMode(OpeningBook::BookRandom)*/
 {
@@ -39,14 +44,12 @@ EngineMatch::EngineMatch(Tournament *tournament, QObject *parent)
 
 EngineMatch::~EngineMatch() { qDeleteAll(m_books); }
 
-OpeningBook *EngineMatch::addOpeningBook(const QString &fileName) {
-  if (fileName.isEmpty())
-    return nullptr;
+OpeningBook* EngineMatch::addOpeningBook(const QString& fileName) {
+  if (fileName.isEmpty()) return nullptr;
 
-  if (m_books.contains(fileName))
-    return m_books[fileName];
+  if (m_books.contains(fileName)) return m_books[fileName];
 
-  PolyglotBook *book = nullptr; // new PolyglotBook(m_bookMode);
+  PolyglotBook* book = nullptr;  // new PolyglotBook(m_bookMode);
   /*if (!book->read(fileName))
       {
               delete book;
@@ -60,10 +63,10 @@ OpeningBook *EngineMatch::addOpeningBook(const QString &fileName) {
 
 void EngineMatch::start() {
   connect(m_tournament, SIGNAL(finished()), this, SLOT(onTournamentFinished()));
-  connect(m_tournament, SIGNAL(gameStarted(ChessGame *, int, int, int)), this,
-          SLOT(onGameStarted(ChessGame *, int)));
-  connect(m_tournament, SIGNAL(gameFinished(ChessGame *, int, int, int)), this,
-          SLOT(onGameFinished(ChessGame *, int)));
+  connect(m_tournament, SIGNAL(gameStarted(ChessGame*, int, int, int)), this,
+          SLOT(onGameStarted(ChessGame*, int)));
+  connect(m_tournament, SIGNAL(gameFinished(ChessGame*, int, int, int)), this,
+          SLOT(onGameFinished(ChessGame*, int)));
 
   if (m_debug)
     connect(m_tournament->gameManager(), SIGNAL(debugMessage(QString)), this,
@@ -87,18 +90,16 @@ void EngineMatch::setBookMode(OpeningBook::BookMoveMode mode) {
   m_bookMode = mode;
 }
 
-void EngineMatch::onGameStarted(ChessGame *game, int number) {
+void EngineMatch::onGameStarted(ChessGame* game, int number) {
   Q_ASSERT(game != nullptr);
 
-  auto fen = game->board()->fenString();
-  qInfo("Started game %d of %d (%s vs %s) with fen: %s", number,
+  qInfo("Started game %d of %d (%s vs %s)", number,
         m_tournament->finalGameCount(),
         qUtf8Printable(game->player(Chess::Side::Red)->name()),
-        qUtf8Printable(game->player(Chess::Side::Black)->name()),
-        qUtf8Printable(fen));
+        qUtf8Printable(game->player(Chess::Side::Black)->name()));
 }
 
-void EngineMatch::onGameFinished(ChessGame *game, int number) {
+void EngineMatch::onGameFinished(ChessGame* game, int number) {
   Q_ASSERT(game != nullptr);
 
   Chess::Result result(game->result());
@@ -128,8 +129,7 @@ void EngineMatch::onTournamentFinished() {
     printRanking();
 
   QString error = m_tournament->errorString();
-  if (!error.isEmpty())
-    qWarning("%s", qUtf8Printable(error));
+  if (!error.isEmpty()) qWarning("%s", qUtf8Printable(error));
 
   qInfo("Finished match");
   connect(m_tournament->gameManager(), SIGNAL(finished()), this,
@@ -137,7 +137,7 @@ void EngineMatch::onTournamentFinished() {
   m_tournament->gameManager()->finish();
 }
 
-void EngineMatch::print(const QString &msg) {
+void EngineMatch::print(const QString& msg) {
   qInfo("%lld %s", m_startTime.elapsed(), qUtf8Printable(msg));
 }
 

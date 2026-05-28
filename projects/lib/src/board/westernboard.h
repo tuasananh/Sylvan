@@ -39,20 +39,20 @@ class WesternZobrist;
 class LIB_EXPORT WesternBoard : public Board {
   Q_DECLARE_TR_FUNCTIONS(WesternBoard)
 
-public:
+ public:
   /*! Basic piece types for western variants. */
   enum WesternPieceType {
-    Pawn = 1, //!< Pawn
-    Elephant, //!< Bishop
-    Guard,    //!< Advisor
-    Cannon,   //!< Cannon
-    Horse,    //!< Knight
-    Rook,     //!< Rook
-    King      //!< King
+    Pawn = 1,  //!< Pawn
+    Elephant,  //!< Bishop
+    Guard,     //!< Advisor
+    Cannon,    //!< Cannon
+    Horse,     //!< Knight
+    Rook,      //!< Rook
+    King       //!< King
   };
 
   /*! Creates a new WesternBoard object. */
-  WesternBoard(WesternZobrist *zobrist);
+  WesternBoard(WesternZobrist* zobrist);
 
   // Inherited from Board
   virtual int width() const;
@@ -60,12 +60,12 @@ public:
   virtual Result result();
   virtual int reversibleMoveCount() const;
 
-protected:
+ protected:
   /*! Types of Pawn moves. */
   enum StepType {
-    NoStep = 0,     //!< Cannot move here
-    FreeStep = 1,   //!< May move if target is empty
-    CaptureStep = 2 //!< Capture opposing piece only
+    NoStep = 0,      //!< Cannot move here
+    FreeStep = 1,    //!< May move if target is empty
+    CaptureStep = 2  //!< Capture opposing piece only
   };
 
   /*!
@@ -97,21 +97,21 @@ protected:
   // Inherited from Board
   virtual void vInitialize();
   virtual QString vFenString(FenNotation notation) const;
-  virtual bool vSetFenString(const QStringList &fen);
-  virtual QString lanMoveString(const Move &move);
-  virtual QString standardMoveString(const Move &move);
-  virtual Move moveFromLanString(const QString &str);
-  virtual void vMakeMove(const Move &move, BoardTransition *transition);
-  virtual void vUndoMove(const Move &move);
-  virtual void generateMovesForPiece(QVarLengthArray<Move> &moves,
+  virtual bool vSetFenString(const QStringList& fen);
+  virtual QString lanMoveString(const Move& move);
+  virtual QString standardMoveString(const Move& move);
+  virtual Move moveFromLanString(const QString& str);
+  virtual void vMakeMove(const Move& move, BoardTransition* transition);
+  virtual void vUndoMove(const Move& move);
+  virtual void generateMovesForPiece(QVarLengthArray<Move>& moves,
                                      int pieceType, int square) const;
-  virtual bool vIsLegalMove(const Move &move);
+  virtual bool vIsLegalMove(const Move& move);
   virtual bool isLegalPosition();
-  virtual int captureType(const Move &move) const;
+  virtual int captureType(const Move& move) const;
 
-  virtual Move moveFromStandardString(const QString &str);
+  virtual Move moveFromStandardString(const QString& str);
 
-private:
+ private:
   // Data for reversing/unmaking a move
   struct MoveData {
     Piece capture;
@@ -124,7 +124,7 @@ private:
   int m_plyOffset;
   int m_reversibleMoveCount;
 
-  const WesternZobrist *m_zobrist;
+  const WesternZobrist* m_zobrist;
   QVector<MoveData> m_history;
   QVarLengthArray<int> m_BPawnOffsets;
   QVarLengthArray<int> m_RPawnOffsets;
@@ -143,5 +143,5 @@ private:
   QVarLengthArray<QString> strnumName;
 };
 
-} // namespace Chess
-#endif // WESTERNBOARD_H
+}  // namespace Chess
+#endif  // WESTERNBOARD_H

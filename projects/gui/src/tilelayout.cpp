@@ -17,20 +17,20 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-
-#include <QWidget>
-#include <qmath.h>
-
 #include "tilelayout.h"
 
-TileLayout::TileLayout(QWidget *parent) : QLayout(parent) {
+#include <qmath.h>
+
+#include <QWidget>
+#include <algorithm>
+
+TileLayout::TileLayout(QWidget* parent) : QLayout(parent) {
   setContentsMargins(0, 0, 0, 0);
 }
 
 TileLayout::~TileLayout() { qDeleteAll(m_items); }
 
-void TileLayout::addItem(QLayoutItem *item) { m_items.append(item); }
+void TileLayout::addItem(QLayoutItem* item) { m_items.append(item); }
 
 Qt::Orientations TileLayout::expandingDirections() const {
   return Qt::Vertical | Qt::Horizontal;
@@ -38,35 +38,34 @@ Qt::Orientations TileLayout::expandingDirections() const {
 
 int TileLayout::count() const { return m_items.size(); }
 
-QLayoutItem *TileLayout::itemAt(int index) const {
+QLayoutItem* TileLayout::itemAt(int index) const {
   return m_items.value(index, nullptr);
 }
 
 QSize TileLayout::minimumSize() const {
   QSize size;
-  for (const QLayoutItem *item : qAsConst(m_items))
+  for (const QLayoutItem* item : qAsConst(m_items))
     size = size.expandedTo(item->minimumSize());
 
-  if (!size.isValid())
-    return QLayout::minimumSize();
+  if (!size.isValid()) return QLayout::minimumSize();
 
   return size;
 }
 
-void TileLayout::setGeometry(const QRect &rect) {
+void TileLayout::setGeometry(const QRect& rect) {
   QLayout::setGeometry(rect);
   doLayout(rect);
 }
 
 QSize TileLayout::sizeHint() const {
   QSize size;
-  for (const QLayoutItem *item : qAsConst(m_items))
+  for (const QLayoutItem* item : qAsConst(m_items))
     size = size.expandedTo(item->sizeHint());
 
   return size;
 }
 
-QLayoutItem *TileLayout::takeAt(int index) {
+QLayoutItem* TileLayout::takeAt(int index) {
   if (index >= 0 && index < m_items.size())
     return m_items.takeAt(index);
   else
@@ -81,9 +80,8 @@ int TileLayout::verticalSpacing() const {
   return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
 }
 
-void TileLayout::doLayout(const QRect &rect) const {
-  if (m_items.isEmpty())
-    return;
+void TileLayout::doLayout(const QRect& rect) const {
+  if (m_items.isEmpty()) return;
 
   int left, top, right, bottom;
   getContentsMargins(&left, &top, &right, &bottom);
@@ -91,7 +89,7 @@ void TileLayout::doLayout(const QRect &rect) const {
   int x = effectiveRect.x();
   int y = effectiveRect.y();
 
-  QWidget *widget = m_items.first()->widget();
+  QWidget* widget = m_items.first()->widget();
   int spaceX = horizontalSpacing();
   if (spaceX == -1)
     spaceX = widget->style()->layoutSpacing(
@@ -119,10 +117,8 @@ void TileLayout::doLayout(const QRect &rect) const {
     cols = smallest;
     rows = smallest;
   }
-  if (count <= cols * (rows - 1))
-    rows--;
-  if (count <= (cols - 1) * rows)
-    cols--;
+  if (count <= cols * (rows - 1)) rows--;
+  if (count <= (cols - 1) * rows) cols--;
 
   // Often the column and row counts are backwards, meaning that
   // the available space isn't being used efficiently. In that
@@ -130,15 +126,14 @@ void TileLayout::doLayout(const QRect &rect) const {
   if (qAbs(cols - rows) >= 1) {
     qreal ar1 = qreal(cols * sh.width()) / (rows * sh.height());
     qreal ar2 = qreal(rows * sh.width()) / (cols * sh.height());
-    if (qAbs(ar1 - layoutAr) > qAbs(ar2 - layoutAr))
-      std::swap(cols, rows);
+    if (qAbs(ar1 - layoutAr) > qAbs(ar2 - layoutAr)) std::swap(cols, rows);
   }
 
   int itemWidth = (effectiveRect.width() - (cols - 1) * spaceX) / cols;
   int itemHeight = (effectiveRect.height() - (rows - 1) * spaceY) / rows;
 
   int col = 0;
-  for (QLayoutItem *item : qAsConst(m_items)) {
+  for (QLayoutItem* item : qAsConst(m_items)) {
     int nextX = x + itemWidth + spaceX;
     if (++col > cols) {
       col = 1;
@@ -154,13 +149,12 @@ void TileLayout::doLayout(const QRect &rect) const {
 }
 
 int TileLayout::smartSpacing(QStyle::PixelMetric pm) const {
-  QObject *parent = this->parent();
-  if (!parent)
-    return -1;
+  QObject* parent = this->parent();
+  if (!parent) return -1;
 
   if (parent->isWidgetType()) {
-    QWidget *pw = static_cast<QWidget *>(parent);
+    QWidget* pw = static_cast<QWidget*>(parent);
     return pw->style()->pixelMetric(pm, nullptr, pw);
   }
-  return static_cast<QLayout *>(parent)->spacing();
+  return static_cast<QLayout*>(parent)->spacing();
 }

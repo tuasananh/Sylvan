@@ -39,7 +39,7 @@ class Piece;
 class PieceChooser : public QGraphicsObject {
   Q_OBJECT
 
-public:
+ public:
   /*! The type value returned by type(). */
   enum { Type = UserType + 2 };
 
@@ -55,25 +55,25 @@ public:
    * The created dialog is hidden, and can be displayed by
    * calling reveal().
    */
-  PieceChooser(const QList<GraphicsPiece *> &pieces, qreal squareSize,
-               QGraphicsItem *parent = nullptr);
+  PieceChooser(const QList<GraphicsPiece*>& pieces, qreal squareSize,
+               QGraphicsItem* parent = nullptr);
 
   // Inherited from QGraphicsObject
   virtual int type() const;
   virtual QRectF boundingRect() const;
-  virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget = nullptr);
+  virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+                     QWidget* widget = nullptr);
 
   /*! Chooses a null piece and destroys the object. */
   void cancelChoice();
 
-public slots:
+ public slots:
   /*! Reveals the dialog with an animation. */
   void reveal();
   /*! Fades the dialog out and destroys the object. */
   void destroy();
 
-signals:
+ signals:
   /*!
    * This signal is emitted when the user has chosen a piece.
    *
@@ -82,17 +82,17 @@ signals:
    * The piece chooser is destroyed automatically after the
    * choice has been made.
    */
-  void pieceChosen(const Chess::Piece &piece);
+  void pieceChosen(const Chess::Piece& piece);
 
-protected:
+ protected:
   // Inherited from QGraphicsObject
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 
-private:
+ private:
   qreal m_squareSize;
   QRectF m_rect;
-  QList<GraphicsPiece *> m_pieces[2];
-  QAbstractAnimation *m_anim;
+  QList<GraphicsPiece*> m_pieces[2];
+  QAbstractAnimation* m_anim;
 };
 
-#endif // PIECECHOOSER_H
+#endif  // PIECECHOOSER_H

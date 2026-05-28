@@ -19,16 +19,16 @@
 
 #include "enginecheckoption.h"
 
-EngineCheckOption::EngineCheckOption(const QString &name, const QVariant &value,
-                                     const QVariant &defaultValue,
-                                     const QString &alias)
+EngineCheckOption::EngineCheckOption(const QString& name, const QVariant& value,
+                                     const QVariant& defaultValue,
+                                     const QString& alias)
     : EngineOption(name, QVariant::Bool, value, defaultValue, alias) {}
 
-EngineOption *EngineCheckOption::copy() const {
+EngineOption* EngineCheckOption::copy() const {
   return new EngineCheckOption(*this);
 }
 
-bool EngineCheckOption::isValid(const QVariant &value) const {
+bool EngineCheckOption::isValid(const QVariant& value) const {
   if (value.canConvert(QVariant::Bool)) {
     QString str(value.toString());
     return (str == "true" || str == "false");

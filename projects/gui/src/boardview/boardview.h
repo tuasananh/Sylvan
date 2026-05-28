@@ -35,27 +35,27 @@ class QTimer;
 class BoardView : public QGraphicsView {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new BoardView object that displays \a scene. */
-  explicit BoardView(QGraphicsScene *scene, QWidget *parent = nullptr);
+  explicit BoardView(QGraphicsScene* scene, QWidget* parent = nullptr);
 
   // Inherited from QGraphicsView
   virtual QSize sizeHint() const;
   virtual int heightForWidth(int width) const;
 
-protected:
+ protected:
   // Inherited from QGraphicsView
-  virtual void resizeEvent(QResizeEvent *event);
-  virtual void paintEvent(QPaintEvent *event);
+  virtual void resizeEvent(QResizeEvent* event);
+  virtual void paintEvent(QPaintEvent* event);
 
-private slots:
+ private slots:
   void fitToRect();
   void onSceneRectChanged();
 
-private:
+ private:
   bool m_initialized;
-  QTimer *m_resizeTimer;
+  QTimer* m_resizeTimer;
   QPixmap m_resizePixmap;
 };
 
-#endif // BOARDVIEW_H
+#endif  // BOARDVIEW_H

@@ -17,25 +17,26 @@
     along with Sylvan.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <functional>
+#include "enginemanagementwidget.h"
+
+#include <enginemanager.h>
 
 #include <QFileDialog>
 #include <QSettings>
 #include <QSortFilterProxyModel>
-
-#include <enginemanager.h>
+#include <algorithm>
+#include <functional>
 
 #include "engineconfigurationdlg.h"
 #include "engineconfigurationmodel.h"
-#include "enginemanagementwidget.h"
 #include "sylvanapp.h"
 #include "ui_enginemanagementwidget.h"
 
-EngineManagementWidget::EngineManagementWidget(QWidget *parent)
+EngineManagementWidget::EngineManagementWidget(QWidget* parent)
     : QWidget(parent),
       m_engineManager(SylvanApplication::instance()->engineManager()),
-      m_hasChanged(false), m_filteredModel(new QSortFilterProxyModel(this)),
+      m_hasChanged(false),
+      m_filteredModel(new QSortFilterProxyModel(this)),
       ui(new Ui::EngineManagementWidget) {
   ui->setupUi(this);
 
@@ -54,7 +55,7 @@ EngineManagementWidget::EngineManagementWidget(QWidget *parent)
   // Signals for updating the UI
   connect(
       ui->m_enginesList->selectionModel(),
-      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+      SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
       this, SLOT(updateUi()));
   connect(ui->m_enginesList, SIGNAL(doubleClicked(QModelIndex)), this,
           SLOT(configureEngine(QModelIndex)));
@@ -96,7 +97,7 @@ void EngineManagementWidget::updateUi() {
       ui->m_enginesList->selectionModel()->hasSelection());
 }
 
-void EngineManagementWidget::updateSearch(const QString &terms) {
+void EngineManagementWidget::updateSearch(const QString& terms) {
   m_filteredModel->setFilterWildcard(terms);
   updateEngineCount();
 }
@@ -126,10 +127,10 @@ void EngineManagementWidget::configureEngine() {
   configureEngine(ui->m_enginesList->currentIndex());
 }
 
-void EngineManagementWidget::configureEngine(const QModelIndex &index) {
+void EngineManagementWidget::configureEngine(const QModelIndex& index) {
   // Map the index from the filtered model to the original model
   int row = m_filteredModel->mapToSource(index).row();
-  const EngineConfiguration &config = m_engineManager->engineAt(row);
+  const EngineConfiguration& config = m_engineManager->engineAt(row);
 
   QSet<QString> names = m_engineManager->engineNames();
   names.remove(config.name());
@@ -155,10 +156,10 @@ void EngineManagementWidget::removeEngine() {
   // Can't use std::greater because operator> isn't implemented
   // for QModelIndex.
   std::sort(selected.begin(), selected.end(),
-            [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
+            [](const QModelIndex& a, const QModelIndex& b) { return b < a; });
 
   if (!selected.isEmpty()) {
-    for (const QModelIndex &index : qAsConst(selected))
+    for (const QModelIndex& index : qAsConst(selected))
       m_engineManager->removeEngineAt(index.row());
     m_hasChanged = true;
     updateEngineCount();
@@ -173,7 +174,7 @@ void EngineManagementWidget::browseDefaultLocation() {
   dlg->setAttribute(Qt::WA_DeleteOnClose);
   dlg->setAcceptMode(QFileDialog::AcceptOpen);
 
-  connect(dlg, &QFileDialog::fileSelected, [=](const QString &dir) {
+  connect(dlg, &QFileDialog::fileSelected, [=](const QString& dir) {
     ui->m_defaultLocationEdit->setText(dir);
     QSettings().setValue("ui/default_engine_location", dir);
   });

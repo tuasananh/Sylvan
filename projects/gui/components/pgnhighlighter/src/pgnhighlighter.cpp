@@ -23,11 +23,11 @@
     OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <QTextDocument>
-
 #include "pgnhighlighter.h"
 
-PgnHighlighter::PgnHighlighter(QTextDocument *document)
+#include <QTextDocument>
+
+PgnHighlighter::PgnHighlighter(QTextDocument* document)
     : QSyntaxHighlighter(document) {
   // default text styles
   QTextCharFormat commentFormat;
@@ -53,7 +53,7 @@ PgnHighlighter::PgnHighlighter(QTextDocument *document)
 }
 
 void PgnHighlighter::setFormatFor(Construct construct,
-                                  const QTextCharFormat &format) {
+                                  const QTextCharFormat& format) {
   m_formats[construct] = format;
   rehighlight();
 }
@@ -62,7 +62,7 @@ QTextCharFormat PgnHighlighter::formatFor(Construct construct) const {
   return m_formats[construct];
 }
 
-void PgnHighlighter::highlightBlock(const QString &text) {
+void PgnHighlighter::highlightBlock(const QString& text) {
   int state = previousBlockState();
   int len = text.length();
   int start = 0;
@@ -72,74 +72,74 @@ void PgnHighlighter::highlightBlock(const QString &text) {
     QChar ch = text.at(pos);
 
     switch (state) {
-    default:
-    case NormalState:
-      if (pos == 0 && ch == '%') {
-        setFormat(pos, len, m_formats[Comment]);
-        pos = len - 1; // end of line
-      } else if (ch == ';') {
-        setFormat(pos, len - pos, m_formats[Comment]);
-        pos = len - 1; // end of line
-      } else if (ch == '{') {
-        start = pos;
-        state = InComment;
-      } else if (ch == '[') {
-        start = pos;
-        state = InTag;
-      } else if (ch.isDigit()) {
-        start = pos;
+      default:
+      case NormalState:
+        if (pos == 0 && ch == '%') {
+          setFormat(pos, len, m_formats[Comment]);
+          pos = len - 1;  // end of line
+        } else if (ch == ';') {
+          setFormat(pos, len - pos, m_formats[Comment]);
+          pos = len - 1;  // end of line
+        } else if (ch == '{') {
+          start = pos;
+          state = InComment;
+        } else if (ch == '[') {
+          start = pos;
+          state = InTag;
+        } else if (ch.isDigit()) {
+          start = pos;
 
-        if (text.mid(pos, 3) == "0-1" || text.mid(pos, 3) == "1-0") {
-          pos += 3;
-          setFormat(start, pos - start, m_formats[Result]);
-          state = NormalState;
-        } else if (text.mid(pos, 7) == "1/2-1/2") {
-          pos += 7;
-          setFormat(start, pos - start, m_formats[Result]);
-          state = NormalState;
-        } else if (ch.digitValue() >= 1) {
-          state = InMoveNumber;
+          if (text.mid(pos, 3) == "0-1" || text.mid(pos, 3) == "1-0") {
+            pos += 3;
+            setFormat(start, pos - start, m_formats[Result]);
+            state = NormalState;
+          } else if (text.mid(pos, 7) == "1/2-1/2") {
+            pos += 7;
+            setFormat(start, pos - start, m_formats[Result]);
+            state = NormalState;
+          } else if (ch.digitValue() >= 1) {
+            state = InMoveNumber;
+          }
         }
-      }
-      break;
+        break;
 
-    case InComment:
-      if (ch == '}') {
-        setFormat(start, pos + 1 - start, m_formats[Comment]);
-        state = NormalState;
-      }
-      break;
+      case InComment:
+        if (ch == '}') {
+          setFormat(start, pos + 1 - start, m_formats[Comment]);
+          state = NormalState;
+        }
+        break;
 
-    case InTag:
-      if (ch == ']') {
-        setFormat(start, pos + 1 - start, m_formats[Tag]);
-        state = NormalState;
-      } else if (ch == '"') {
-        setFormat(start, pos - start, m_formats[Tag]);
-        start = pos;
-        state = InString;
-      }
-      break;
+      case InTag:
+        if (ch == ']') {
+          setFormat(start, pos + 1 - start, m_formats[Tag]);
+          state = NormalState;
+        } else if (ch == '"') {
+          setFormat(start, pos - start, m_formats[Tag]);
+          start = pos;
+          state = InString;
+        }
+        break;
 
-    case InString:
-      if (ch == '"') {
-        setFormat(start, pos + 1 - start, m_formats[String]);
-        start = pos + 1;
-        state = InTag;
-      }
-      break;
+      case InString:
+        if (ch == '"') {
+          setFormat(start, pos + 1 - start, m_formats[String]);
+          start = pos + 1;
+          state = InTag;
+        }
+        break;
 
-    case InMoveNumber:
-      if (ch == '.') {
-        setFormat(start, pos + 1 - start, m_formats[MoveNumber]);
-        state = NormalState;
-      } else if (ch.isDigit()) {
-        state = InMoveNumber;
-      } else {
-        state = NormalState;
-      }
+      case InMoveNumber:
+        if (ch == '.') {
+          setFormat(start, pos + 1 - start, m_formats[MoveNumber]);
+          state = NormalState;
+        } else if (ch.isDigit()) {
+          state = InMoveNumber;
+        } else {
+          state = NormalState;
+        }
 
-      break;
+        break;
     }
     pos++;
   }

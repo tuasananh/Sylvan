@@ -27,21 +27,21 @@ class OpeningBook;
 
 /*! \brief A class for storing a player's tournament-specific details. */
 class LIB_EXPORT TournamentPlayer {
-public:
+ public:
   /*! Creates a new TournamentPlayer object. */
-  TournamentPlayer(PlayerBuilder *builder, const TimeControl &timeControl,
-                   const OpeningBook *book, int bookDepth);
+  TournamentPlayer(PlayerBuilder* builder, const TimeControl& timeControl,
+                   const OpeningBook* book, int bookDepth);
 
   /*! Returns the player's builder object. */
-  const PlayerBuilder *builder() const;
+  const PlayerBuilder* builder() const;
   /*! Returns the player's name. */
   QString name() const;
   /*! Sets the player's name to \a name. */
-  void setName(const QString &name);
+  void setName(const QString& name);
   /*! Returns the player's time control. */
-  const TimeControl &timeControl() const;
+  const TimeControl& timeControl() const;
   /*! Returns the player's opening book. */
-  const OpeningBook *book() const;
+  const OpeningBook* book() const;
   /*! Returns the player's maximum book depth. */
   int bookDepth() const;
   /*!
@@ -69,14 +69,14 @@ public:
    */
   int gamesFinished() const;
 
-private:
-  PlayerBuilder *m_builder;
+ private:
+  PlayerBuilder* m_builder;
   TimeControl m_timeControl;
-  const OpeningBook *m_book;
+  const OpeningBook* m_book;
   int m_bookDepth;
   int m_wins;
   int m_draws;
   int m_losses;
 };
 
-#endif // TOURNAMENTPLAYER_H
+#endif  // TOURNAMENTPLAYER_H

@@ -20,8 +20,9 @@
 #ifndef TIMECONTROLDIALOG_H
 #define TIMECONTROLDIALOG_H
 
-#include <QDialog>
 #include <timecontrol.h>
+
+#include <QDialog>
 
 namespace Ui {
 class TimeControlDialog;
@@ -33,31 +34,31 @@ class TimeControlDialog;
 class TimeControlDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*!
    * Creates a new time control dialog.
    *
    * The dialog is initialized according to \a tc.
    */
-  explicit TimeControlDialog(const TimeControl &tc, QWidget *parent = nullptr);
+  explicit TimeControlDialog(const TimeControl& tc, QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~TimeControlDialog();
 
   /*! Returns the time control that was set in the dialog. */
   TimeControl timeControl() const;
 
-private slots:
+ private slots:
   void onTournamentSelected();
   void onTimePerMoveSelected();
   void onInfiniteSelected();
 
-private:
+ private:
   enum TimeUnit { Seconds, Minutes, Hours };
 
   int timeToMs() const;
   void setTime(int ms);
 
-  Ui::TimeControlDialog *ui;
+  Ui::TimeControlDialog* ui;
 };
 
-#endif // TIMECONTROLDIALOG_H
+#endif  // TIMECONTROLDIALOG_H

@@ -18,25 +18,30 @@
 */
 
 #include "gameviewer.h"
-#include "boardview/boardscene.h"
-#include "boardview/boardview.h"
-#include "chessclock.h"
-#include <QHBoxLayout>
-#include <QMessageBox>
-#include <QSlider>
-#include <QToolButton>
-#include <QVBoxLayout>
+
 #include <board/board.h>
 #include <chessgame.h>
 #include <chessplayer.h>
 #include <pgngame.h>
 
-GameViewer::GameViewer(Qt::Orientation orientation, QWidget *parent,
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QSlider>
+#include <QToolButton>
+#include <QVBoxLayout>
+
+#include "boardview/boardscene.h"
+#include "boardview/boardview.h"
+#include "chessclock.h"
+
+GameViewer::GameViewer(Qt::Orientation orientation, QWidget* parent,
                        bool addChessClock)
-    : QWidget(parent), m_moveNumberSlider(new QSlider(Qt::Horizontal)),
+    : QWidget(parent),
+      m_moveNumberSlider(new QSlider(Qt::Horizontal)),
       m_viewFirstMoveBtn(new QToolButton),
       m_viewPreviousMoveBtn(new QToolButton),
-      m_viewNextMoveBtn(new QToolButton), m_viewLastMoveBtn(new QToolButton),
+      m_viewNextMoveBtn(new QToolButton),
+      m_viewLastMoveBtn(new QToolButton),
       m_moveIndex(0) {
 #ifdef Q_OS_MAC
   setStyleSheet("QToolButton:!hover { border: none; }");
@@ -85,7 +90,7 @@ GameViewer::GameViewer(Qt::Orientation orientation, QWidget *parent,
   connect(m_moveNumberSlider, SIGNAL(valueChanged(int)), this,
           SLOT(viewPositionClicked(int)));
 
-  QHBoxLayout *controls = new QHBoxLayout();
+  QHBoxLayout* controls = new QHBoxLayout();
   controls->setContentsMargins(0, 0, 0, 0);
   controls->setSpacing(0);
   controls->addWidget(m_viewFirstMoveBtn);
@@ -93,11 +98,11 @@ GameViewer::GameViewer(Qt::Orientation orientation, QWidget *parent,
   controls->addWidget(m_viewNextMoveBtn);
   controls->addWidget(m_viewLastMoveBtn);
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  QVBoxLayout* layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
 
   if (addChessClock) {
-    QHBoxLayout *clockLayout = new QHBoxLayout();
+    QHBoxLayout* clockLayout = new QHBoxLayout();
     for (int i = 0; i < 2; i++) {
       m_chessClock[i] = new ChessClock();
       clockLayout->addWidget(m_chessClock[i]);
@@ -125,11 +130,11 @@ GameViewer::GameViewer(Qt::Orientation orientation, QWidget *parent,
   setLayout(layout);
 }
 
-ChessClock *GameViewer::chessClock(Chess::Side side) {
+ChessClock* GameViewer::chessClock(Chess::Side side) {
   return m_chessClock[side];
 }
 
-void GameViewer::viewPreviousMove2(Chess::Board *orgBoard) {
+void GameViewer::viewPreviousMove2(Chess::Board* orgBoard) {
   // orgBoard->initialize();
   m_boardScene->setBoard(orgBoard->copy());
   m_boardScene->populate();
@@ -146,7 +151,7 @@ void GameViewer::viewPreviousMove2(Chess::Board *orgBoard) {
 //	m_boardScene->populate();
 // }
 
-void GameViewer::setGame(ChessGame *game) {
+void GameViewer::setGame(ChessGame* game) {
   Q_ASSERT(game != nullptr);
 
   setGame(game->pgn());
@@ -160,19 +165,19 @@ void GameViewer::setGame(ChessGame *game) {
           SLOT(setEnabled(bool)));
 
   for (int i = 0; i < 2; i++) {
-    ChessPlayer *player(m_game->player(Chess::Side::Type(i)));
+    ChessPlayer* player(m_game->player(Chess::Side::Type(i)));
     if (player->isHuman())
       connect(m_boardScene, SIGNAL(humanMove(Chess::GenericMove, Chess::Side)),
               player, SLOT(onHumanMove(Chess::GenericMove, Chess::Side)));
   }
 
-  connect(m_game, SIGNAL(finished(ChessGame *, Chess::Result)), m_boardScene,
-          SLOT(onGameFinished(ChessGame *, Chess::Result)));
+  connect(m_game, SIGNAL(finished(ChessGame*, Chess::Result)), m_boardScene,
+          SLOT(onGameFinished(ChessGame*, Chess::Result)));
   m_boardView->setEnabled(!m_game->isFinished() &&
                           m_game->playerToMove()->isHuman());
 }
 
-void GameViewer::setGame(const PgnGame *pgn) {
+void GameViewer::setGame(const PgnGame* pgn) {
   Q_ASSERT(pgn != nullptr);
 
   disconnectGame();
@@ -189,8 +194,7 @@ void GameViewer::setGame(const PgnGame *pgn) {
   m_moveIndex = 0;
 
   m_moves.clear();
-  for (const PgnGame::MoveData &md : pgn->moves())
-    m_moves.append(md.move);
+  for (const PgnGame::MoveData& md : pgn->moves()) m_moves.append(md.move);
 
   m_viewFirstMoveBtn->setEnabled(false);
   m_viewPreviousMoveBtn->setEnabled(false);
@@ -206,25 +210,23 @@ void GameViewer::setGame(const PgnGame *pgn) {
 
 void GameViewer::disconnectGame() {
   m_boardView->setEnabled(false);
-  if (m_game.isNull())
-    return;
+  if (m_game.isNull()) return;
 
   disconnect(m_game, nullptr, m_boardScene, nullptr);
   disconnect(m_game, nullptr, m_boardView, nullptr);
   disconnect(m_game, nullptr, this, nullptr);
 
   for (int i = 0; i < 2; i++) {
-    ChessPlayer *player(m_game->player(Chess::Side::Type(i)));
-    if (player != nullptr)
-      disconnect(m_boardScene, nullptr, player, nullptr);
+    ChessPlayer* player(m_game->player(Chess::Side::Type(i)));
+    if (player != nullptr) disconnect(m_boardScene, nullptr, player, nullptr);
   }
 
   m_game = nullptr;
 }
 
-Chess::Board *GameViewer::board() const { return m_boardScene->board(); }
+Chess::Board* GameViewer::board() const { return m_boardScene->board(); }
 
-BoardScene *GameViewer::boardScene() const { return m_boardScene; }
+BoardScene* GameViewer::boardScene() const { return m_boardScene; }
 
 void GameViewer::viewFirstMoveClicked() {
   viewFirstMove();
@@ -232,8 +234,7 @@ void GameViewer::viewFirstMoveClicked() {
 }
 
 void GameViewer::viewFirstMove() {
-  while (m_moveIndex > 0)
-    viewPreviousMove();
+  while (m_moveIndex > 0) viewPreviousMove();
 }
 
 void GameViewer::viewPreviousMoveClicked() {
@@ -287,8 +288,7 @@ void GameViewer::viewLastMoveClicked() {
 }
 
 void GameViewer::viewLastMove() {
-  while (m_moveIndex < m_moves.count())
-    viewNextMove();
+  while (m_moveIndex < m_moves.count()) viewNextMove();
 }
 
 void GameViewer::viewPositionClicked(int index) {
@@ -297,13 +297,10 @@ void GameViewer::viewPositionClicked(int index) {
 }
 
 void GameViewer::viewPosition(int index) {
-  if (m_moves.isEmpty())
-    return;
+  if (m_moves.isEmpty()) return;
 
-  while (index < m_moveIndex)
-    viewPreviousMove();
-  while (index > m_moveIndex)
-    viewNextMove();
+  while (index < m_moveIndex) viewPreviousMove();
+  while (index > m_moveIndex) viewNextMove();
 }
 
 void GameViewer::viewMove(int index, bool keyLeft) {
@@ -315,16 +312,14 @@ void GameViewer::viewMove(int index, bool keyLeft) {
   else if (index < m_moveIndex) {
     // We backtrack one move too far and then make one
     // move forward to highlight the correct move
-    while (index < m_moveIndex)
-      viewPreviousMove();
+    while (index < m_moveIndex) viewPreviousMove();
     viewNextMove();
   } else {
-    while (index + 1 > m_moveIndex)
-      viewNextMove();
+    while (index + 1 > m_moveIndex) viewNextMove();
   }
 }
 
-void GameViewer::onFenChanged(const QString &fen) {
+void GameViewer::onFenChanged(const QString& fen) {
   m_moves.clear();
   m_moveIndex = 0;
 
@@ -338,12 +333,11 @@ void GameViewer::onFenChanged(const QString &fen) {
   m_boardScene->setFenString(fen);
 }
 
-void GameViewer::onMoveMade(const Chess::GenericMove &move) {
+void GameViewer::onMoveMade(const Chess::GenericMove& move) {
   m_moves.append(move);
 
   m_moveNumberSlider->setEnabled(true);
   m_moveNumberSlider->setMaximum(m_moves.count());
 
-  if (m_moveIndex == m_moves.count() - 1)
-    viewNextMove();
+  if (m_moveIndex == m_moves.count() - 1) viewNextMove();
 }

@@ -31,7 +31,7 @@
  * \sa EngineMatch
  */
 class MatchParser {
-public:
+ public:
   /*! A parsed command line option. */
   struct Option {
     /*!
@@ -45,14 +45,14 @@ public:
      * If this option's arguments don't match the ones in
      * \a validArgs exactly, an empty map is returned.
      */
-    QMap<QString, QString> toMap(const QString &validArgs) const;
+    QMap<QString, QString> toMap(const QString& validArgs) const;
 
-    QString name;   //!< The name of the option
-    QVariant value; //!< The value of the option
+    QString name;    //!< The name of the option
+    QVariant value;  //!< The value of the option
   };
 
   /*! Constructs a new parser for parsing \a args. */
-  MatchParser(const QStringList &args);
+  MatchParser(const QStringList& args);
 
   /*!
    * Adds a new command line option.
@@ -67,7 +67,7 @@ public:
    * \param duplicates If true, there can be multiple
    *                   instances of this option.
    */
-  void addOption(const QString &name, QVariant::Type type, int minArgs = 0,
+  void addOption(const QString& name, QVariant::Type type, int minArgs = 0,
                  int maxArgs = -1, bool duplicates = false);
   /*!
    * Returns the value of the option with the name \a name
@@ -76,7 +76,7 @@ public:
    * If \a name doesn't match any parsed option,
    * a null QVariant is returned.
    */
-  QVariant takeOption(const QString &name);
+  QVariant takeOption(const QString& name);
   /*! Returns the options parsed by \a parse(). */
   QList<Option> options() const;
   /*!
@@ -85,7 +85,7 @@ public:
    */
   bool parse();
 
-private:
+ private:
   struct PrivateOption {
     QVariant::Type type;
     int priority;
@@ -94,7 +94,7 @@ private:
     bool duplicates;
   };
 
-  bool contains(const QString &optionName) const;
+  bool contains(const QString& optionName) const;
 
   QStringList m_args;
   QMultiMap<int, Option> m_options;
@@ -102,4 +102,4 @@ private:
   int m_priority;
 };
 
-#endif // MATCHPARSER_H
+#endif  // MATCHPARSER_H

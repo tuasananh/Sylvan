@@ -36,27 +36,27 @@ class PgnGame;
 class EvalHistory : public QWidget {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new EvalHistory widget. */
-  explicit EvalHistory(QWidget *parent = nullptr);
+  explicit EvalHistory(QWidget* parent = nullptr);
   /*!
    * Connects the widget to \a game and disconnects
    * from the previous game (if any).
    */
-  void setGame(ChessGame *game);
+  void setGame(ChessGame* game);
   /*! Sets evaluation history from PGN game (pointer) \a pgn */
-  void setPgnGame(PgnGame *pgn);
+  void setPgnGame(PgnGame* pgn);
 
-private slots:
+ private slots:
   void onScore(int ply, int score);
 
-private:
+ private:
   void addData(int ply, int score);
   void replot(int maxPly);
-  void setScores(const QMap<int, int> &scores);
+  void setScores(const QMap<int, int>& scores);
 
-  QCustomPlot *m_plot;
+  QCustomPlot* m_plot;
   QPointer<ChessGame> m_game;
 };
 
-#endif // EVALHISTORY_H
+#endif  // EVALHISTORY_H

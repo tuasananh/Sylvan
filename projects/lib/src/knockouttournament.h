@@ -31,32 +31,32 @@
 class LIB_EXPORT KnockoutTournament : public Tournament {
   Q_OBJECT
 
-public:
+ public:
   /*! Creates a new Knockout tournament. */
-  explicit KnockoutTournament(GameManager *gameManager,
-                              QObject *parent = nullptr);
+  explicit KnockoutTournament(GameManager* gameManager,
+                              QObject* parent = nullptr);
 
   // Inherited from Tournament
   virtual QString type() const;
   virtual bool canSetRoundMultiplier() const;
   virtual QString results() const;
 
-protected:
+ protected:
   // Inherited from Tournament
   virtual void initializePairing();
   virtual int gamesPerCycle() const;
-  virtual TournamentPair *nextPair(int gameNumber);
+  virtual TournamentPair* nextPair(int gameNumber);
   virtual void addScore(int player, int score);
   virtual bool areAllGamesFinished() const;
 
-private:
+ private:
   static int playerSeed(int rank, int bracketSize);
 
   QList<int> firstRoundPlayers() const;
   QList<int> lastRoundWinners() const;
-  bool needMoreGames(const TournamentPair *pair) const;
+  bool needMoreGames(const TournamentPair* pair) const;
 
-  QList<QList<TournamentPair *>> m_rounds;
+  QList<QList<TournamentPair*>> m_rounds;
 };
 
-#endif // KNOCKOUTTOURNAMENT_H
+#endif  // KNOCKOUTTOURNAMENT_H

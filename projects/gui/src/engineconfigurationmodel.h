@@ -45,12 +45,12 @@ class EngineManager;
 class EngineConfigurationModel : public QAbstractListModel {
   Q_OBJECT
 
-public:
+ public:
   /*!
    * Creates an empty model.
    */
-  EngineConfigurationModel(EngineManager *engineManager,
-                           QObject *parent = nullptr);
+  EngineConfigurationModel(EngineManager* engineManager,
+                           QObject* parent = nullptr);
   /*! Destroys the model. */
   virtual ~EngineConfigurationModel();
 
@@ -62,24 +62,24 @@ public:
    */
   QString chessVariant() const;
   /*! Sets the chosen chess variant to \a variant. */
-  void setChessVariant(const QString &variant);
+  void setChessVariant(const QString& variant);
 
   // Inherited from QAbstractListModel
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual QVariant data(const QModelIndex &index, int role) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex& index, int role) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;
 
-private slots:
+ private slots:
   void onEngineAdded(int index);
   void onEngineAboutToBeRemoved(int index);
   void onEngineUpdated(int index);
   void onEnginesReset();
 
-private:
-  EngineManager *m_engineManager;
+ private:
+  EngineManager* m_engineManager;
   QString m_chessVariant;
 };
 
-#endif // ENGINE_CONFIGURATION_MODEL_H
+#endif  // ENGINE_CONFIGURATION_MODEL_H

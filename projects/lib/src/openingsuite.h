@@ -20,8 +20,9 @@
 #ifndef OPENINGSUITE_H
 #define OPENINGSUITE_H
 
-#include "pgngame.h"
 #include <QVector>
+
+#include "pgngame.h"
 
 class QString;
 class QFile;
@@ -40,23 +41,23 @@ class PgnStream;
  * \sa PgnGame
  */
 class LIB_EXPORT OpeningSuite {
-public:
+ public:
   /*! The format of the opening data. */
   enum Format {
-    EpdFormat, //!< EPD format
-    PgnFormat  //!< PGN format
+    EpdFormat,  //!< EPD format
+    PgnFormat   //!< PGN format
   };
 
   /*! The order in which openings are picked. */
   enum Order {
-    SequentialOrder, //!< Sequential order
-    RandomOrder      //!< Random order
+    SequentialOrder,  //!< Sequential order
+    RandomOrder       //!< Random order
   };
 
   /*!
    * Creates a new opening suite that starts every game at \a fen.
    */
-  OpeningSuite(const QString &fen);
+  OpeningSuite(const QString& fen);
   /*!
    * Creates a new opening suite that reads the openings
    * from \a fileName in \a format format.
@@ -70,7 +71,7 @@ public:
    * \note The created opening suite is null until
    * initialize() is called.
    */
-  OpeningSuite(const QString &fileName, Format format,
+  OpeningSuite(const QString& fileName, Format format,
                Order order = SequentialOrder, int startIndex = 0);
   /*! Destroys the opening suite. */
   ~OpeningSuite();
@@ -103,7 +104,7 @@ public:
    */
   PgnGame nextGame(int maxPlies);
 
-private:
+ private:
   struct FilePosition {
     qint64 pos;
     qint64 lineNumber;
@@ -119,10 +120,10 @@ private:
   int m_startIndex;
   QString m_fileName;
   QString m_fen;
-  QFile *m_file;
-  QTextStream *m_epdStream;
-  PgnStream *m_pgnStream;
+  QFile* m_file;
+  QTextStream* m_epdStream;
+  PgnStream* m_pgnStream;
   QVector<FilePosition> m_filePositions;
 };
 
-#endif // OPENINGSUITE_H
+#endif  // OPENINGSUITE_H

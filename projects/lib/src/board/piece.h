@@ -20,8 +20,9 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include "side.h"
 #include <QtGlobal>
+
+#include "side.h"
 
 namespace Chess {
 
@@ -39,7 +40,7 @@ namespace Chess {
  * \note A Board object is needed to convert between a Piece and a string.
  */
 class Piece {
-public:
+ public:
   /*! No piece. Used for empty squares. */
   static const int NoPiece = 0;
   /*! A wall square outside of board. */
@@ -51,13 +52,13 @@ public:
   Piece(Side side, int type);
 
   /*! Returns true if \a other is the same as this piece. */
-  bool operator==(const Piece &other) const;
+  bool operator==(const Piece& other) const;
   /*! Returns true if \a other is different from this piece. */
-  bool operator!=(const Piece &other) const;
+  bool operator!=(const Piece& other) const;
   /*! Returns true if this piece is less than \a other. */
-  bool operator<(const Piece &other) const;
+  bool operator<(const Piece& other) const;
   /*! Returns true if this piece is more than \a other. */
-  bool operator>(const Piece &other) const;
+  bool operator>(const Piece& other) const;
 
   /*! Returns true if the piece is empty (type is NoPiece). */
   bool isEmpty() const;
@@ -76,7 +77,7 @@ public:
   /*! Sets the type to \a type. */
   void setType(int type);
 
-private:
+ private:
   quint16 m_data;
 };
 
@@ -88,19 +89,19 @@ inline Piece::Piece(Side side, int type) : m_data(type | (side << 10)) {
   Q_ASSERT(type != NoPiece);
 }
 
-inline bool Piece::operator==(const Piece &other) const {
+inline bool Piece::operator==(const Piece& other) const {
   return m_data == other.m_data;
 }
 
-inline bool Piece::operator!=(const Piece &other) const {
+inline bool Piece::operator!=(const Piece& other) const {
   return m_data != other.m_data;
 }
 
-inline bool Piece::operator<(const Piece &other) const {
+inline bool Piece::operator<(const Piece& other) const {
   return m_data < other.m_data;
 }
 
-inline bool Piece::operator>(const Piece &other) const {
+inline bool Piece::operator>(const Piece& other) const {
   return m_data > other.m_data;
 }
 
@@ -118,5 +119,5 @@ inline void Piece::setSide(Side side) { m_data = type() | (side << 10); }
 
 inline void Piece::setType(int type) { m_data = type | (m_data & 0xc00); }
 
-} // namespace Chess
-#endif // PIECE_H
+}  // namespace Chess
+#endif  // PIECE_H

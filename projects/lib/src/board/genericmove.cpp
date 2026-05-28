@@ -23,17 +23,17 @@ namespace Chess {
 
 GenericMove::GenericMove() {}
 
-GenericMove::GenericMove(const Square &sourceSquare, const Square &targetSquare)
+GenericMove::GenericMove(const Square& sourceSquare, const Square& targetSquare)
     : m_sourceSquare(sourceSquare), m_targetSquare(targetSquare) {}
 
-bool GenericMove::operator==(const GenericMove &other) const {
+bool GenericMove::operator==(const GenericMove& other) const {
   if (m_sourceSquare == other.m_sourceSquare &&
       m_targetSquare == other.m_targetSquare)
     return true;
   return false;
 }
 
-bool GenericMove::operator!=(const GenericMove &other) const {
+bool GenericMove::operator!=(const GenericMove& other) const {
   if (m_sourceSquare != other.m_sourceSquare ||
       m_targetSquare != other.m_targetSquare)
     return true;
@@ -49,12 +49,12 @@ Square GenericMove::sourceSquare() const { return m_sourceSquare; }
 
 Square GenericMove::targetSquare() const { return m_targetSquare; }
 
-void GenericMove::setSourceSquare(const Square &square) {
+void GenericMove::setSourceSquare(const Square& square) {
   m_sourceSquare = square;
 }
 
-void GenericMove::setTargetSquare(const Square &square) {
+void GenericMove::setTargetSquare(const Square& square) {
   m_targetSquare = square;
 }
 
-} // namespace Chess
+}  // namespace Chess

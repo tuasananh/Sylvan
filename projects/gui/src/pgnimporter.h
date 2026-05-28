@@ -32,38 +32,38 @@ class PgnDatabase;
 class PgnImporter : public Worker {
   Q_OBJECT
 
-public:
+ public:
   /*! Import error. */
   enum Error {
-    FileDoesNotExist, //!< The PGN file was not found
-    IoError           //!< A generic I/O error
+    FileDoesNotExist,  //!< The PGN file was not found
+    IoError            //!< A generic I/O error
   };
 
   /*!
    * Constructs a PgnImporter with \a fileName as
    * database to be imported.
    */
-  PgnImporter(const QString &fileName);
+  PgnImporter(const QString& fileName);
   /*! Returns the file name of the database to be imported. */
   QString fileName() const;
 
-protected:
+ protected:
   void work() override;
 
-signals:
+ signals:
   /*! Emitted when \a database is read. */
-  void databaseRead(PgnDatabase *database);
+  void databaseRead(PgnDatabase* database);
   /*!
    * Emitted periodically to give progress information about the import.
    *
    * The import was initiated at \a started and so far \a numReadGames games
    * and \a numReadBytes bytes have been read.
    */
-  void databaseReadStatus(const QTime &started, int numReadGames,
+  void databaseReadStatus(const QTime& started, int numReadGames,
                           qint64 numReadBytes);
 
-private:
+ private:
   QString m_fileName;
 };
 
-#endif // PGN_IMPORTER_H
+#endif  // PGN_IMPORTER_H

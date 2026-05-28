@@ -45,7 +45,7 @@ class PgnStream;
  * the book for Zobrist keys that match the current board position.
  */
 class LIB_EXPORT OpeningBook {
-public:
+ public:
   /*! AccessMode defines how a book is accessed during play. */
   enum BookMoveMode { BookRandom, BookBest };
 
@@ -88,7 +88,7 @@ public:
    *
    * Returns the number of moves imported.
    */
-  int import(const PgnGame &pgn, int maxMoves);
+  int import(const PgnGame& pgn, int maxMoves);
   /*!
    * Imports PGN games from a stream.
    *
@@ -98,7 +98,7 @@ public:
    *
    * Returns the number of moves imported.
    */
-  int import(PgnStream &in, int maxMoves);
+  int import(PgnStream& in, int maxMoves);
 
   /*!
    * Returns a move that can be played in a position where the
@@ -126,20 +126,20 @@ public:
    * Reads a book from \a filename.
    * Returns true if successful; otherwise returns false.
    */
-  bool read(const QString &filename);
+  bool read(const QString& filename);
 
   /*!
    * Writes the book to \a filename.
    * Returns true if successful; otherwise returns false.
    */
-  bool write(const QString &filename) const;
+  bool write(const QString& filename) const;
 
   // QString getRandomString(int length);
 
-protected:
-  friend LIB_EXPORT QDataStream &operator>>(QDataStream &in, OpeningBook *book);
-  friend LIB_EXPORT QDataStream &operator<<(QDataStream &out,
-                                            const OpeningBook *book);
+ protected:
+  friend LIB_EXPORT QDataStream& operator>>(QDataStream& in, OpeningBook* book);
+  friend LIB_EXPORT QDataStream& operator<<(QDataStream& out,
+                                            const OpeningBook* book);
 
   /*! The type of binary tree. */
   typedef QMultiMap<quint64, Entry> Map;
@@ -148,7 +148,7 @@ protected:
   virtual int entrySize() const = 0;
 
   /*! Adds a new entry to the book. */
-  void addEntry(const Entry &entry, quint64 key);
+  void addEntry(const Entry& entry, quint64 key);
 
   /*!
    * Reads a new book entry from \a in and returns it.
@@ -156,13 +156,13 @@ protected:
    * The implementation must set \a key to the hash that
    * belongs to the entry.
    */
-  virtual Entry readEntry(QDataStream &in, quint64 *key) const = 0;
+  virtual Entry readEntry(QDataStream& in, quint64* key) const = 0;
 
   /*! Writes the key and entry pointed to by \a it, to \a out. */
-  virtual void writeEntry(const Map::const_iterator &it,
-                          QDataStream &out) const = 0;
+  virtual void writeEntry(const Map::const_iterator& it,
+                          QDataStream& out) const = 0;
 
-private:
+ private:
   QList<Entry> entriesFromDisk(quint64 key) const;
 
   BookMoveMode m_mode;
@@ -181,7 +181,7 @@ private:
  * \note Multiple book files can be appended to the same
  * OpeningBook object.
  */
-extern LIB_EXPORT QDataStream &operator>>(QDataStream &in, OpeningBook *book);
+extern LIB_EXPORT QDataStream& operator>>(QDataStream& in, OpeningBook* book);
 
 /*!
  * Writes a book to a data stream.
@@ -190,7 +190,7 @@ extern LIB_EXPORT QDataStream &operator>>(QDataStream &in, OpeningBook *book);
  * data stream, because the books are likely to have duplicate
  * entries.
  */
-extern LIB_EXPORT QDataStream &operator<<(QDataStream &out,
-                                          const OpeningBook *book);
+extern LIB_EXPORT QDataStream& operator<<(QDataStream& out,
+                                          const OpeningBook* book);
 
-#endif // OPENING_BOOK_H
+#endif  // OPENING_BOOK_H

@@ -1,11 +1,12 @@
+#include <pipereader_win.h>
+
 #include <QSignalSpy>
 #include <QtTest/QtTest>
-#include <pipereader_win.h>
 
 class tst_Pipereader : public QObject {
   Q_OBJECT
 
-private slots:
+ private slots:
   void initTestCase();
 
   void initialized();
@@ -14,12 +15,12 @@ private slots:
 
   void cleanupTestCase();
 
-private:
-  qint64 write(const char *data);
+ private:
+  qint64 write(const char* data);
 
   HANDLE m_read;
   HANDLE m_write;
-  PipeReader *m_reader;
+  PipeReader* m_reader;
 };
 
 void tst_Pipereader::initTestCase() {
@@ -41,16 +42,14 @@ void tst_Pipereader::cleanupTestCase() {
   QSignalSpy spy(m_reader, SIGNAL(finished()));
   CloseHandle(m_write);
 
-  while (!spy.count())
-    QTest::qWait(50);
+  while (!spy.count()) QTest::qWait(50);
   CloseHandle(m_read);
 }
 
-qint64 tst_Pipereader::write(const char *data) {
+qint64 tst_Pipereader::write(const char* data) {
   DWORD maxSize = qstrlen(data);
   DWORD dwWritten = 0;
-  if (!WriteFile(m_write, data, maxSize, &dwWritten, 0))
-    return -1;
+  if (!WriteFile(m_write, data, maxSize, &dwWritten, 0)) return -1;
   return qint64(dwWritten);
 }
 
@@ -82,13 +81,12 @@ void tst_Pipereader::readText() {
   QSignalSpy spy(m_reader, SIGNAL(readyRead()));
   qint64 bytesWritten = write(bytes.constData());
 
-  while (!spy.count())
-    QTest::qWait(50);
+  while (!spy.count()) QTest::qWait(50);
   QVERIFY(m_reader->canReadLine());
   QVERIFY(m_reader->bytesAvailable() >= bytesWritten);
   qint64 readBytes = m_reader->readData(data, ms);
 
-  data[readBytes] = 0; // null termination needed for comparison
+  data[readBytes] = 0;  // null termination needed for comparison
   if (expect.isEmpty()) {
     bytes.truncate(ms);
     QVERIFY(data == bytes);

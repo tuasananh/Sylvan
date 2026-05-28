@@ -24,124 +24,119 @@
 */
 
 #include "jsonserializer.h"
+
 #include <QTextStream>
 
 namespace {
 
-QString jsonString(const QString &source) {
+QString jsonString(const QString& source) {
   QString str;
-  for (const QChar &c : source) {
+  for (const QChar& c : source) {
     switch (c.toLatin1()) {
-    case '\"':
-      str += "\\\"";
-      break;
-    case '\\':
-      str += "\\\\";
-      break;
-    case '\b':
-      str += "\\b";
-      break;
-    case '\f':
-      str += "\\f";
-      break;
-    case '\n':
-      str += "\\n";
-      break;
-    case '\r':
-      str += "\\r";
-      break;
-    case '\t':
-      str += "\\t";
-      break;
-    default:
-      if (c.unicode() >= 128) {
-        QString u(QString::number(c.unicode(), 16));
-        str += "\\u" + u.rightJustified(4, '0');
-      } else
-        str += c;
-      break;
+      case '\"':
+        str += "\\\"";
+        break;
+      case '\\':
+        str += "\\\\";
+        break;
+      case '\b':
+        str += "\\b";
+        break;
+      case '\f':
+        str += "\\f";
+        break;
+      case '\n':
+        str += "\\n";
+        break;
+      case '\r':
+        str += "\\r";
+        break;
+      case '\t':
+        str += "\\t";
+        break;
+      default:
+        if (c.unicode() >= 128) {
+          QString u(QString::number(c.unicode(), 16));
+          str += "\\u" + u.rightJustified(4, '0');
+        } else
+          str += c;
+        break;
     }
   }
 
   return str;
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
-JsonSerializer::JsonSerializer(const QVariant &data)
+JsonSerializer::JsonSerializer(const QVariant& data)
     : m_error(false), m_data(data) {}
 
 bool JsonSerializer::hasError() const { return m_error; }
 
 QString JsonSerializer::errorString() const { return m_errorString; }
 
-void JsonSerializer::setError(const QString &message) {
-  if (m_error)
-    return;
+void JsonSerializer::setError(const QString& message) {
+  if (m_error) return;
   m_error = true;
   m_errorString = message;
 }
 
-bool JsonSerializer::serializeNode(QTextStream &stream, const QVariant &node,
+bool JsonSerializer::serializeNode(QTextStream& stream, const QVariant& node,
                                    int indentLevel) {
   const QString indent(indentLevel, '\t');
 
   switch (node.type()) {
-  case QVariant::Invalid:
-    stream << "null";
-    break;
-  case QVariant::Map: {
-    stream << "{\n";
+    case QVariant::Invalid:
+      stream << "null";
+      break;
+    case QVariant::Map: {
+      stream << "{\n";
 
-    const QVariantMap map(node.toMap());
-    QVariantMap::const_iterator it;
-    for (it = map.constBegin(); it != map.constEnd(); ++it) {
-      stream << indent << "\t\"" << jsonString(it.key()) << "\" : ";
-      if (!serializeNode(stream, it.value(), indentLevel + 1))
+      const QVariantMap map(node.toMap());
+      QVariantMap::const_iterator it;
+      for (it = map.constBegin(); it != map.constEnd(); ++it) {
+        stream << indent << "\t\"" << jsonString(it.key()) << "\" : ";
+        if (!serializeNode(stream, it.value(), indentLevel + 1)) return false;
+        if (it != map.constEnd() - 1) stream << ',';
+        stream << '\n';
+      }
+
+      stream << indent << '}';
+    } break;
+    case QVariant::List:
+    case QVariant::StringList: {
+      stream << "[\n";
+
+      const QVariantList list(node.toList());
+      for (int i = 0; i < list.size(); i++) {
+        stream << indent << '\t';
+        if (!serializeNode(stream, list.at(i), indentLevel + 1)) return false;
+        if (i != list.size() - 1) stream << ',';
+        stream << '\n';
+      }
+
+      stream << indent << ']';
+    } break;
+    case QVariant::String:
+    case QVariant::ByteArray:
+      stream << '\"' << jsonString(node.toString()) << '\"';
+      break;
+    default:
+      if (node.canConvert(QVariant::String))
+        stream << node.toString();
+      else {
+        setError(tr("Invalid variant type: %1").arg(node.typeName()));
         return false;
-      if (it != map.constEnd() - 1)
-        stream << ',';
-      stream << '\n';
-    }
-
-    stream << indent << '}';
-  } break;
-  case QVariant::List:
-  case QVariant::StringList: {
-    stream << "[\n";
-
-    const QVariantList list(node.toList());
-    for (int i = 0; i < list.size(); i++) {
-      stream << indent << '\t';
-      if (!serializeNode(stream, list.at(i), indentLevel + 1))
-        return false;
-      if (i != list.size() - 1)
-        stream << ',';
-      stream << '\n';
-    }
-
-    stream << indent << ']';
-  } break;
-  case QVariant::String:
-  case QVariant::ByteArray:
-    stream << '\"' << jsonString(node.toString()) << '\"';
-    break;
-  default:
-    if (node.canConvert(QVariant::String))
-      stream << node.toString();
-    else {
-      setError(tr("Invalid variant type: %1").arg(node.typeName()));
-      return false;
-    }
-    break;
+      }
+      break;
   }
 
   return true;
 }
 
-bool JsonSerializer::serialize(QTextStream &stream) {
+bool JsonSerializer::serialize(QTextStream& stream) {
   bool ok = serializeNode(stream, m_data, 0);
-  if (ok)
-    stream << '\n';
+  if (ok) stream << '\n';
   return ok;
 }

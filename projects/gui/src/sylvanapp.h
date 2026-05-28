@@ -37,23 +37,23 @@ class GameWall;
 class SylvanApplication : public QApplication {
   Q_OBJECT
 
-public:
-  SylvanApplication(int &argc, char *argv[]);
+ public:
+  SylvanApplication(int& argc, char* argv[]);
   virtual ~SylvanApplication();
 
   QString configPath();
-  EngineManager *engineManager();
-  GameManager *gameManager();
-  GameDatabaseManager *gameDatabaseManager();
-  QList<MainWindow *> gameWindows();
+  EngineManager* engineManager();
+  GameManager* gameManager();
+  GameDatabaseManager* gameDatabaseManager();
+  QList<MainWindow*> gameWindows();
   void showGameWindow(int index);
-  TournamentResultsDialog *tournamentResultsDialog();
+  TournamentResultsDialog* tournamentResultsDialog();
 
-  static SylvanApplication *instance();
+  static SylvanApplication* instance();
   static QString userName();
 
-public slots:
-  MainWindow *newGameWindow(ChessGame *game);
+ public slots:
+  MainWindow* newGameWindow(ChessGame* game);
   void newDefaultGame();
   void showSettingsDialog();
   void showTournamentResultsDialog();
@@ -62,22 +62,22 @@ public slots:
   void closeDialogs();
   void onQuitAction();
 
-private:
-  void showDialog(QWidget *dlg);
+ private:
+  void showDialog(QWidget* dlg);
 
-  SettingsDialog *m_settingsDialog;
-  TournamentResultsDialog *m_tournamentResultsDialog;
-  EngineManager *m_engineManager;
-  GameManager *m_gameManager;
-  GameDatabaseManager *m_gameDatabaseManager;
+  SettingsDialog* m_settingsDialog;
+  TournamentResultsDialog* m_tournamentResultsDialog;
+  EngineManager* m_engineManager;
+  GameManager* m_gameManager;
+  GameDatabaseManager* m_gameDatabaseManager;
   QList<QPointer<MainWindow>> m_gameWindows;
-  GameDatabaseDialog *m_gameDatabaseDialog;
+  GameDatabaseDialog* m_gameDatabaseDialog;
   QPointer<GameWall> m_gameWall;
   bool m_initialWindowCreated;
 
-private slots:
+ private slots:
   void onLastWindowClosed();
   void onAboutToQuit();
 };
 
-#endif // SYLVAN_APPLICATION_H
+#endif  // SYLVAN_APPLICATION_H

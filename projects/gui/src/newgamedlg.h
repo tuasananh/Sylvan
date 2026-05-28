@@ -20,10 +20,10 @@
 #ifndef NEWGAMEDIALOG_H
 #define NEWGAMEDIALOG_H
 
-#include <QDialog>
-
 #include <board/side.h>
 #include <engineconfiguration.h>
+
+#include <QDialog>
 
 class ChessGame;
 class PlayerBuilder;
@@ -41,7 +41,7 @@ class NewGameDialog;
 class NewGameDialog : public QDialog {
   Q_OBJECT
 
-public:
+ public:
   /*! Player's type. */
   enum PlayerType {
     /*! Human player. */
@@ -54,29 +54,29 @@ public:
    * Creates a "New Game" dialog with \a engineManager as the
    * source of engine configurations.
    */
-  NewGameDialog(EngineManager *engineManager, QWidget *parent = nullptr);
+  NewGameDialog(EngineManager* engineManager, QWidget* parent = nullptr);
   /*! Destroys the dialog. */
   virtual ~NewGameDialog();
 
   /*! Creates and returns the ChessGame object. */
-  ChessGame *createGame() const;
+  ChessGame* createGame() const;
   /*! Creates and returns the PlayerBuilder for \a side. */
-  PlayerBuilder *createPlayerBuilder(Chess::Side side) const;
+  PlayerBuilder* createPlayerBuilder(Chess::Side side) const;
 
-private slots:
+ private slots:
   void configureEngine();
-  void onVariantChanged(const QString &variant);
+  void onVariantChanged(const QString& variant);
   void onEngineChanged(int index, Chess::Side = Chess::Side::NoSide);
 
-private:
+ private:
   void setPlayerType(Chess::Side side, PlayerType type);
   PlayerType playerType(Chess::Side side) const;
 
-  EngineManager *m_engineManager;
-  EngineConfigurationModel *m_engines;
-  EngineConfigurationProxyModel *m_proxyModel;
+  EngineManager* m_engineManager;
+  EngineConfigurationModel* m_engines;
+  EngineConfigurationProxyModel* m_proxyModel;
   EngineConfiguration m_engineConfig[2];
-  Ui::NewGameDialog *ui;
+  Ui::NewGameDialog* ui;
 };
 
-#endif // NEWGAMEDIALOG_H
+#endif  // NEWGAMEDIALOG_H
