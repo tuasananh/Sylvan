@@ -59,6 +59,11 @@ SettingsDialog::SettingsDialog(QWidget* parent)
             QSettings().setValue("games/human_can_play_after_timeout", checked);
           });
 
+  connect(ui->m_printUciPvCheck, &QCheckBox::toggled, this,
+          [=](bool checked) {
+            QSettings().setValue("ui/pv_uci_notation", checked);
+          });
+
   connect(ui->m_concurrencySpin,
           static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
           [=](int value) {
@@ -172,6 +177,8 @@ void SettingsDialog::readSettings() {
       s.value("use_full_user_name", true).toBool());
   ui->m_playersSidesOnClocksCheck->setChecked(
       s.value("display_players_sides_on_clocks", false).toBool());
+  ui->m_printUciPvCheck->setChecked(
+      s.value("pv_uci_notation", false).toBool());
   ui->m_tbPathEdit->setText(s.value("tb_path").toString());
   s.endGroup();
 

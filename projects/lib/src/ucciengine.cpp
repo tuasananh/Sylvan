@@ -17,6 +17,7 @@
 
 #include "ucciengine.h"
 
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 
@@ -118,7 +119,8 @@ void UcciEngine::startGame() {
   m_ponderHits = 0;
   m_bmBuffer.clear();
   m_moveStrings.clear();
-  m_useDirectPv = directPvList.contains(board()->variant());
+  m_useDirectPv = directPvList.contains(board()->variant()) ||
+                  QSettings().value("ui/pv_uci_notation", false).toBool();
   m_startFen = board()->fenString(Chess::Board::XFen);
   setVariant(board()->variant());
 

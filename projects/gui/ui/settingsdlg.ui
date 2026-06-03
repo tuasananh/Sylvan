@@ -79,6 +79,13 @@
            </property>
           </widget>
          </item>
+         <item row="7" column="0">
+          <widget class="QCheckBox" name="m_printUciPvCheck">
+           <property name="text">
+            <string>Print engine PV as UCI notation</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
