@@ -558,8 +558,8 @@ void WesternBoard::generateMovesForPiece(QVarLengthArray<Move>& moves,
             if (capture.isWall()) break;
             if (capture.side() != side) {
               moves.append(Move(sourceSquare, targetSquare));
-              break;
             }
+            break;
           }
         }
       }
