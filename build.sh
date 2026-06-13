@@ -1,5 +1,5 @@
 qmake
-make
+make -j"$(nproc)"
 mkdir -p target/release
 cp ./projects/cli/sylvan-cli ./target/release/
 cp ./projects/gui/sylvan ./target/release/
