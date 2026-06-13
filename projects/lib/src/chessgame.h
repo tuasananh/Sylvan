@@ -24,6 +24,7 @@
 #include <QStringList>
 #include <QVector>
 
+#include "board/board.h"
 #include "board/move.h"
 #include "board/result.h"
 #include "gameadjudicator.h"
@@ -60,6 +61,9 @@ class LIB_EXPORT ChessGame : public QObject {
   const QVector<Chess::Move>& moves() const;
   const QMap<int, int>& scores() const;
   Chess::Result result() const;
+
+  Chess::Board::MoveNotation pgnNotation() const;
+  void setPgnNotation(Chess::Board::MoveNotation notation);
 
   void setError(const QString& message);
   void setPlayer(Chess::Side side, ChessPlayer* player);
@@ -139,6 +143,7 @@ class LIB_EXPORT ChessGame : public QObject {
   Chess::Result m_result;
   QVector<Chess::Move> m_moves;
   QMap<int, int> m_scores;
+  Chess::Board::MoveNotation m_pgnNotation;
   PgnGame* m_pgn;
   QSemaphore m_pauseSem;
   QSemaphore m_resumeSem;

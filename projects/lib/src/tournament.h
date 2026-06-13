@@ -25,6 +25,7 @@
 #include <QTextStream>
 #include <QVector>
 
+#include "board/board.h"
 #include "board/move.h"
 #include "gameadjudicator.h"
 #include "pgngame.h"
@@ -185,6 +186,8 @@ class LIB_EXPORT Tournament : public QObject {
    */
   void setPgnOutput(const QString& fileName,
                     PgnGame::PgnMode mode = PgnGame::Verbose);
+  Chess::Board::MoveNotation pgnNotation() const;
+  void setPgnNotation(Chess::Board::MoveNotation notation);
 
   /*!
    * Sets the PgnGame mode to write unfinished games to \a enabled.
@@ -465,6 +468,7 @@ class LIB_EXPORT Tournament : public QObject {
   int m_repetitionCounter;
   int m_swapSides;
   PgnGame::PgnMode m_pgnOutMode;
+  Chess::Board::MoveNotation m_pgnNotation;
   TournamentPair* m_pair;
   QMap<QPair<int, int>, TournamentPair*> m_pairs;
   QList<TournamentPlayer> m_players;

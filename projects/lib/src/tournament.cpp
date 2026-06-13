@@ -61,6 +61,7 @@ Tournament::Tournament(GameManager* gameManager, QObject* parent)
       m_repetitionCounter(0),
       m_swapSides(true),
       m_pgnOutMode(PgnGame::Verbose),
+      m_pgnNotation(Chess::Board::Standard),
       m_pair(nullptr) {
   Q_ASSERT(gameManager != nullptr);
 }
@@ -179,6 +180,14 @@ void Tournament::setPgnOutput(const QString& fileName, PgnGame::PgnMode mode) {
   m_pgnOutMode = mode;
 }
 
+Chess::Board::MoveNotation Tournament::pgnNotation() const {
+  return m_pgnNotation;
+}
+
+void Tournament::setPgnNotation(Chess::Board::MoveNotation notation) {
+  m_pgnNotation = notation;
+}
+
 void Tournament::setPgnWriteUnfinishedGames(bool enabled) {
   m_pgnWriteUnfinishedGames = enabled;
 }
@@ -251,6 +260,7 @@ void Tournament::startGame(TournamentPair* pair) {
   Chess::Board* board = Chess::BoardFactory::create(m_variant);
   Q_ASSERT(board != nullptr);
   ChessGame* game = new ChessGame(board, new PgnGame());
+  game->setPgnNotation(m_pgnNotation);
 
   connect(game, SIGNAL(started(ChessGame*)), this,
           SLOT(onGameStarted(ChessGame*)));

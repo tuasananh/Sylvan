@@ -60,6 +60,7 @@ ChessGame::ChessGame(Chess::Board* board, PgnGame* pgn, QObject* parent)
       m_pgnInitialized(false),
       m_bookOwnerGuardp(false),
       m_boardShouldBeFlipped(false),
+      m_pgnNotation(Chess::Board::Standard),
       m_pgn(pgn) {
   Q_ASSERT(pgn != nullptr);
 
@@ -92,6 +93,14 @@ bool ChessGame::boardShouldBeFlipped() const { return m_boardShouldBeFlipped; }
 
 void ChessGame::setBoardShouldBeFlipped(bool flip) {
   m_boardShouldBeFlipped = flip;
+}
+
+Chess::Board::MoveNotation ChessGame::pgnNotation() const {
+  return m_pgnNotation;
+}
+
+void ChessGame::setPgnNotation(Chess::Board::MoveNotation notation) {
+  m_pgnNotation = notation;
 }
 
 PgnGame* ChessGame::pgn() const { return m_pgn; }
@@ -175,7 +184,7 @@ void ChessGame::addPgnMove(const Chess::Move& move, const QString& comment) {
   PgnGame::MoveData md;
   md.key = m_board->key();
   md.move = m_board->genericMove(move);
-  md.moveString = m_board->moveString(move, Chess::Board::Standard);
+  md.moveString = m_board->moveString(move, m_pgnNotation);
   md.comment = comment;
 
   m_pgn->addMove(md);

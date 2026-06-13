@@ -16,6 +16,7 @@
 */
 
 #include <board/boardfactory.h>
+#include <board/board.h>
 #include <board/result.h>
 #include <enginebuilder.h>
 #include <enginefactory.h>
@@ -216,7 +217,7 @@ EngineMatch* parseMatch(const QStringList& args, QObject* parent) {
   parser.addOption("-debug", QVariant::Bool, 0, 0);
   parser.addOption("-openings", QVariant::StringList);
   parser.addOption("-bookmode", QVariant::String);
-  parser.addOption("-pgnout", QVariant::StringList, 1, 3);
+  parser.addOption("-pgnout", QVariant::StringList, 1, 4);
   parser.addOption("-epdout", QVariant::String, 1, 1);
   parser.addOption("-repeat", QVariant::Int, 0, 1);
   parser.addOption("-noswap", QVariant::Bool, 0, 0);
@@ -432,12 +433,14 @@ EngineMatch* parseMatch(const QStringList& args, QObject* parent) {
     else if (name == "-pgnout") {
       PgnGame::PgnMode mode = PgnGame::Verbose;
       QStringList list = value.toStringList();
-      if (list.size() == 2 || list.size() == 3) {
+      if (list.size() >= 2 && list.size() <= 4) {
         for (int i = 1; i < list.size(); i++) {
           if (list.at(i) == "min")
             mode = PgnGame::Minimal;
           else if (list.at(i) == "fi")
             tournament->setPgnWriteUnfinishedGames(false);
+          else if (list.at(i) == "uci")
+            tournament->setPgnNotation(Chess::Board::LongAlgebraic);
           else
             ok = false;
         }
